@@ -1,0 +1,160 @@
+@charset "utf-8";
+/* color */
+
+.fw-border-primary{
+  border:1px solid #2d8cf0 !important;
+}
+.fw-b-primary{
+  background-color: #2d8cf0 !important;
+}
+.fw-b-lightPrimary{
+  background-color: #5cadff;
+}
+.fw-b-darkPrimary{
+  background-color:#2b85e4;
+}
+.fw-b-title{
+  background-color: #1c2438;
+}
+.fw-b-content{
+  background-color: #495060;
+}
+.fw-b-SubColor{
+  background-color: #80848f;
+}
+.fw-circle{
+  border-radius: 50%;
+}
+.fw-margin-sm{
+  margin: 6px;
+}
+.fw-b-Disabled{
+  background-color: #bbbec4;
+}
+.fw-font-sm{
+font-size: 10px;
+}
+.fw-font-de{
+  font-size: 16px;
+}
+.fw-font-lg{
+  font-size: 26px;
+}
+.fw-font-bold{
+  font-weight: bold;
+}
+.fw-c-fff{
+  color: #fff;
+}
+.fw-c-primary{
+  color: #2d8cf0 !important;
+}
+.fw-c-lightPrimary{
+  color: #5cadff;
+}
+.fw-c-darkPrimary{
+  color:#2b85e4;
+}
+.fw-c-title{
+  color: #1c2438;
+}
+.fw-c-Success{
+  color:#19be6b !important;
+}
+.fw-c-content{
+  color: #495060;
+}
+.fw-c-SubColor{
+  color: #80848f;
+}
+.fw-c-sa{
+    justify-content: space-around;
+}
+.fw-c-error{
+  color:#ed3f14;
+}
+.fw-c-Disabled{
+  color: #bbbec4;
+}
+.fw-fixed-bottom{
+  position: fixed;
+  bottom: 0px;
+}
+.fw-w100{
+  width: 100%;
+}
+.fw-w45{
+  width:45%;
+}
+.fw-flex{
+  display: flex;
+}
+.fw-c-c{
+  justify-content: center;
+}
+.fw-c-l{
+  justify-content: left;
+}
+.fw-c-sb{
+  justify-content: space-between;
+}
+.fw-warp{
+  flex-wrap: wrap;
+}
+.fw-bgc{
+  background-color: #f8f8f9 !important;
+}
+.fw-hide {
+  display: none !important;
+  visibility: hidden !important;
+}
+.fw-margin-top-xs{
+  margin-top:16px; 
+}
+.fw-margin-left-mini{
+  margin-left:10px; 
+}
+.fw-margin-bottom-mini{
+  margin-bottom:10px; 
+}
+.fw-margin-right-mini{
+  margin-right:10px; 
+}
+.fw-margin-top-mini{
+  margin-top:10px; 
+}
+.fw-margin-top-zero{
+  margin-top: 0px;
+}
+.fw-block{
+  display: block;
+}
+.fw-fl{
+  float: left;
+}
+.fw-fr{
+  float: right;
+}
+.fw-fdc{
+  flex-direction: column;
+}
+.fw-hportraip-default{
+width: 80px;
+height: 80px;
+}
+.fw-hportraip-sm{
+width: 66px;
+height: 66px;
+}
+.fw-padding-default{
+  padding: 10px;
+}
+.fw-text-c{
+  text-align: center;
+}
+.fw-w80{
+  width: 80%;
+}
+.fw-w20{
+  width: 20%;
+}

@@ -1,0 +1,10 @@
+img {
+    width: 10em;
+    height: 10em;
+}
+
+#urlImg {
+    width: 10em;
+    height: 10em;
+    background: url('./../img/i/logo.png');
+}

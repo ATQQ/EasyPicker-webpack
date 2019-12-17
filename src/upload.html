@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>EasyPicker</title>
+    <meta name="description" content="EasyPicker管理端">
+    <meta name="keywords" content="EasyPicker">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+</head>
+
+<body class="bgc" style="background: linear-gradient(to bottom, rgba(128, 222, 234, 0.6313725490196078) 0% ,#ffffff 100%);">
+    <div class="fw-w100 fw-flex fw-fdc theme">
+
+        <h1 class="am-margin-sm fw-text-c">EasyPicker</h1>
+        <div id="heart" class="am-center">
+            <i class="am-icon-heartbeat"></i>
+        </div>
+        <div class="fw-flex fw-fdc fw-c-c">
+            <div class="fw-flex fw-c-c am-margin-top-sm">
+                <label>父类选择:
+                <select id="course" data-am-selected="{btnStyle: 'secondary'}">
+                    <!--<option value="a">Apple</option>-->
+                </select>
+            </label>
+            </div>
+            <div class="fw-flex fw-c-c am-margin-top-sm">
+                <label>子类选择:
+               <select id="task" data-am-selected="{btnStyle: 'secondary'}">
+                   <!--<option value="a">Apple</option>-->
+               </select>
+           </label>
+            </div>
+            <div class="am-g fw-flex fw-c-c am-margin-top-sm">
+                <div class="am-u-lg-4 am-u-md-5 am-u-sm-8">
+                    <label class="am-input-group am-input-group-primary">
+                    <span class="am-input-group-label"><i class="am-icon-smile-o am-icon-fw"></i></span>
+                    <input id="name" type="text" class="am-form-field" placeholder="你的大名">
+                </label>
+                </div>
+            </div>
+            <div class="fw-flex fw-fdc am-margin-top-sm">
+                <div class="fw-flex fw-c-c">
+                    <div id="thelist" class="uploader-list">
+                    </div>
+                </div>
+                <div class="fw-flex fw-c-c">
+                    <div id="uploader" class="wu-example">
+                        <!--用来存放文件信息-->
+                        <div class="btns">
+                            <div id="picker">选择文件</div>
+                            <button id="uploadBtn" class="am-btn am-btn-success" data-am-loading="{spinner: 'circle-o-notch', loadingText: '文件上传中...'}">确认提交</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="am-text-center am-margin-top-sm" id="attributePanel" hidden>
+                <div target="ddl">
+                    <div>截止日期: 1999-01-01 00:00:00</div>
+                    <div>还剩:5天6时8分9秒</div>
+                </div>
+                <div target="template">
+                    <div><button filename="" id="downlloadTemplate" class="am-btn-sm am-btn am-btn-warning">下载模板</button></div>
+                </div>
+            </div>
+            <div class="fw-flex fw-c-c am-margin-top-sm am-footer" style="color: #45d9ec">
+                IF（BOOL 学习= =FALSE）BOOL 落后=TRUE
+            </div>
+
+            <footer class="footer-nav am-container">
+                <ul class="am-u-lg-5 am-u-md-6 am-u-sm-12 am-center" id="bottom-links">
+                </ul>
+            </footer>
+        </div>
+    </div>
+</body>
+<!--WebUploader-->
+<script src="./js/webuploader.js"></script>
+
+</html>

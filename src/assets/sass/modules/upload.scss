@@ -1,0 +1,54 @@
+@charset "utf-8";
+.theme{
+  color: #040404;
+  margin-top: 10%;
+  h1{
+    font-size: 50px;
+  }
+}
+
+@keyframes heart{
+  0%{
+    transform: rotateY(0deg);
+  }50%{
+     transform: rotateY(180deg);
+
+   }
+  100%{
+    transform: rotateY(360deg);
+  }
+}
+//旋转小心心
+#heart{
+  width: 25px;
+  transition: 1s;
+  animation: heart 10s linear infinite;
+  //transform:rotate(7deg);
+  //position: relative;
+  i{
+    font-size: 30px;
+    color: palevioletred;
+  }
+}
+
+.scroll-area{
+  max-height: 60px;
+  overflow-y: scroll;
+}
+
+.footer-nav{
+  margin-top: 3rem;
+  display: flex;
+  justify-content: center;
+  ul{
+    display: flex;
+    justify-content: space-around;
+    li{
+      list-style: none;
+      a{
+        font-size: 1.4rem;
+        color: rgba(14, 144, 210, 0.45);
+      }
+    }
+  }
+}

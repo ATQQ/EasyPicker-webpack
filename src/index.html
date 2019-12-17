@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>EasyPicker</title>
+    <meta name="description" content="EasyPicker首页">
+    <meta name="keywords" content="EasyPicker">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+</head>
+
+<body class="bgc" style="background: linear-gradient(to bottom, rgba(128, 222, 234, 0.6313725490196078) 0% ,#ffffff 100%);">
+    <div class="fw-w100 fw-flex fw-fdc theme">
+        <div class="am-g">
+            <div class="fw-flex fw-c-c">
+                <div class="am-u-lg-3 am-u-md-5 am-center am-u-sm-12 ">
+                    <!-- 登录面板 -->
+                    <div panel="login" id="loginPanel" class="animated  homePanel am-padding-lg am-margin-top-lg">
+                        <h2 class="fw-text-c">用户登录</h2>
+                        <section class="fw-flex fw-fdc">
+                            <div class="am-input-group am-input-group-secondary am-margin-top-lg">
+                                <span class="am-input-group-label"><i class="am-icon-user am-icon-fw"></i></span>
+                                <input type="text" class="am-form-field" placeholder="请输入账号" id="login-username">
+                            </div>
+                            <div class="am-input-group am-input-group-secondary am-margin-top-lg">
+                                <span class="am-input-group-label"><i class="am-icon-lock am-icon-fw"></i></span>
+                                <input type="password" class="am-form-field" placeholder="请输入密码" id="login-password">
+                            </div>
+                            <div class="fw-flex fw-c-c am-margin-top-lg fw-warp">
+                                <div class="fw-flex fw-c-c">
+                                    <label class="am-checkbox">
+                                    <input id="rememberAccount" type="checkbox" value="" data-am-ucheck> 记住登录信息?
+                                </label>
+                                </div>
+                                <button class="am-btn am-btn-success w80" id="login">登录</button>
+                                <button targetPanel="register" class="changePanel am-margin-top-sm am-btn w80 am-btn-primary">新用户注册</button>
+                                <p align="center" class="am-margin-sm"><a targetPanel="forget" class="changePanel" href="javascript:void(0)">忘记密码?</a></p>
+
+                            </div>
+                        </section>
+                    </div>
+                    <!-- 注册面板 -->
+                    <div panel="register" id="registerPanel" class="animated  homePanel am-padding-lg am-margin-top-lg" hidden>
+                        <h2 class="fw-text-c">新用户注册</h2>
+                        <section class="fw-flex fw-fdc">
+                            <div class="am-input-group am-input-group-secondary am-margin-top-lg">
+                                <span class="am-input-group-label"><i class="am-icon-user am-icon-fw"></i></span>
+                                <input type="text" class="am-form-field" placeholder="请输入注册账号">
+                            </div>
+                            <div class="am-input-group am-input-group-secondary am-margin-top-lg">
+                                <span class="am-input-group-label"><i class="am-icon-lock am-icon-fw"></i></span>
+                                <input type="password" class="am-form-field" placeholder="请输入密码">
+                            </div>
+                            <div class="am-input-group am-input-group-secondary am-margin-top-lg">
+                                <span class="am-input-group-label"><i class="am-icon-lock am-icon-fw"></i></span>
+                                <input type="password" class="am-form-field" placeholder="请再次输入密码">
+                            </div>
+                            <div class="am-input-group am-input-group-primary am-margin-top-lg">
+                                <span class="am-input-group-label"><i class="am-icon-phone-square am-icon-fw"></i></span>
+                                <input readonly id="userMobile" type="number" class="am-form-field" placeholder="(可选)绑定手机号">
+                                <span class="am-input-group-label">
+                                <input type="checkbox" id="isBindMobile">
+                            </span>
+                            </div>
+                            <div class="am-input-group am-input-group-primary am-margin-top-lg" style="display: none;">
+                                <input type="text" placeholder="输入验证码" class="am-form-field">
+                                <span class="am-input-group-btn">
+                                <button id="getCode" class="am-btn am-btn-secondary" disabled type="button">获取验证码</button>
+                            </span>
+                            </div>
+                            <div class="fw-flex fw-c-c am-margin-top-lg fw-warp">
+                                <button class="am-btn am-btn-success w80" id="register">完成注册</button>
+                                <button targetPanel="login" class="changePanel am-margin-top-sm am-btn w80 am-btn-primary">返回登录</button>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- 忘记密码面板 -->
+                    <div panel="forget" id="forgetPanel" class="animated  homePanel am-padding-lg am-margin-top-lg" hidden>
+                        <h2 class="fw-text-c">忘记密码</h2>
+                        <section class="fw-flex fw-fdc">
+                            <div class="am-input-group am-input-group-secondary am-margin-top-lg">
+                                <span class="am-input-group-label"><i class="am-icon-phone-square am-icon-fw"></i></span>
+                                <input type="number" class="am-form-field" placeholder="请输入绑定的手机号" id="bindPhone">
+                            </div>
+                            <div class="am-input-group am-input-group-primary am-margin-top-lg">
+                                <input type="text" placeholder="输入验证码" class="am-form-field">
+                                <span class="am-input-group-btn">
+                                <button id="getForgetCode" class="am-btn am-btn-secondary" disabled type="button">获取验证码</button>
+                            </span>
+                            </div>
+                            <div class="am-input-group am-input-group-secondary am-margin-top-lg">
+                                <span class="am-input-group-label"><i class="am-icon-lock am-icon-fw"></i></span>
+                                <input type="password" class="am-form-field" placeholder="请输入新密码">
+                            </div>
+                            <div class="fw-flex fw-c-c am-margin-top-lg fw-warp">
+                                <button class="am-btn am-btn-success w80" id="sureReset">确认重置</button>
+                                <button targetPanel="login" class="changePanel am-margin-top-sm am-btn w80 am-btn-primary">返回登录</button>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fw-flex fw-c-c">
+                <!-- 简介面板 -->
+                <div class="am-u-lg-8 am-u-md-6 fw-fl am-u-sm-12 fw-text-c am-margin-top-sm">
+                    <h1 class="" style="font-size:5rem;">EasyPicker</h1>
+                    <p class="am-margin-top-sm">一款在线文件收取助手</p>
+                    <p class="am-margin-top-sm">自动归档,记录每次提交的文件信息与提交人信息</p>
+                    <p class="am-margin-top-sm">随时随地下载,查看收取详细情况</p>
+
+                </div>
+            </div>
+        </div>
+
+        <!--弹窗-->
+        <div class="am-modal am-modal-alert" tabindex="-1" id="resetPwd-alert">
+            <div class="am-modal-dialog">
+                <div class="am-modal-hd">忘记密码</div>
+                <div class="am-modal-bd">
+                    要么不做,要做就做最好!
+                </div>
+                <div class="am-modal-footer">
+                    <span class="am-modal-btn">确定</span>
+                </div>
+            </div>
+        </div>
+
+        <footer class="home-footer">
+            <div class="am-g am-g-fixed am-u-sm-centered">
+                <div class="am-u-sm-12 am-u-md-6 am-u-lg-6">
+                    <h3>联系作者</h3>
+                    <p>
+                        <a title="发起QQ交流" target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=2604395430&site=qq&menu=yes"><span
+                            class="footer-icon am-icon-qq am-icon-fw am-primary"></span></a>
+                        <a title="GayHub关注" target="_blank" href="https://github.com/ATQQ/EasyPicker"><span
+                            class="footer-icon am-icon-github am-icon-fw "></span></a>
+                        <a title="不玩微博所有没有" href="javascript:void(0)"><span class="footer-icon am-icon-weibo am-icon-fw "></span></a>
+                        <a title="手动加微信号:2604395430" href="javascript:void(0)"><span
+                            class="footer-icon am-icon-weixin am-icon-fw "></span></a>
+                    </p>
+                </div>
+                <div class="am-u-sm-12 am-u-md-6- am-u-lg-6 am-margin-sm">
+                    <h3>&emsp;&emsp;我不想成为一个庸俗的人。十年百年后，当我们死去，质疑我们的人同样死去，后人看到的是裹足不前、原地打转的你，还是一直奔跑、走到远方的我？</h3>
+                </div>
+            </div>
+            <div class="fw-text-c">© 2019 by <a target="_blank" href="https://github.com/ATQQ">sugar</a>
+            </div>
+        </footer>
+        <!--<h1>假设这是主页</h1>-->
+
+    </div>
+</body>
+<script src="./js/webuploader.js"></script>
+
+</html>
