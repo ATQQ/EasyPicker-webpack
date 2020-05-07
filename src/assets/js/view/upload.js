@@ -1,7 +1,8 @@
 import '../../sass/modules/upload.scss'
 import '../../css/webuploader.css'
-$(document).ready(function() {
-    let baseUrl = "/Api";
+
+$(document).ready(function () {
+    let baseUrl = "/EasyPicker/";
     let uname = null; //提交者姓名
     let ucourse = null; //父类目名称
     let utask = null; //子类目名称
@@ -12,7 +13,7 @@ $(document).ready(function() {
     //设置全局ajax设置
     $.ajaxSetup({
         // 默认添加请求头
-        error: function() {
+        error: function () {
             alert("网络错误");
         }
     });
@@ -48,7 +49,7 @@ $(document).ready(function() {
     });
 
     // 当有文件被添加进队列的时候
-    uploader.on('fileQueued', function(file) {
+    uploader.on('fileQueued', function (file) {
         let $list = $('#thelist');
         $list.append('<div id="' + file.id + '" class="item">' +
             '<h4 class="info am-margin-bottom-sm">' + file.name + '</h4>' +
@@ -56,14 +57,14 @@ $(document).ready(function() {
             '</div>');
     });
     // 文件上传过程中创建进度条实时显示。
-    uploader.on('uploadProgress', function(file, percentage) {
+    uploader.on('uploadProgress', function (file, percentage) {
         let $li = $('#' + file.id);
         $li.find('p.state').text(`上传中:${percentage.toFixed(2) * 100}`);
     });
 
 
     // 文件上传成功处理。
-    uploader.on('uploadSuccess', function(file, response) {
+    uploader.on('uploadSuccess', function (file, response) {
         $('#' + file.id).find('p.state').text('上传完成');
         const { filename } = response.data;
         addReport(uname, ucourse, utask, filename, account);
@@ -71,12 +72,12 @@ $(document).ready(function() {
     });
 
     //上传出错
-    uploader.on('uploadError', function(file) {
+    uploader.on('uploadError', function (file) {
         $('#' + file.id).find('p.state').text('上传出错');
     });
 
     // 开始上传
-    $('#uploadBtn').on('click', function(e) {
+    $('#uploadBtn').on('click', function (e) {
         ucourse = $('option[value="' + $("#course").val() + '"]').html();
         utask = $('option[value="' + $("#task").val() + '"]').html();
 
@@ -121,7 +122,7 @@ $(document).ready(function() {
 
     });
     //上传之前
-    uploader.on('uploadBeforeSend', function(block, data) {
+    uploader.on('uploadBeforeSend', function (block, data) {
         $("#uploadBtn").button("loading");
     });
     //页面初始化
@@ -130,14 +131,14 @@ $(document).ready(function() {
     /**
      * 父类发生改变
      */
-    $("#course").on('change', function() {
+    $("#course").on('change', function () {
         setdata('children', $(this).val(), account);
     });
 
     /**
      * 子类发生改变
      */
-    $("#task").on('change', function() {
+    $("#task").on('change', function () {
         if (!loadParentComplete && utask) return;
         $.ajax({
             url: baseUrl + "childContent/childContent" + `?time=${Date.now()}`,
@@ -145,7 +146,7 @@ $(document).ready(function() {
             data: {
                 "taskid": $(this).val()
             },
-            success: function(res) {
+            success: function (res) {
                 $('#uploadBtn').attr("disabled", false);
                 //如果有数据
                 const { code } = res;
@@ -172,7 +173,7 @@ $(document).ready(function() {
                         $("#attributePanel").children('div[target="template"]').show();
                         // $("#downlloadTemplate").attr("filename",res.template);
                         $("#downlloadTemplate").unbind('click');
-                        $("#downlloadTemplate").on('click', function() {
+                        $("#downlloadTemplate").on('click', function () {
                             let parent = $("#course").next().children().eq(0).find(".am-selected-status").html();
                             let child = $("#task").next().children().eq(0).find(".am-selected-status").html();
                             let jsonArray = new Array();
@@ -183,7 +184,7 @@ $(document).ready(function() {
                             downloadFile(baseUrl + "file/down", jsonArray);
                             let $btn = $(this);
                             $btn.button('loading');
-                            setTimeout(function() {
+                            setTimeout(function () {
                                 $btn.button('reset');
                             }, 5000);
                         });
@@ -196,7 +197,7 @@ $(document).ready(function() {
                     $("#attributePanel").hide();
                 }
             },
-            error: function(e) {
+            error: function (e) {
                 alert("网络错误");
             }
         });
@@ -205,7 +206,7 @@ $(document).ready(function() {
     /**
      * 管理员登录
      */
-    $('#login-btn').on('click', function(e) {
+    $('#login-btn').on('click', function (e) {
         let username = $('#username').val();
         let pwd = $('#password').val();
         if (isEmpty(username)) {
@@ -225,20 +226,20 @@ $(document).ready(function() {
      */
     function loadBottomLinks() {
         const links = [{
-                href: "/EasyPicker/home",
-                text: "首页"
-            }, {
-                href: "https://github.com/ATQQ/EasyPicker",
-                text: "GitHub"
-            },
-            {
-                href: "https://sugar-js.gitbook.io/easypicker-manual/",
-                text: "使用手册"
-            },
-            {
-                href: "https://github.com/ATQQ/EasyPicker/issues",
-                text: "问题反馈"
-            }
+            href: "/EasyPicker/home",
+            text: "首页"
+        }, {
+            href: "https://github.com/ATQQ/EasyPicker",
+            text: "GitHub"
+        },
+        {
+            href: "https://sugar-js.gitbook.io/easypicker-manual/",
+            text: "使用手册"
+        },
+        {
+            href: "https://github.com/ATQQ/EasyPicker/issues",
+            text: "问题反馈"
+        }
         ];
         const docFrag = document.createDocumentFragment();
         links.forEach((link) => {
@@ -331,25 +332,19 @@ $(document).ready(function() {
         $('#course').empty();
         $('#task').empty();
         //获取链接中 的管理员账号与附加参数
-
+        let params = location.search
+        params = params.slice(1).split('&').reduce((pre, now) => {
+            now = now.split('=')
+            pre[now[0]] = now[1]
+            return pre
+        }, {})
+        console.log(params);
         let type = null; //三种情况
         //1 :获取全部父类
         //2 :获取指定父类
         //3: 获取指定子类
-
-        let str = window.location.href;
-        let username = null;
-        let paramStr = null;
-        let parent = "";
-        let child = "";
-        if (str.lastIndexOf('?') !== -1) {
-            username = decodeURI(decodeURI(str.substring(str.lastIndexOf("/") + 1, str.lastIndexOf('?'))));
-            paramStr = str.substring(str.lastIndexOf('?') + 1);
-            //解码
-            paramStr = decodeURI(decodeURI(paramStr));
-            //获取parent/child
-            parent = getUrlParam(paramStr, 'parent');
-            child = getUrlParam(paramStr, 'child');
+        let { username, parent, child } = params
+        if (location.search.includes('?')) {
             if (parent) {
                 type = 2;
                 if (child) {
@@ -357,50 +352,51 @@ $(document).ready(function() {
                 }
             }
         } else {
-            username = str.substring(str.lastIndexOf("/") + 1);
+            // 废弃
             type = 1;
         }
 
 
-        if (username === "" || username == null || type == null) {
+        if (!username || !type || type === 1) {
             alert("链接失效!!!");
             redirectHome();
+            return
         }
 
 
         account = username;
         //查询账号是否有效
         $.ajax({
-                url: baseUrl + 'user/check',
-                async: false,
-                contentType: "application/json",
-                type: 'POST',
-                data: JSON.stringify({
-                    "username": username
-                }),
-                success: function(res) {
-                    if (res) {
-                        switch (type) {
-                            //获取父类全部子类
-                            case 2:
-                                setDataByParent(type, parent, username);
-                                break;
-                                //获取指定子类
-                            case 3:
-                                setDataByChild(type, parent, child, username);
-                                break;
-                        }
-                    } else {
-                        alert("链接失效!!!");
-                        redirectHome();
+            url: baseUrl + 'user/check',
+            async: false,
+            contentType: "application/json",
+            type: 'POST',
+            data: JSON.stringify({
+                "username": username
+            }),
+            success: function (res) {
+                if (res) {
+                    switch (type) {
+                        //获取父类全部子类
+                        case 2:
+                            setDataByParent(type, parent, username);
+                            break;
+                        //获取指定子类
+                        case 3:
+                            setDataByChild(type, parent, child, username);
+                            break;
                     }
-                },
-                error: function() {
-                    alert("网络错误");
+                } else {
+                    alert("链接失效!!!");
                     redirectHome();
                 }
-            })
-            //加载导航数据
+            },
+            error: function () {
+                alert("网络错误");
+                redirectHome();
+            }
+        })
+        //加载导航数据
         loadBottomLinks();
     }
 
@@ -423,7 +419,7 @@ $(document).ready(function() {
      * 重定向到首页
      */
     function redirectHome() {
-        // window.location.href = "index.html"
+        window.location.href = "home"
     }
 
     /**
@@ -439,10 +435,10 @@ $(document).ready(function() {
             data: JSON.stringify({
                 "username": username
             }),
-            success: function(res) {
+            success: function (res) {
                 return res;
             },
-            error: function() {
+            error: function () {
                 return false;
             }
         })
@@ -465,7 +461,7 @@ $(document).ready(function() {
                 "contentid": parentid,
                 "username": username
             },
-            success: function(res) {
+            success: function (res) {
                 const { code, data: { courseList } } = res;
                 if (code !== 200) {
                     return;
@@ -497,7 +493,7 @@ $(document).ready(function() {
                 }
                 loadParentComplete = true;
             },
-            error: function() {
+            error: function () {
                 alert("网络错误");
             }
         })
@@ -519,7 +515,7 @@ $(document).ready(function() {
                 "parent": parent,
                 "username": username
             },
-            success: function(res) {
+            success: function (res) {
                 const { data: { status } } = res;
                 if (status) {
                     let node = res.data.data;
@@ -531,7 +527,7 @@ $(document).ready(function() {
                     redirectHome();
                 }
             },
-            error: function() {
+            error: function () {
                 alert("网络错误");
             }
         });
@@ -649,7 +645,7 @@ $(document).ready(function() {
         form.attr("action", path);
 
 
-        jsonArray.forEach(function(key) {
+        jsonArray.forEach(function (key) {
             let temp = $("<input>");
             temp.attr("type", "hidden");
             temp.attr("name", key.key);
@@ -680,7 +676,7 @@ $(document).ready(function() {
         //设置响应类型为 blob
         xhr.responseType = 'blob';
         //关键部分
-        xhr.onload = function(e) {
+        xhr.onload = function (e) {
             //如果请求执行成功
             if (this.status == 200) {
                 let blob = this.response;

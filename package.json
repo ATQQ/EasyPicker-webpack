@@ -6,7 +6,7 @@
     "scripts": {
         "dev": "webpack-dev-server  --config=config/webpack.config.dev.js",
         "dev:dist": "webpack --mode development --config=config/webpack.config.dev.js",
-        "build": "webpack  --config=config/webpack.config.build.js"
+        "build": "webpack  --config=config/webpack.config.build.js && ./build/mv.sh"
     },
     "keywords": [],
     "author": "",

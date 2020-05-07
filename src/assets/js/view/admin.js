@@ -1,21 +1,24 @@
 //css
+import '../../css/amazeui.datatables.min.css'
 import '../../css/Ecalendar/style.css'
 import '../../sass/modules/admin.scss'
 //js
+
 import '../common/app'
 import '../common/theme'
+
 //剪贴板
 import ZeroClipboard from '../plunge/ZeroClipboard.min.js'
 //日期插件
 import ECalendar from '../plunge/Ecalendar.jquery.min'
 
 $(function() {
-    const baseUrl = "/Api";
-    const username = sessionStorage.getItem("username");
+    const baseUrl = "/EasyPicker/";
+    const username = localStorage.getItem("username");
     let reports = null; //存放所有文件信息
     let nodes = null; //存放所有类别信息(子类/父类)
     let isSupportClip = true;
-    const token = sessionStorage.getItem("token");
+    const token = localStorage.getItem("token");
     let filterFlag = null; //记录过滤的表名
     //设置全局ajax设置
     $.ajaxSetup({
@@ -160,7 +163,7 @@ $(function() {
             $("#datePicker").attr("readonly", "readonly");
             let newDate = v * 1000;
             //绑定设置时间按钮事件
-            document.getElementById('sure-Date').on('click', function(e) {
+            $('#sure-Date').on('click', function() {
                 http.put("childContent/childContext", {
                     "ddl": newDate,
                     "taskid": nowClickId,
@@ -933,7 +936,7 @@ $(function() {
         let parent = document.getElementById('courseActive').textContent;
         let child = this.previousElementSibling.textContent;
         let shareUrl = window.location.href;
-        shareUrl = `${shareUrl.substring(0, shareUrl.lastIndexOf("/"))}/home/${username}?parent=${parent}&child=${child}`;
+        shareUrl = `${shareUrl.substring(0, shareUrl.lastIndexOf("/"))}/upload?username=${username}&parent=${parent}&child=${child}`;
         setCopyContent(shareUrl);
         openModel("#copy-panel");
     });
@@ -944,8 +947,7 @@ $(function() {
     $('#coursePanel').on('click', 'button.share', function() {
         let parent = this.previousElementSibling.textContent;
         let shareUrl = window.location.href;
-        shareUrl = shareUrl.substring(0, shareUrl.lastIndexOf("/")) + "/home/" + username;
-        shareUrl += (`?parent=${parent}`);
+        shareUrl = `${shareUrl.substring(0, shareUrl.lastIndexOf("/"))}/upload?username=${username}&parent=${parent}`;
         setCopyContent(shareUrl);
         openModel("#copy-panel");
     });
@@ -1134,8 +1136,7 @@ $(function() {
      * 退出登录
      */
     function logout() {
-        // sessionStorage.removeItem("username");
-        sessionStorage.clear();
+        localStorage.clear();
         redirectHome();
     }
 
@@ -1287,7 +1288,7 @@ $(function() {
      * 重定向到首页
      */
     function redirectHome() {
-        window.location.href = baseUrl + "home";
+        window.location.href = "home";
     }
 
     /**
@@ -1305,7 +1306,7 @@ $(function() {
      */
     function Init() {
         //判断登录是否失效
-        let token = sessionStorage.getItem("token");
+        let token = localStorage.getItem("token");
         if (token == null || token == '') {
             alert("登录已经失效,请重新登录");
             redirectHome();

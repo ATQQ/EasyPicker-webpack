@@ -3,7 +3,7 @@ import '../../css/index.css'
 import '../../sass/modules/index.scss'
 
 $(document).ready(function() {
-    const baseurl = "/Api";
+    const baseurl = "/EasyPicker/";
     var isGetCode = false;
 
     //全局默认处理ajax
@@ -418,9 +418,9 @@ $(document).ready(function() {
                     const { power, token } = res.data;
                     //判断是否有权限
                     if (power !== 1) {
-                        sessionStorage.setItem("token", token);
-                        sessionStorage.setItem("username", username);
-                        window.location.href = 'admin.html';
+                        localStorage.setItem("token", token);
+                        localStorage.setItem("username", username);
+                        window.location.href = 'admin';
                     } else {
                         alert("登录失败,没有权限");
                     }
@@ -468,7 +468,7 @@ $(document).ready(function() {
      * 重定向到首页
      */
     function redirectHome() {
-        window.location.href = "/home/";
+        window.location.href = "home";
     }
 
 

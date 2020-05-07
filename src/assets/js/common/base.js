@@ -6,17 +6,17 @@
 // import '../../fonts/fontawesome-webfont.woff2'
 
 //第三方UI库
-import '../../css/amazeui.css'
-import '../../css/amazeui.flat.min.css'
-import '../../css/amazeui.datatables.min.css'
+// import '../../css/amazeui.css'
+// import '../../css/amazeui.flat.min.css'
+// import '../../css/amazeui.datatables.min.css'
 
 // 动画库
-import '../../css/animate.css'
+// import '../../css/animate.css'
 import '../../css/app.css'
 
 //公共库
 import $ from '../lib/jquery-vendor'
-import '../plunge/amazeui'
+// import '../plunge/amazeui'
 
 import '../../sass/common/fw.scss'
 

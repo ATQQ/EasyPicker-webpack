@@ -11,9 +11,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="renderer" content="webkit">
     <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="stylesheet" href="https://cdn.staticfile.org/amazeui/2.7.2/css/amazeui.min.css">
+    <link rel="stylesheet" href="https://cdn.staticfile.org/animate.css/3.7.2/animate.min.css">
 </head>
 
-<body class="bgc" style="background: linear-gradient(to bottom, rgba(128, 222, 234, 0.6313725490196078) 0% ,#ffffff 100%);">
+<body class="bgc"
+    style="background: linear-gradient(to bottom, rgba(128, 222, 234, 0.6313725490196078) 0% ,#ffffff 100%);">
     <div class="fw-w100 fw-flex fw-fdc theme">
         <div class="am-g">
             <div class="fw-flex fw-c-c">
@@ -33,18 +36,21 @@
                             <div class="fw-flex fw-c-c am-margin-top-lg fw-warp">
                                 <div class="fw-flex fw-c-c">
                                     <label class="am-checkbox">
-                                    <input id="rememberAccount" type="checkbox" value="" data-am-ucheck> 记住登录信息?
-                                </label>
+                                        <input id="rememberAccount" type="checkbox" value="" data-am-ucheck> 记住登录信息?
+                                    </label>
                                 </div>
                                 <button class="am-btn am-btn-success w80" id="login">登录</button>
-                                <button targetPanel="register" class="changePanel am-margin-top-sm am-btn w80 am-btn-primary">新用户注册</button>
-                                <p align="center" class="am-margin-sm"><a targetPanel="forget" class="changePanel" href="javascript:void(0)">忘记密码?</a></p>
+                                <button targetPanel="register"
+                                    class="changePanel am-margin-top-sm am-btn w80 am-btn-primary">新用户注册</button>
+                                <p align="center" class="am-margin-sm"><a targetPanel="forget" class="changePanel"
+                                        href="javascript:void(0)">忘记密码?</a></p>
 
                             </div>
                         </section>
                     </div>
                     <!-- 注册面板 -->
-                    <div panel="register" id="registerPanel" class="animated  homePanel am-padding-lg am-margin-top-lg" hidden>
+                    <div panel="register" id="registerPanel" class="animated  homePanel am-padding-lg am-margin-top-lg"
+                        hidden>
                         <h2 class="fw-text-c">新用户注册</h2>
                         <section class="fw-flex fw-fdc">
                             <div class="am-input-group am-input-group-secondary am-margin-top-lg">
@@ -60,38 +66,45 @@
                                 <input type="password" class="am-form-field" placeholder="请再次输入密码">
                             </div>
                             <div class="am-input-group am-input-group-primary am-margin-top-lg">
-                                <span class="am-input-group-label"><i class="am-icon-phone-square am-icon-fw"></i></span>
-                                <input readonly id="userMobile" type="number" class="am-form-field" placeholder="(可选)绑定手机号">
+                                <span class="am-input-group-label"><i
+                                        class="am-icon-phone-square am-icon-fw"></i></span>
+                                <input readonly id="userMobile" type="number" class="am-form-field"
+                                    placeholder="(可选)绑定手机号">
                                 <span class="am-input-group-label">
-                                <input type="checkbox" id="isBindMobile">
-                            </span>
+                                    <input type="checkbox" id="isBindMobile">
+                                </span>
                             </div>
                             <div class="am-input-group am-input-group-primary am-margin-top-lg" style="display: none;">
                                 <input type="text" placeholder="输入验证码" class="am-form-field">
                                 <span class="am-input-group-btn">
-                                <button id="getCode" class="am-btn am-btn-secondary" disabled type="button">获取验证码</button>
-                            </span>
+                                    <button id="getCode" class="am-btn am-btn-secondary" disabled
+                                        type="button">获取验证码</button>
+                                </span>
                             </div>
                             <div class="fw-flex fw-c-c am-margin-top-lg fw-warp">
                                 <button class="am-btn am-btn-success w80" id="register">完成注册</button>
-                                <button targetPanel="login" class="changePanel am-margin-top-sm am-btn w80 am-btn-primary">返回登录</button>
+                                <button targetPanel="login"
+                                    class="changePanel am-margin-top-sm am-btn w80 am-btn-primary">返回登录</button>
                             </div>
                         </section>
                     </div>
 
                     <!-- 忘记密码面板 -->
-                    <div panel="forget" id="forgetPanel" class="animated  homePanel am-padding-lg am-margin-top-lg" hidden>
+                    <div panel="forget" id="forgetPanel" class="animated  homePanel am-padding-lg am-margin-top-lg"
+                        hidden>
                         <h2 class="fw-text-c">忘记密码</h2>
                         <section class="fw-flex fw-fdc">
                             <div class="am-input-group am-input-group-secondary am-margin-top-lg">
-                                <span class="am-input-group-label"><i class="am-icon-phone-square am-icon-fw"></i></span>
+                                <span class="am-input-group-label"><i
+                                        class="am-icon-phone-square am-icon-fw"></i></span>
                                 <input type="number" class="am-form-field" placeholder="请输入绑定的手机号" id="bindPhone">
                             </div>
                             <div class="am-input-group am-input-group-primary am-margin-top-lg">
                                 <input type="text" placeholder="输入验证码" class="am-form-field">
                                 <span class="am-input-group-btn">
-                                <button id="getForgetCode" class="am-btn am-btn-secondary" disabled type="button">获取验证码</button>
-                            </span>
+                                    <button id="getForgetCode" class="am-btn am-btn-secondary" disabled
+                                        type="button">获取验证码</button>
+                                </span>
                             </div>
                             <div class="am-input-group am-input-group-secondary am-margin-top-lg">
                                 <span class="am-input-group-label"><i class="am-icon-lock am-icon-fw"></i></span>
@@ -99,7 +112,8 @@
                             </div>
                             <div class="fw-flex fw-c-c am-margin-top-lg fw-warp">
                                 <button class="am-btn am-btn-success w80" id="sureReset">确认重置</button>
-                                <button targetPanel="login" class="changePanel am-margin-top-sm am-btn w80 am-btn-primary">返回登录</button>
+                                <button targetPanel="login"
+                                    class="changePanel am-margin-top-sm am-btn w80 am-btn-primary">返回登录</button>
                             </div>
                         </section>
                     </div>
@@ -136,13 +150,15 @@
                 <div class="am-u-sm-12 am-u-md-6 am-u-lg-6">
                     <h3>联系作者</h3>
                     <p>
-                        <a title="发起QQ交流" target="_blank" href="http://wpa.qq.com/msgrd?v=3&uin=2604395430&site=qq&menu=yes"><span
-                            class="footer-icon am-icon-qq am-icon-fw am-primary"></span></a>
+                        <a title="发起QQ交流" target="_blank"
+                            href="http://wpa.qq.com/msgrd?v=3&uin=2604395430&site=qq&menu=yes"><span
+                                class="footer-icon am-icon-qq am-icon-fw am-primary"></span></a>
                         <a title="GayHub关注" target="_blank" href="https://github.com/ATQQ/EasyPicker"><span
-                            class="footer-icon am-icon-github am-icon-fw "></span></a>
-                        <a title="不玩微博所有没有" href="javascript:void(0)"><span class="footer-icon am-icon-weibo am-icon-fw "></span></a>
+                                class="footer-icon am-icon-github am-icon-fw "></span></a>
+                        <a title="不玩微博所有没有" href="javascript:void(0)"><span
+                                class="footer-icon am-icon-weibo am-icon-fw "></span></a>
                         <a title="手动加微信号:2604395430" href="javascript:void(0)"><span
-                            class="footer-icon am-icon-weixin am-icon-fw "></span></a>
+                                class="footer-icon am-icon-weixin am-icon-fw "></span></a>
                     </p>
                 </div>
                 <div class="am-u-sm-12 am-u-md-6- am-u-lg-6 am-margin-sm">
@@ -152,10 +168,9 @@
             <div class="fw-text-c">© 2019 by <a target="_blank" href="https://github.com/ATQQ">sugar</a>
             </div>
         </footer>
-        <!--<h1>假设这是主页</h1>-->
-
     </div>
 </body>
-<script src="./js/webuploader.js"></script>
+<!-- amazeui -->
+<script src="https://cdn.staticfile.org/amazeui/2.7.2/js/amazeui.min.js"></script>
 
 </html>

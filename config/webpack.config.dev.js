@@ -89,7 +89,7 @@ module.exports = {
                 test: /\.(html)$/,
                 loader: 'html-loader',
                 options: {
-                    attrs: ['img:src', 'img:data-src', 'audio:src']
+                    attrs: ['img:src', 'img:data-src']
                 }
             },
             {
@@ -101,13 +101,11 @@ module.exports = {
             },
             { //字体文件
                 test: /\.(eot|svg|ttf|woff|woff2)$/,
-                use: [{
-                    loader: 'file-loader',
-                    options: {
-                        name: "[name].[ext]",
-                        outputPath: './fonts'
-                    }
-                }]
+                loader: 'file-loader',
+                options: {
+                    name: "[name].[ext]",
+                    outputPath: './fonts'
+                }
             }
 
             // { //压缩css和js中的图片

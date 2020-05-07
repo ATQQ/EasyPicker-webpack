@@ -1,6 +1,6 @@
 const path = require('path');
 const webpack = require('webpack')
-    // 打包html
+// 打包html
 const htmlWebpackPlugin = require('html-webpack-plugin');
 //分离css
 const extractTextPlugin = require('extract-text-webpack-plugin');
@@ -8,34 +8,17 @@ const extractTextPlugin = require('extract-text-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 // 静态资源拷贝
 const copyWebpackPlugin = require('copy-webpack-plugin');
-
+// __webpack_public_path=myRuntimePublicPath
 module.exports = {
-    mode: "development",
-    devServer: {
-        contentBase: './dist', //项目基本访问目录
-        host: 'localhost', //服务器ip地址
-        port: 8088, //端口
-        open: false, //自动打开页面
-        hot: true, //模块热替换
-        hotOnly: false, //只有热更新不会刷新页面
-        proxy: { //跨域配置
-            '/Api': {
-                target: 'http://sugarat.top/EasyPicker',
-                changeOrigin: true, //是否跨域
-                pathRewrite: {
-                    '^/Api': '' //规定请求地址以什么作为开头
-                }
-
-            }
-        }
-    },
+    mode: "production",
     entry: {
         base: './src/assets/js/common/base.js',
         index: './src/assets/js/view/index.js',
-        admin: './src/assets/js/view/admin.js'
+        admin: './src/assets/js/view/admin.js',
+        upload: './src/assets/js/view/upload.js'
     },
     output: {
-        filename: 'js/[name].js',
+        filename: 'js/[name]-[hash].js',
         path: path.resolve(__dirname, './../dist')
     },
     resolve: {
@@ -51,63 +34,63 @@ module.exports = {
     module: {
         // 配置loader
         rules: [{
-                test: /\.css/,
-                use: extractTextPlugin.extract({
-                    fallback: 'style-loader',
-                    use: [
-                        'css-loader'
-                    ],
-                    publicPath: '../'
-                })
-            }, {
-                test: /\.less$/,
-                use: extractTextPlugin.extract({
-                    fallback: 'style-loader',
-                    use: ['css-loader', 'less-loader']
-                })
-            }, {
-                test: /\.scss$/,
-                include: [
-                    path.resolve(__dirname, '../src/assets/sass')
+            test: /\.css/,
+            use: extractTextPlugin.extract({
+                fallback: 'style-loader',
+                use: [
+                    'css-loader'
                 ],
-                use: extractTextPlugin.extract({
-                    fallback: 'style-loader',
-                    use: ['css-loader', 'sass-loader']
-                })
-            },
-            {
-                test: /\.(png|jpg|gif|jpeg)$/,
+                publicPath: '../'
+            })
+        }, {
+            test: /\.less$/,
+            use: extractTextPlugin.extract({
+                fallback: 'style-loader',
+                use: ['css-loader', 'less-loader']
+            })
+        }, {
+            test: /\.scss$/,
+            include: [
+                path.resolve(__dirname, '../src/assets/sass')
+            ],
+            use: extractTextPlugin.extract({
+                fallback: 'style-loader',
+                use: ['css-loader', 'sass-loader']
+            })
+        },
+        {
+            test: /\.(png|jpg|gif|jpeg)$/,
+            loader: 'file-loader',
+            options: {
+                name: '[hash].[ext]',
+                outputPath: './img',
+                esModule: false
+            }
+        },
+        {
+            test: /\.(html)$/,
+            loader: 'html-loader',
+            options: {
+                attrs: ['img:src', 'img:data-src', 'audio:src']
+            }
+        },
+        {
+            test: /\.js?$/,
+            include: [
+                path.resolve(__dirname, '../src/assets/js/views')
+            ],
+            loader: 'babel-loader'
+        },
+        { //字体文件
+            test: /\.(eot|svg|ttf|woff|woff2)$/,
+            use: [{
                 loader: 'file-loader',
                 options: {
-                    name: '[hash].[ext]',
-                    outputPath: './img',
-                    esModule: false
+                    name: "[name].[ext]",
+                    outputPath: './fonts'
                 }
-            },
-            {
-                test: /\.(html)$/,
-                loader: 'html-loader',
-                options: {
-                    attrs: ['img:src', 'img:data-src', 'audio:src']
-                }
-            },
-            {
-                test: /\.js?$/,
-                include: [
-                    path.resolve(__dirname, '../src/assets/js/views')
-                ],
-                loader: 'babel-loader'
-            },
-            { //字体文件
-                test: /\.(eot|svg|ttf|woff|woff2)$/,
-                use: [{
-                    loader: 'file-loader',
-                    options: {
-                        name: "[name].[ext]",
-                        outputPath: './fonts'
-                    }
-                }]
-            }
+            }]
+        }
 
             // { //压缩css和js中的图片
             //     test: /\.(png|jpg|gif|jpeg)/, //匹配图片文件后缀名
@@ -148,32 +131,42 @@ module.exports = {
             chunks: ['base', 'admin'], //引入对应的js
             template: 'src/admin.html'
         }),
+        new htmlWebpackPlugin({
+            filename: 'upload.html',
+            minify: {
+                removeAttributeQuotes: true,
+                removeComments: true, //去掉注释
+                collapseWhitespace: true //去掉空白
+            },
+            chunks: ['base', 'upload'], //引入对应的js
+            template: 'src/upload.html'
+        }),
         new CleanWebpackPlugin(),
         new copyWebpackPlugin([{
-                //上传插件
-                from: path.join(__dirname, "../src/assets/js/plunge/webuploader.js"),
-                to: path.join(__dirname, "../dist/js")
-            },
-            {
-                //依赖的 flash
-                from: path.join(__dirname, "../src/assets/js/plunge/Uploader.swf"),
-                to: path.join(__dirname, "../dist/js")
-            },
-            {
-                from: path.join(__dirname, "../src/assets/js/plunge/ZeroClipboard.swf"),
-                to: path.join(__dirname, "../dist/js")
-            },
-            {
-                from: path.join(__dirname, "../src/assets/js/plunge/amazeui.datatables.js"),
-                to: path.join(__dirname, "../dist/js")
-            },
-            {
-                from: path.join(__dirname, "../src/assets/js/lib/dataTables.responsive.min.js"),
-                to: path.join(__dirname, "../dist/js")
-            },
+            //上传插件
+            from: path.join(__dirname, "../src/assets/js/plunge/webuploader.js"),
+            to: path.join(__dirname, "../dist/js")
+        },
+        {
+            //依赖的 flash
+            from: path.join(__dirname, "../src/assets/js/plunge/Uploader.swf"),
+            to: path.join(__dirname, "../dist/js")
+        },
+        {
+            from: path.join(__dirname, "../src/assets/js/plunge/ZeroClipboard.swf"),
+            to: path.join(__dirname, "../dist/js")
+        },
+        {
+            from: path.join(__dirname, "../src/assets/js/plunge/amazeui.datatables.js"),
+            to: path.join(__dirname, "../dist/js")
+        },
+        {
+            from: path.join(__dirname, "../src/assets/js/lib/dataTables.responsive.min.js"),
+            to: path.join(__dirname, "../dist/js")
+        },
         ]),
         //css分离(输出文件名))
-        new extractTextPlugin('css/[name].css'),
+        new extractTextPlugin('css/[name]-[hash].css'),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.ProvidePlugin({
             // $: "jQuery",
