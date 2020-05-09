@@ -1,15 +1,15 @@
 @charset "utf-8";
 
-.btn-theme-green{
-  color:#20e215 !important;
+.btn-theme-green {
+  color: #20e215 !important;
   border: 1px solid #20e215 !important;
-  &:hover{
-    background-color:#20e215 !important;
+  &:hover {
+    background-color: #20e215 !important;
     color: #fff !important;
   }
 }
 //人员概况面板
-#people-modal{
+#people-modal {
   align-items: center;
   text-align: center;
   margin-left: 0px;
@@ -21,4 +21,10 @@
   max-height: 99vh;
   overflow: scroll;
   background-color: #f8f8f8;
+}
+
+// 上传组件样式
+.webuploader-pick + div {
+  width: 100% !important;
+  height: 100% !important;
 }

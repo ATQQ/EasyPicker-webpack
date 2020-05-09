@@ -2,6 +2,7 @@
 import '../../css/amazeui.datatables.min.css'
 import '../../css/Ecalendar/style.css'
 import '../../sass/modules/admin.scss'
+
 //js
 
 import '../common/app'
@@ -189,7 +190,7 @@ $(function() {
         //选择完文件或是否自动上传
         auto: false,
         //swf文件路径
-        swf: '../plunge/Uploader.swf',
+        swf: 'https://cdn.staticfile.org/webuploader/0.1.1/Uploader.swf',
         //是否要分片处理大文件上传。
         chunked: false,
         // 如果要分片，分多大一片？ 默认大小为5M.
@@ -199,19 +200,13 @@ $(function() {
         //文件接收服务端
         server: baseUrl + "file/saveTemplate",
         // 内部根据当前运行是创建，可能是input元素，也可能是flash.
-        pick: '#choose-File',
+        pick: '#choose-file',
         method: "POST",
         // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
         resize: false
-
     });
     // 当有文件被添加进队列的时候
     uploader.on('fileQueued', function(file) {
-        //结构
-        // '<div id="' + file.id + '" class="item">' +
-        // '<h4 class="info am-margin-bottom-sm">' + file.name + '</h4>' +
-        // '<p class="state fw-text-c">等待上传...</p>' +
-        // '</div>'
         const docFrag = document.createDocumentFragment();
         const fileLIst = document.getElementById('fileList');
         //fileItem
@@ -227,13 +222,13 @@ $(function() {
         div.append(h4, p);
         docFrag.appendChild(div);
         fileLIst.appendChild(docFrag);
+        uploader.options.formData = {}
     });
     // 文件上传过程中创建进度条实时显示。
     uploader.on('uploadProgress', function(file, percentage) {
         const p = document.getElementById(`${file.id}`).querySelector('p');
         p.textContent = `上传中:${percentage.toFixed(2) * 100}`;
     });
-
 
     // 文件上传成功处理。
     uploader.on('uploadSuccess', function(file, response) {
@@ -284,7 +279,7 @@ $(function() {
      */
     let peoplePicker = WebUploader.create({
         auto: false,
-        swf: '../plunge/Uploader.swf',
+        swf: 'https://cdn.staticfile.org/webuploader/0.1.1/Uploader.swf',
         threads: 1,
         server: baseUrl + "file/people",
         pick: '#filePicker',
@@ -1288,7 +1283,7 @@ $(function() {
      * 重定向到首页
      */
     function redirectHome() {
-        window.location.href = "home";
+        window.location.href = "/"
     }
 
     /**

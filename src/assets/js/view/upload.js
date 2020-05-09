@@ -27,7 +27,7 @@ $(document).ready(function () {
         //选择完文件或是否自动上传
         auto: false,
         //swf文件路径
-        swf: '../plunge/Uploader.swf',
+        swf: 'https://cdn.staticfile.org/webuploader/0.1.1/Uploader.swf',
         //是否要分片处理大文件上传。
         chunked: false,
         // 如果要分片，分多大一片？ 默认大小为5M.
@@ -419,7 +419,7 @@ $(document).ready(function () {
      * 重定向到首页
      */
     function redirectHome() {
-        window.location.href = "home"
+        window.location.href = "/"
     }
 
     /**

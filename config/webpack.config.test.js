@@ -137,7 +137,7 @@ module.exports = {
             template: 'src/index.html'
         }),
         new htmlWebpackPlugin({
-            filename: 'admin.html',
+            filename: 'admin/index.html',
             minify: {
                 removeAttributeQuotes: false,
                 removeComments: false, //去掉注释
@@ -147,7 +147,7 @@ module.exports = {
             template: 'src/admin.html'
         }),
         new htmlWebpackPlugin({
-            filename: 'upload.html',
+            filename: 'upload/index.html',
             minify: {
                 removeAttributeQuotes: false,
                 removeComments: false, //去掉注释
