@@ -332,13 +332,12 @@ $(document).ready(function () {
         $('#course').empty();
         $('#task').empty();
         //获取链接中 的管理员账号与附加参数
-        let params = location.search
+        let params = decodeURI(decodeURI(location.search))
         params = params.slice(1).split('&').reduce((pre, now) => {
             now = now.split('=')
             pre[now[0]] = now[1]
             return pre
         }, {})
-        console.log(params);
         let type = null; //三种情况
         //1 :获取全部父类
         //2 :获取指定父类

@@ -91,22 +91,6 @@ module.exports = {
                 }
             }]
         }
-
-            // { //压缩css和js中的图片
-            //     test: /\.(png|jpg|gif|jpeg)/, //匹配图片文件后缀名
-            //     use: [{
-            //         loader: 'url-loader', //指定使用的loader和loader的配置参数
-            //         options: {
-            //             limit: 5 * 1024, //是把小于5KB的文件打成Base64的格式，写入JS
-            //             outputPath: './img/', //打包后的图片放到img文件夹下
-            //         }
-            //     }]
-            // },
-            // ,
-            // { //html配置
-            //     test: /\.(htm|html)$/i,
-            //     use: ['html-withimg-loader']
-            // }
         ]
     },
     // 配置插件

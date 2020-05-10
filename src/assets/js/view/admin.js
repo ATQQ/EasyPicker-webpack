@@ -1131,7 +1131,7 @@ $(function() {
      * 退出登录
      */
     function logout() {
-        localStorage.clear();
+        localStorage.removeItem('token')
         redirectHome();
     }
 

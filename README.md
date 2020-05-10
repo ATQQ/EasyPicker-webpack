@@ -18,7 +18,7 @@
 ## [源项目地址](https://github.com/ATQQ/EasyPicker)
 
 ## 项目简介
-**[轻取](http://sugarat.top/EasyPicker/home)**,为方便在线文件收取而生。
+**[轻取](http://picker.sugarat.top)**,为方便在线文件收取而生。
 
 ## 项目背景
 校园学习或者工作场景中会出现以下几个场景:
