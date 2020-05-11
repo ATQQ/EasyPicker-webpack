@@ -9,7 +9,8 @@
         "test": "webpack-dev-server --config=config/webpack.config.test.js",
         "test:dist": "webpack --mode development --config=config/webpack.config.test.js",
         "test:build": "webpack --config=config/webpack.config.test.build.js",
-        "build": "webpack  --config=config/webpack.config.build.js && ./build/mv.sh"
+        "build": "webpack  --config=config/webpack.config.build.js && ./build/mv.sh",
+        "deploy":"npm run test:build && ./build/deploy.sh"
     },
     "keywords": [],
     "author": "",

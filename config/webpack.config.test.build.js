@@ -62,7 +62,7 @@ module.exports = {
             test: /\.(png|jpg|gif|jpeg)$/,
             loader: 'file-loader',
             options: {
-                name: '[hash].[ext]',
+                name: '[name].[ext]',
                 outputPath: './img',
                 esModule: false
             }
@@ -126,38 +126,18 @@ module.exports = {
             template: 'src/upload.html'
         }),
         new CleanWebpackPlugin(),
-        new copyWebpackPlugin([{
-            //上传插件
-            from: path.join(__dirname, "../src/assets/js/plunge/webuploader.js"),
-            to: path.join(__dirname, "../dist/js")
-        },
-        {
-            //依赖的 flash
-            from: path.join(__dirname, "../src/assets/js/plunge/Uploader.swf"),
-            to: path.join(__dirname, "../dist/js")
-        },
-        {
-            from: path.join(__dirname, "../src/assets/js/plunge/ZeroClipboard.swf"),
-            to: path.join(__dirname, "../dist/js")
-        },
-        {
-            from: path.join(__dirname, "../src/assets/js/plunge/amazeui.datatables.js"),
-            to: path.join(__dirname, "../dist/js")
-        },
-        {
-            from: path.join(__dirname, "../src/assets/js/lib/dataTables.responsive.min.js"),
-            to: path.join(__dirname, "../dist/js")
-        },
+        new copyWebpackPlugin([
+            {
+                from: path.join(__dirname, "../src/assets/js/plunge/amazeui.datatables.js"),
+                to: path.join(__dirname, "../dist/js")
+            },
+            {
+                from: path.join(__dirname, "../src/assets/js/lib/dataTables.responsive.min.js"),
+                to: path.join(__dirname, "../dist/js")
+            }
         ]),
         //css分离(输出文件名))
         new extractTextPlugin('css/[name]-[hash].css'),
-        new webpack.HotModuleReplacementPlugin(),
-        new webpack.ProvidePlugin({
-            // $: "jQuery",
-            // jQuery: "jQuery",
-            // jquery: "jQuery",
-            // webUploader: "webUploader",
-            // webuploader: "webUploader"
-        })
+        new webpack.HotModuleReplacementPlugin()
     ]
 }

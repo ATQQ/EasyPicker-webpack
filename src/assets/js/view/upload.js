@@ -1,5 +1,6 @@
 import '../../sass/modules/upload.scss'
 import '../../css/webuploader.css'
+import { stringEncode } from './../common/utils'
 
 $(document).ready(function () {
     let baseUrl = "/EasyPicker/";
@@ -82,6 +83,7 @@ $(document).ready(function () {
         utask = $('option[value="' + $("#task").val() + '"]').html();
 
         uname = $('#name').val();
+        uname = stringEncode(uname)
         if (uname.trim() == null || uname.trim() == "") {
             alert('姓名不能为空');
             return;
@@ -204,24 +206,6 @@ $(document).ready(function () {
     });
 
     /**
-     * 管理员登录
-     */
-    $('#login-btn').on('click', function (e) {
-        let username = $('#username').val();
-        let pwd = $('#password').val();
-        if (isEmpty(username)) {
-            alert('账号为空')
-            return;
-        }
-        if (isEmpty(pwd)) {
-            alert("密码为空");
-            return;
-        }
-        login(username, pwd);
-        e.stopPropagation();
-    });
-
-    /**
      * 加载底部导航链接
      */
     function loadBottomLinks() {
@@ -332,8 +316,16 @@ $(document).ready(function () {
         $('#course').empty();
         $('#task').empty();
         //获取链接中 的管理员账号与附加参数
-        let params = decodeURI(decodeURI(location.search))
-        params = params.slice(1).split('&').reduce((pre, now) => {
+        let params = ''
+        try {
+            params = decodeURI(decodeURI(decodeURI(atob(location.search.slice(1)))))
+        } catch (err) {
+            alert('链接无效!!!,请联系管理员')
+            redirectHome()
+            return
+        }
+        console.log(params);
+        params = params.split('&').reduce((pre, now) => {
             now = now.split('=')
             pre[now[0]] = now[1]
             return pre
@@ -461,10 +453,11 @@ $(document).ready(function () {
                 "username": username
             },
             success: function (res) {
-                const { code, data: { courseList } } = res;
+                const { code } = res;
                 if (code !== 200) {
                     return;
                 }
+                let courseList = res.data.courseList || []
                 if (courseList.length === 0) {
                     if (range === 'parents') {
                         clearselect('#course');

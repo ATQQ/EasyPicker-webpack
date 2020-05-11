@@ -510,6 +510,9 @@ $(document).ready(function() {
         nowUser = JSON.parse(nowUser);
         $('#login-username').val(nowUser.username);
         $('#login-password').val(nowUser.password);
+        if(localStorage.getItem('token')){
+            window.location.href = 'admin'
+        }
     }
 
 })
