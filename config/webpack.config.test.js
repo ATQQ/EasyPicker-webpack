@@ -20,7 +20,7 @@ module.exports = {
         hotOnly: false, //只有热更新不会刷新页面
         proxy: { //跨域配置
             '/EasyPicker': {
-                target: 'http://localhost:8080/EasyPicker',
+                target: 'http://sugarat.top:8080/EasyPicker',
                 changeOrigin: true, //是否跨域
                 pathRewrite: {
                     '^/EasyPicker': '' //规定请求地址以什么作为开头

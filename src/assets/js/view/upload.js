@@ -137,72 +137,84 @@ $(document).ready(function () {
         setdata('children', $(this).val(), account);
     });
 
+    // 丢弃中间请求
+    let tempFlag = 1
     /**
      * 子类发生改变
      */
     $("#task").on('change', function () {
         if (!loadParentComplete && utask) return;
-        $.ajax({
-            url: baseUrl + "childContent/childContent" + `?time=${Date.now()}`,
-            type: "GET",
-            data: {
-                "taskid": $(this).val()
-            },
-            success: function (res) {
-                $('#uploadBtn').attr("disabled", false);
-                //如果有数据
-                const { code } = res;
-                if (code === 200) {
-                    $("#attributePanel").show();
+        if (!$(this).val()) {
+            return
+        }
 
-                    res = res.data;
-                    limited = res.people;
-                    // console.log(limited);
-                    if (res.ddl) {
-                        //取得日期面板dom
-                        let $ddl = $("#attributePanel").children('div[target="ddl"]');
-                        //显示截止日期
-                        $ddl.children().eq(0).html("截止日期:" + new Date(res.ddl).Format("yyyy-MM-dd,hh:mm:ss"));
-                        //计算日期间隔
-                        $ddl.children().eq(1).html(calculateDateDiffer(res.ddl, (new Date().getTime())) ? "还剩:" + calculateDateDiffer(res.ddl, (new Date().getTime())) : "已经截止!!!");
-                        //显示时间面板
-                        $ddl.show();
-                    } else {
-                        //隐藏截止时间面板
-                        $("#attributePanel").children('div[target="ddl"]').hide();
+        const request = (key) => {
+            $.ajax({
+                url: baseUrl + "childContent/childContent" + `?time=${Date.now()}`,
+                type: "GET",
+                data: {
+                    "taskid": $(this).val()
+                },
+                success: function (res) {
+                    if (key !== tempFlag) {
+                        return
                     }
-                    if (res.template) {
-                        $("#attributePanel").children('div[target="template"]').show();
-                        // $("#downlloadTemplate").attr("filename",res.template);
-                        $("#downlloadTemplate").unbind('click');
-                        $("#downlloadTemplate").on('click', function () {
-                            let parent = $("#course").next().children().eq(0).find(".am-selected-status").html();
-                            let child = $("#task").next().children().eq(0).find(".am-selected-status").html();
-                            let jsonArray = new Array();
-                            jsonArray.push({ "key": "course", "value": parent });
-                            jsonArray.push({ "key": "tasks", "value": child + "_Template" });
-                            jsonArray.push({ "key": "filename", "value": res.template });
-                            jsonArray.push({ "key": "username", "value": account });
-                            downloadFile(baseUrl + "file/down", jsonArray);
-                            let $btn = $(this);
-                            $btn.button('loading');
-                            setTimeout(function () {
-                                $btn.button('reset');
-                            }, 5000);
-                        });
+                    $('#uploadBtn').attr("disabled", false);
+                    //如果有数据
+                    const { code } = res;
+                    if (code === 200) {
+                        $("#attributePanel").show();
+
+                        res = res.data;
+                        limited = res.people;
+                        // console.log(limited);
+                        if (res.ddl) {
+                            //取得日期面板dom
+                            let $ddl = $("#attributePanel").children('div[target="ddl"]');
+                            //显示截止日期
+                            $ddl.children().eq(0).html("截止日期:" + new Date(res.ddl).Format("yyyy-MM-dd,hh:mm:ss"));
+                            //计算日期间隔
+                            $ddl.children().eq(1).html(calculateDateDiffer(res.ddl, (new Date().getTime())) ? "还剩:" + calculateDateDiffer(res.ddl, (new Date().getTime())) : "已经截止!!!");
+                            //显示时间面板
+                            $ddl.show();
+                        } else {
+                            //隐藏截止时间面板
+                            $("#attributePanel").children('div[target="ddl"]').hide();
+                        }
+                        if (res.template) {
+                            $("#attributePanel").children('div[target="template"]').show();
+                            // $("#downlloadTemplate").attr("filename",res.template);
+                            $("#downlloadTemplate").unbind('click');
+                            $("#downlloadTemplate").on('click', function () {
+                                let parent = $("#course").next().children().eq(0).find(".am-selected-status").html();
+                                let child = $("#task").next().children().eq(0).find(".am-selected-status").html();
+                                let jsonArray = new Array();
+                                jsonArray.push({ "key": "course", "value": parent });
+                                jsonArray.push({ "key": "tasks", "value": child + "_Template" });
+                                jsonArray.push({ "key": "filename", "value": res.template });
+                                jsonArray.push({ "key": "username", "value": account });
+                                downloadFile(baseUrl + "file/down", jsonArray);
+                                let $btn = $(this);
+                                $btn.button('loading');
+                                setTimeout(function () {
+                                    $btn.button('reset');
+                                }, 5000);
+                            });
+                        } else {
+                            $("#attributePanel").children('div[target="template"]').hide();
+                        }
                     } else {
-                        $("#attributePanel").children('div[target="template"]').hide();
+                        //    如果没有数据
+                        limited = false;
+                        $("#attributePanel").hide();
                     }
-                } else {
-                    //    如果没有数据
-                    limited = false;
-                    $("#attributePanel").hide();
+                },
+                error: function (e) {
+                    alert("网络错误");
                 }
-            },
-            error: function (e) {
-                alert("网络错误");
-            }
-        });
+            });
+        }
+        request(++tempFlag)
     });
 
     /**
@@ -442,6 +454,9 @@ $(document).ready(function () {
      * @param username
      */
     function setdata(range, parentid, username) {
+        if (!range || !parentid || !username) {
+            return
+        }
         $.ajax({
             url: baseUrl + 'course/check?' + `timestamp=${new Date().getTime()}`,
             async: true,
@@ -498,6 +513,9 @@ $(document).ready(function () {
      * @param username
      */
     function setDataByParent(type, parent, username) {
+        if (!type || !parent || !username) {
+            return
+        }
         $.ajax({
             url: baseUrl + 'course/course?' + `timestamp=${new Date().getTime()}`,
             contentType: "application/json",
