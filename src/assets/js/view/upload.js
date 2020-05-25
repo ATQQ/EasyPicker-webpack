@@ -222,7 +222,7 @@ $(document).ready(function () {
      */
     function loadBottomLinks() {
         const links = [{
-            href: "/EasyPicker/home",
+            href: "/",
             text: "首页"
         }, {
             href: "https://github.com/ATQQ/EasyPicker",
