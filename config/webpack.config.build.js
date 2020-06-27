@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack')
+const { getDirFileByType } = require('./fileUtil')
 // 打包html
 const htmlWebpackPlugin = require('html-webpack-plugin');
 //分离css
@@ -8,7 +9,8 @@ const extractTextPlugin = require('extract-text-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 // 静态资源拷贝
 const copyWebpackPlugin = require('copy-webpack-plugin');
-// __webpack_public_path=myRuntimePublicPath
+console.log(process.env.NODE_ENV);
+
 module.exports = {
     mode: "production",
     entry: {
@@ -62,7 +64,7 @@ module.exports = {
             test: /\.(png|jpg|gif|jpeg)$/,
             loader: 'file-loader',
             options: {
-                name: '[hash].[ext]',
+                name: '[name].[ext]',
                 outputPath: './img',
                 esModule: false
             }
@@ -91,22 +93,6 @@ module.exports = {
                 }
             }]
         }
-
-            // { //压缩css和js中的图片
-            //     test: /\.(png|jpg|gif|jpeg)/, //匹配图片文件后缀名
-            //     use: [{
-            //         loader: 'url-loader', //指定使用的loader和loader的配置参数
-            //         options: {
-            //             limit: 5 * 1024, //是把小于5KB的文件打成Base64的格式，写入JS
-            //             outputPath: './img/', //打包后的图片放到img文件夹下
-            //         }
-            //     }]
-            // },
-            // ,
-            // { //html配置
-            //     test: /\.(htm|html)$/i,
-            //     use: ['html-withimg-loader']
-            // }
         ]
     },
     // 配置插件
@@ -122,7 +108,7 @@ module.exports = {
             template: 'src/index.html'
         }),
         new htmlWebpackPlugin({
-            filename: 'admin.html',
+            filename: 'admin/index.html',
             minify: {
                 removeAttributeQuotes: true,
                 removeComments: true, //去掉注释
@@ -132,7 +118,7 @@ module.exports = {
             template: 'src/admin.html'
         }),
         new htmlWebpackPlugin({
-            filename: 'upload.html',
+            filename: 'upload/index.html',
             minify: {
                 removeAttributeQuotes: true,
                 removeComments: true, //去掉注释
@@ -142,38 +128,18 @@ module.exports = {
             template: 'src/upload.html'
         }),
         new CleanWebpackPlugin(),
-        new copyWebpackPlugin([{
-            //上传插件
-            from: path.join(__dirname, "../src/assets/js/plunge/webuploader.js"),
-            to: path.join(__dirname, "../dist/js")
-        },
-        {
-            //依赖的 flash
-            from: path.join(__dirname, "../src/assets/js/plunge/Uploader.swf"),
-            to: path.join(__dirname, "../dist/js")
-        },
-        {
-            from: path.join(__dirname, "../src/assets/js/plunge/ZeroClipboard.swf"),
-            to: path.join(__dirname, "../dist/js")
-        },
-        {
-            from: path.join(__dirname, "../src/assets/js/plunge/amazeui.datatables.js"),
-            to: path.join(__dirname, "../dist/js")
-        },
-        {
-            from: path.join(__dirname, "../src/assets/js/lib/dataTables.responsive.min.js"),
-            to: path.join(__dirname, "../dist/js")
-        },
+        new copyWebpackPlugin([
+            {
+                from: path.join(__dirname, "../src/assets/js/plunge/amazeui.datatables.js"),
+                to: path.join(__dirname, "../dist/js")
+            },
+            {
+                from: path.join(__dirname, "../src/assets/js/lib/dataTables.responsive.min.js"),
+                to: path.join(__dirname, "../dist/js")
+            }
         ]),
         //css分离(输出文件名))
         new extractTextPlugin('css/[name]-[hash].css'),
-        new webpack.HotModuleReplacementPlugin(),
-        new webpack.ProvidePlugin({
-            // $: "jQuery",
-            // jQuery: "jQuery",
-            // jquery: "jQuery",
-            // webUploader: "webUploader",
-            // webuploader: "webUploader"
-        })
+        new webpack.HotModuleReplacementPlugin()
     ]
 }

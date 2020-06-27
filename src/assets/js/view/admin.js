@@ -8,9 +8,6 @@ import '../../sass/modules/admin.scss'
 import '../common/app'
 import '../common/theme'
 
-//日期插件
-import ECalendar from '../plunge/Ecalendar.jquery.min'
-
 import { stringEncode, baseAddress } from './../common/utils'
 
 $(function () {

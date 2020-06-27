@@ -2,7 +2,7 @@
 import '../../css/index.css'
 import '../../sass/modules/index.scss'
 
-$(document).ready(function() {
+$(document).ready(function () {
     const baseurl = "/EasyPicker/";
     var isGetCode = false;
 
@@ -24,7 +24,7 @@ $(document).ready(function() {
     /**
      * 输入框内容发生改变时候
      */
-    $('input').on('change', function() {
+    $('input').on('change', function () {
         if ($(this).attr('id') === 'userMobile') {
             return;
         }
@@ -36,7 +36,7 @@ $(document).ready(function() {
     /**
      * 手机号输入框内容改变
      */
-    $('#userMobile').on('input', function(e) {
+    $('#userMobile').on('input', function (e) {
         var rMobile = /^0?(13|15|18|14|17)[0-9]{9}$/;
         if (rMobile.test(e.target.value)) {
             if (yzTimes == 90) {
@@ -56,7 +56,7 @@ $(document).ready(function() {
     /**
      * 忘记密码手机号输入框内容改变
      */
-    $('#bindPhone').on('input', function(e) {
+    $('#bindPhone').on('input', function (e) {
         var rMobile = /^0?(13|15|18|14|17)[0-9]{9}$/;
         if (rMobile.test(e.target.value)) {
             if (yzTimes2 === 90) {
@@ -75,9 +75,9 @@ $(document).ready(function() {
     /**
      * 忘记密码获取验证码
      */
-    $('#getForgetCode').on('click', function(e) {
+    $('#getForgetCode').on('click', function (e) {
         var that = this;
-        var fun = function() {
+        var fun = function () {
             yzTimes2--;
             $(that).html(yzTimes2 + "(s)");
             if (yzTimes2 === 0) {
@@ -97,7 +97,7 @@ $(document).ready(function() {
             data: {
                 "mobile": mobile
             },
-            success: function(res) {
+            success: function (res) {
                 if (res.code === 200) {
                     $(that).attr('disabled', true);
                     //开始执行
@@ -106,7 +106,7 @@ $(document).ready(function() {
                     alert(res.errMsg);
                 }
             },
-            error: function() {
+            error: function () {
                 alert("网络错误");
             }
         });
@@ -116,7 +116,7 @@ $(document).ready(function() {
     /**
      * 确认重置密码
      */
-    $('#sureReset').on('click', function() {
+    $('#sureReset').on('click', function () {
         var that = this;
         var $inputs = $('#forgetPanel').find('input');
         var phoneNumber = $inputs.eq(0).val(); //手机号
@@ -143,10 +143,10 @@ $(document).ready(function() {
             return;
         }
         const submitData = {
-                mobile: phoneNumber,
-                password: newPwd
-            }
-            // console.log(submitData);
+            mobile: phoneNumber,
+            password: newPwd
+        }
+        // console.log(submitData);
         $.ajax({
             url: baseurl + "user/update/" + code,
             type: "PUT",
@@ -191,7 +191,7 @@ $(document).ready(function() {
     /**
      * 是否开启绑定手机号的面板
      */
-    $('#isBindMobile').on('change', function(e) {
+    $('#isBindMobile').on('change', function (e) {
         if ($(this).is(':checked')) {
             $(this).parent().prev().attr('readonly', false).parent().next().show();
         } else {
@@ -202,7 +202,7 @@ $(document).ready(function() {
     /**
      * 用户登录
      */
-    $('#login').on('click', function(e) {
+    $('#login').on('click', function (e) {
         var $inputs = $('#loginPanel').find('input');
         var username = $inputs.eq(0).val();
         var pwd = $inputs.eq(1).val();
@@ -225,10 +225,10 @@ $(document).ready(function() {
     /**
      * 新用户注册获取验证码
      */
-    $('#getCode').on('click', function(e) {
+    $('#getCode').on('click', function (e) {
 
         let that = this;
-        const fun = function() {
+        const fun = function () {
             yzTimes--;
             $(that).html(yzTimes + "(s)");
             if (yzTimes === 0) {
@@ -264,7 +264,7 @@ $(document).ready(function() {
     /**
      * 确认新用户注册
      */
-    $('#register').on('click', function() {
+    $('#register').on('click', function () {
         var that = this;
         var $inputs = $('#registerPanel').find('input');
         var username = $inputs.eq(0).val();
@@ -375,7 +375,7 @@ $(document).ready(function() {
     /**
      * 切换登录/注册面板/忘记密码面板
      */
-    $('.changePanel').on('click', function() {
+    $('.changePanel').on('click', function () {
         $('div.homePanel').hide(); //隐藏全部
         const panelKey = $(this).attr('targetPanel');
         $('div.homePanel[panel="' + panelKey + '"]').addClass("flipInY").show();
@@ -425,7 +425,7 @@ $(document).ready(function() {
                         alert("登录失败,没有权限");
                     }
                     break;
-                    //登录失败
+                //登录失败
                 case 20010:
                     $inputs.eq(0).val('');
                     resetPlaceHolder($inputs.eq(0), "用户不存在");
@@ -503,14 +503,20 @@ $(document).ready(function() {
      * 加载最后一次存储的账号信息
      */
     function loadLocatAccount() {
-        var nowUser = localStorage.getItem("user");
-        if (nowUser == null) {
+        let nowUser = localStorage.getItem("user");
+        console.log(nowUser);
+        if (!nowUser) {
             return;
         }
-        nowUser = JSON.parse(nowUser);
-        $('#login-username').val(nowUser.username);
-        $('#login-password').val(nowUser.password);
-        if(localStorage.getItem('token')){
+        try {
+            const { username, password } = JSON.parse(nowUser);
+            $('#login-username').val(username);
+            $('#login-password').val(password);
+        } catch (err) {
+            console.error(err);
+            localStorage.removeItem("user")
+        }
+        if (localStorage.getItem('token')) {
             window.location.href = 'admin'
         }
     }

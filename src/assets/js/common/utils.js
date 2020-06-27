@@ -7,7 +7,7 @@ function stringEncode(str) {
     }
     return div.innerHTML;
 }
-const baseAddress = location.protocol + '//' + location.hostname
+const baseAddress = location.protocol + '//' + location.host
 export {
     stringEncode,
     baseAddress
