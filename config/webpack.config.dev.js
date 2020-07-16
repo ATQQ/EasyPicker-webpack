@@ -84,7 +84,7 @@ module.exports = {
         hotOnly: false, //只有热更新不会刷新页面
         proxy: { //跨域配置
             '/EasyPicker': {
-                target: 'http://localhost:8080/EasyPicker',
+                target: 'http://sugarat.top:8080/EasyPicker-Server-1.0' || 'http://localhost:8080/EasyPicker',
                 changeOrigin: true, //是否跨域
                 pathRewrite: {
                     '^/EasyPicker': '' //规定请求地址以什么作为开头
@@ -122,7 +122,7 @@ module.exports = {
             include: [
                 path.resolve(__dirname, '../src/assets/sass')
             ],
-            loader: ['css-loader','sass-loader']
+            loader: ['style-loader','css-loader', 'sass-loader']
         },
         {
             test: /\.(png|jpg|gif|jpeg)$/,
@@ -136,7 +136,7 @@ module.exports = {
         {
             test: /\.js?$/,
             include: [
-                path.resolve(__dirname, '../src/assets/js/views')
+                path.resolve(__dirname, '../src/assets/js/view')
             ],
             loader: ['babel-loader?cacheDirectory']
         },
@@ -157,20 +157,10 @@ module.exports = {
         getHtml('upload/index.html', ['base', 'upload'], 'src/upload.html', 'EasyPicker-轻取 提交文件'),
         new CleanWebpackPlugin(),
         // ...happyPackLoaders,
-        // new copyWebpackPlugin([
-        //     {
-        //         from: path.join(__dirname, "../css/amazeui.datatables.min.css"),
-        //         to: path.join(__dirname, "../dist/css")
-        //     },
-        //     {
-        //         from: path.join(__dirname, "../css/Ecalendar/style.css"),
-        //         to: path.join(__dirname, "../dist/css")
-        //     },
-        // ]),
         //css分离(输出文件名))
         new extractTextPlugin('css/[name]-[hash].css'),
         new webpack.HotModuleReplacementPlugin(),
         new optimizeCssAssetsWebpackPlugin(),
-        new BundleAnalyzerPlugin()
+        // new BundleAnalyzerPlugin()
     ],
 }

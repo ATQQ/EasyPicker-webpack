@@ -167,14 +167,24 @@ $(document).ready(function () {
 
                         res = res.data;
                         limited = res.people;
-                        // console.log(limited);
                         if (res.ddl) {
                             //取得日期面板dom
                             let $ddl = $("#attributePanel").children('div[target="ddl"]');
                             //显示截止日期
                             $ddl.children().eq(0).html("截止日期:" + new Date(res.ddl).Format("yyyy-MM-dd,hh:mm:ss"));
-                            //计算日期间隔
-                            $ddl.children().eq(1).html(calculateDateDiffer(res.ddl, (new Date().getTime())) ? "还剩:" + calculateDateDiffer(res.ddl, (new Date().getTime())) : "已经截止!!!");
+                            const fn = () => {
+                                let str = "已经截止!!!"
+                                //计算日期间隔
+                                if (Date.now() > res.ddl) {
+                                    $('#uploadBtn').attr("disabled", true);
+                                    $ddl.children().eq(1).html(str);
+                                    return
+                                }
+                                str = "还剩:" + calculateDateDiffer(res.ddl, (new Date().getTime()))
+                                $ddl.children().eq(1).html(str);
+                                requestAnimationFrame(fn)
+                            }
+                            fn()
                             //显示时间面板
                             $ddl.show();
                         } else {
@@ -261,18 +271,12 @@ $(document).ready(function () {
         let hour = 0;
         let minute = 0;
         let seconds = 0;
-        if (now > old) {
-            $('#uploadBtn').attr("disabled", true);
-            return false;
-        }
         let differ = Math.floor(Number((old - now) / 1000));
         day = Math.floor(differ / (24 * 60 * 60)); //天
         differ -= day * (24 * 60 * 60);
-        // console.log(differ);
 
         hour = Math.floor(differ / (60 * 60)); //时
         differ -= hour * (60 * 60);
-        // console.log(differ);
 
         minute = Math.floor(differ / 60); //分
 

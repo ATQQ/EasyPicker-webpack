@@ -504,7 +504,6 @@ $(document).ready(function () {
      */
     function loadLocatAccount() {
         let nowUser = localStorage.getItem("user");
-        console.log(nowUser);
         if (!nowUser) {
             return;
         }
