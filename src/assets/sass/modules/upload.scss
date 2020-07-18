@@ -1,54 +1,83 @@
 @charset "utf-8";
-.theme{
+.theme {
   color: #040404;
   margin-top: 10%;
-  h1{
+  h1 {
     font-size: 50px;
   }
 }
 
-@keyframes heart{
-  0%{
+@keyframes heart {
+  0% {
     transform: rotateY(0deg);
-  }50%{
-     transform: rotateY(180deg);
-
-   }
-  100%{
+  }
+  50% {
+    transform: rotateY(180deg);
+  }
+  100% {
     transform: rotateY(360deg);
   }
 }
 //旋转小心心
-#heart{
+#heart {
   width: 25px;
   transition: 1s;
   animation: heart 10s linear infinite;
   //transform:rotate(7deg);
   //position: relative;
-  i{
+  i {
     font-size: 30px;
     color: palevioletred;
   }
 }
 
-.scroll-area{
+.scroll-area {
   max-height: 60px;
   overflow-y: scroll;
 }
 
-.footer-nav{
+.footer-nav {
   padding: 3rem 0;
   display: flex;
   justify-content: center;
-  ul{
+  ul {
     display: flex;
     justify-content: space-around;
-    li{
+    li {
       list-style: none;
-      a{
+      a {
         font-size: 1.4rem;
         color: rgba(14, 144, 210, 0.45);
       }
+    }
+  }
+}
+#uploader .btns button {
+  display: block;
+}
+
+#picker {
+  position: relative;
+  input {
+    position: absolute;
+    display: block;
+    width: 100%;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0;
+  }
+}
+.uploader-list {
+  .file-item {
+    text-align: center;
+    width: 60vw;
+    position: relative;
+    span.delete {
+      position: absolute;
+      top: 3.4rem;
+      right: -2rem;
     }
   }
 }

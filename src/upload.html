@@ -45,15 +45,28 @@
             </div>
             <div class="fw-flex fw-fdc am-margin-top-sm">
                 <div class="fw-flex fw-c-c">
-                    <div id="thelist" class="uploader-list">
-                    </div>
+                    <ul id="thelist" class="uploader-list">
+                        <!-- <li class="file-item">
+                            <h4 class="am-margin-bottom-sm">文件名</h4>
+                            <div class="am-progress">
+                                <div class="progress am-progress-bar am-progress-bar-secondary" style="width: 100%">
+                                    等待上传
+                                </div>
+                            </div>
+                            <span class="delete am-icon-close"></span>
+                        </li> -->
+                    </ul>
                 </div>
                 <div class="fw-flex fw-c-c">
                     <div id="uploader" class="wu-example">
                         <!--用来存放文件信息-->
                         <div class="btns">
-                            <div id="picker">选择文件</div>
-                            <button id="uploadBtn" class="am-btn am-btn-success"
+                            <label for="file">
+                                <button id="picker" class="am-btn am-btn-primary">选择文件
+                                    <input type="file" name="file">
+                                </button>
+                            </label>
+                            <button id="uploadBtn" class="am-btn am-btn-success am-margin-top-sm"
                                 data-am-loading="{spinner: 'circle-o-notch', loadingText: '文件上传中...'}">确认提交</button>
                         </div>
                     </div>
@@ -66,7 +79,8 @@
                 </div>
                 <div target="template">
                     <div><button filename="" id="downlloadTemplate"
-                            class="am-btn-sm am-btn am-btn-warning">下载模板</button></div>
+                            class="am-btn-sm am-btn am-btn-warning">下载模板</button>
+                    </div>
                 </div>
             </div>
             <div class="fw-flex fw-c-c am-margin-top-sm am-footer" style="color: #45d9ec">
@@ -95,6 +109,7 @@
     <script src="https://cdn.staticfile.org/amazeui/2.2.1/js/amazeui.min.js"></script>
     <!--WebUploader-->
     <script src="https://cdn.staticfile.org/webuploader/0.1.1/webuploader.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qiniu-js/3.0.3/qiniu.min.js"></script>
 </body>
 
 </html>
