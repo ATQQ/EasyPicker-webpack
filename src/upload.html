@@ -5,15 +5,11 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>EasyPicker</title>
-    <meta name="description" content="EasyPicker管理端">
-    <meta name="keywords" content="EasyPicker">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <meta name="renderer" content="webkit">
+    <title><%= htmlWebpackPlugin.options.title %></title>
+    <meta name="apple-mobile-web-app-title" content="<%= htmlWebpackPlugin.options.title %>" />
     <meta http-equiv="Cache-Control" content="no-siteapp" />
     <link rel="shortcut icon" href="http://img.cdn.sugarat.top/mdImg/MTU4OTE3MzM5NTcwNA==589173395704">
     <link rel="stylesheet" href="https://cdn.staticfile.org/amazeui/2.2.1/css/amazeui.min.css">
-
 </head>
 
 <body class="bgc"
@@ -25,15 +21,17 @@
             <i class="am-icon-heartbeat"></i>
         </div>
         <div class="fw-flex fw-fdc fw-c-c">
+            <h4 style="margin:0;text-align:center;">空间选择</h4>
             <div class="fw-flex fw-c-c am-margin-top-sm">
-                <label>父类选择:
+                <label>
                     <select id="course" data-am-selected="{btnStyle: 'secondary'}">
                         <!--<option value="a">Apple</option>-->
                     </select>
                 </label>
             </div>
+            <h4 style="margin:0;text-align:center;">文件夹选择(可点击下拉)</h4>
             <div class="fw-flex fw-c-c am-margin-top-sm">
-                <label>子类选择:
+                <label>
                     <select id="task" data-am-selected="{btnStyle: 'secondary'}">
                         <!--<option value="a">Apple</option>-->
                     </select>
@@ -49,15 +47,28 @@
             </div>
             <div class="fw-flex fw-fdc am-margin-top-sm">
                 <div class="fw-flex fw-c-c">
-                    <div id="thelist" class="uploader-list">
-                    </div>
+                    <ul id="thelist" class="uploader-list">
+                        <!-- <li class="file-item">
+                            <h4 class="am-margin-bottom-sm">文件名</h4>
+                            <div class="am-progress">
+                                <div class="progress am-progress-bar am-progress-bar-secondary" style="width: 100%">
+                                    等待上传
+                                </div>
+                            </div>
+                            <span class="delete am-icon-close"></span>
+                        </li> -->
+                    </ul>
                 </div>
                 <div class="fw-flex fw-c-c">
                     <div id="uploader" class="wu-example">
                         <!--用来存放文件信息-->
                         <div class="btns">
-                            <div id="picker">选择文件</div>
-                            <button id="uploadBtn" class="am-btn am-btn-success"
+                            <label for="file">
+                                <button id="picker" class="am-btn-sm am-btn am-btn-primary">选择文件
+                                    <input type="file" name="file">
+                                </button>
+                            </label>
+                            <button id="uploadBtn" class="am-btn-sm am-btn am-btn-success am-margin-top-sm"
                                 data-am-loading="{spinner: 'circle-o-notch', loadingText: '文件上传中...'}">确认提交</button>
                         </div>
                     </div>
@@ -70,13 +81,13 @@
                 </div>
                 <div target="template">
                     <div><button filename="" id="downlloadTemplate"
-                            class="am-btn-sm am-btn am-btn-warning">下载模板</button></div>
+                            class="am-btn-sm am-btn am-btn-warning">下载模板</button>
+                    </div>
                 </div>
             </div>
-            <div class="fw-flex fw-c-c am-margin-top-sm am-footer" style="color: #45d9ec">
+            <!-- <div class="fw-flex fw-c-c am-margin-top-sm am-footer" style="color: #45d9ec">
                 IF（BOOL 学习= =FALSE）BOOL 落后=TRUE
-            </div>
-
+            </div> -->
             <footer class="footer-nav am-container">
                 <ul class="am-u-lg-5 am-u-md-6 am-u-sm-12 am-center" id="bottom-links">
                 </ul>
@@ -94,10 +105,11 @@
             justify-content: center;
         }
     </style>
+    <script src="https://cdn.staticfile.org/jquery/2.1.4/jquery.min.js"></script>
+    <!-- AmazeUI -->
+    <script src="https://cdn.staticfile.org/amazeui/2.2.1/js/amazeui.min.js"></script>
+    <!--WebUploader-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qiniu-js/3.0.3/qiniu.min.js"></script>
 </body>
-<!-- AmazeUI -->
-<script src="https://cdn.staticfile.org/amazeui/2.2.1/js/amazeui.min.js"></script>
-<!--WebUploader-->
-<script src="https://cdn.staticfile.org/webuploader/0.1.1/webuploader.min.js"></script>
 
 </html>

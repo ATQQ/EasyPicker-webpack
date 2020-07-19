@@ -5,17 +5,12 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>EasyPicker 管理端</title>
-    <meta name="description" content="EasyPicker 管理端">
-    <meta name="keywords" content="EasyPicker">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="renderer" content="webkit">
+    <title><%= htmlWebpackPlugin.options.title %></title>
     <meta http-equiv="Cache-Control" content="no-siteapp" />
-    <link rel="shortcut icon" href="http://img.cdn.sugarat.top/mdImg/MTU4OTE3MzM5NTcwNA==589173395704">
-    <meta name="apple-mobile-web-app-title" content="EasyPicker 管理端" />
+    <meta name="apple-mobile-web-app-title" content="<%= htmlWebpackPlugin.options.title %>" />
     <link rel="stylesheet" href="https://cdn.staticfile.org/amazeui/2.2.1/css/amazeui.min.css">
     <link rel="stylesheet" href="https://cdn.staticfile.org/animate.css/3.7.2/animate.min.css">
-    <link rel="stylesheet" href="https://cdn.staticfile.org/amazeui/2.2.1/css/amazeui.flat.min.css">
+    <!-- <link rel="stylesheet" href="https://cdn.staticfile.org/amazeui/2.2.1/css/amazeui.flat.min.css"> -->
 </head>
 
 <body data-type="index">
@@ -375,16 +370,11 @@
                         </div>
                         <div class="fw-flex fw-c-sa">
                             <div class="am-btn-group">
-                                <!--隐藏上传文件插件-->
-                                <style>
-                                    input[type="file"] {
-                                        display: none;
-                                    }
-                                </style>
-                                <button type="button" id="choose-file"
-                                    class="am-btn am-btn-sm am-btn-primary">选择</button>
-                                <button type="button" id="sure-Template"
-                                    class="am-btn am-btn-sm am-btn-success">确定</button>
+                                <button type="button" id="choose-file" class="am-btn am-btn-sm am-btn-primary">选择
+                                    <input type="file">
+                                </button>
+                                <button type="button" id="sure-Template" class="am-btn am-btn-sm am-btn-success"
+                                    data-am-loading="{spinner: 'circle-o-notch', loadingText: '文件上传中...'}">确定</button>
                             </div>
                             <button type="button" id="cancel-Template"
                                 class="am-btn am-btn-sm  am-radius am-btn-danger">
@@ -427,6 +417,12 @@
                         <!--文件选择区域-->
                         <div class="fw-flex fw-c-sa am-margin-bottom-sm" id="showPeople">
                             <div class="am-btn-group">
+                                <!--隐藏上传文件插件-->
+                                <style>
+                                    #filePicker input[type="file"] {
+                                        display: none;
+                                    }
+                                </style>
                                 <button style="position: relative;" id="filePicker"
                                     class="am-btn am-radius am-btn-primary am-btn-sm">选择文件
                                 </button>
@@ -551,13 +547,16 @@
             justify-content: center;
         }
     </style>
+    <script src="https://cdn.staticfile.org/jquery/2.1.4/jquery.min.js"></script>
+    <!-- 日期插件 -->
+    <script src="http://img.cdn.sugarat.top/js/Ecalendar.jquery.min.js"></script>
+    <!-- amazeui -->
+    <script src="https://cdn.staticfile.org/amazeui/2.2.1/js/amazeui.min.js"></script>
+    <!--WebUploader-->
+    <script src="https://cdn.staticfile.org/webuploader/0.1.1/webuploader.min.js"></script>
+    <script src="http://img.cdn.sugarat.top/js/amazeui/amazeui.datatables.min.js"></script>
+    <script src="http://img.cdn.sugarat.top/js/amazeui/dataTables.responsive.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qiniu-js/3.0.3/qiniu.min.js"></script>
 </body>
-<!-- amazeui -->
-<script src="https://cdn.staticfile.org/amazeui/2.2.1/js/amazeui.min.js"></script>
-<!--WebUploader-->
-<script src="https://cdn.staticfile.org/webuploader/0.1.1/webuploader.min.js"></script>
-<!-- datatable -->
-<script src="./../js/amazeui.datatables.js"></script>
-<script src="./../js/dataTables.responsive.min.js"></script>
 
 </html>
