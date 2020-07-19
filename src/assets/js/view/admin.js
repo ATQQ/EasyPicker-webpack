@@ -8,8 +8,8 @@ import '../../sass/modules/admin.scss'
 import '../common/app'
 import '../common/theme'
 
-import { stringEncode, baseAddress, getRandomStr, AlertModal, getQiNiuUploadToken } from './../common/utils'
-
+import { stringEncode, baseAddress, getRandomStr, AlertModal, getQiNiuUploadToken, downLoadByUrl } from './../common/utils'
+import fileApi from './../apis/file.js'
 $(function () {
     const baseUrl = "/EasyPicker/";
     const username = localStorage.getItem("username");
@@ -28,7 +28,7 @@ $(function () {
             "token": token
         },
         error: function () {
-            alert("网络错误");
+            Alert("网络错误");
         }
     });
     //初始化用户名
@@ -170,7 +170,7 @@ $(function () {
                     "type": 1
                 }).then(({ code }) => {
                     if (code === 200) {
-                        alert(`截止日期已设置为:${new Date(newDate).Format("yyyy-MM-dd hh:mm:ss")}`);
+                        Alert(`截止日期已设置为:${new Date(newDate).Format("yyyy-MM-dd hh:mm:ss")}`);
                         //关闭按钮启用
                         document.querySelector('#cancel-Date').disabled = false;
                     }
@@ -222,7 +222,7 @@ $(function () {
             getQiNiuUploadToken().then(res => {
                 $btn.button("loading");
                 const ucourse = document.getElementById('courseActive').textContent;
-                const utask = document.getElementById('taskActive').textContent + '_template';
+                const utask = document.getElementById('taskActive').textContent + '_Template';
                 let key = `${username}/${ucourse}/${utask}/${file.name}`
                 const observable = qiniu.upload(file, key, res.data.data)
                 templateFile.status = 2
@@ -253,7 +253,7 @@ $(function () {
                             "type": 3
                         }).then(res => {
                             if (res.code === 200) {
-                                alert("模板已设置成功:" + file.name);
+                                Alert("模板已设置成功:" + file.name);
                                 //启用删除模板按钮
                                 document.getElementById('cancel-Template').disabled = false;
                                 const docFrag = document.createDocumentFragment();
@@ -321,7 +321,7 @@ $(function () {
         if (code === 200) {
             const { failCount } = response.data;
             if (failCount > 0) {
-                alert(`有${failCount}条数据未导入成功`);
+                Alert(`有${failCount}条数据未导入成功`);
                 // 自动下载未导入成功数据文件
                 let tempData = peoplePicker.options.formData;
                 let filename = file.name;
@@ -333,12 +333,12 @@ $(function () {
                 jsonArray.push({ "key": "filename", "value": filename });
                 downloadFile(baseUrl + "file/down", jsonArray);
             } else {
-                alert("全部导入成功");
+                Alert("全部导入成功");
             }
         } else {
             span.classList.replace("am-badge-success", "am-badge-warning");
             span.textContent = "不支持的文件类型";
-            alert("文件格式不符合要求,目前只支持.txt,.xls,.xlsx等文件类型");
+            Alert("文件格式不符合要求,目前只支持.txt,.xls,.xlsx等文件类型");
         }
 
     });
@@ -379,7 +379,7 @@ $(function () {
             document.execCommand('copy');
         }
         document.body.removeChild(input);
-        alert("结果已成功复制到剪贴板")
+        Alert("结果已成功复制到剪贴板")
     }
     $('#copyLink').on('click', function (e) {
         copyRes(document.getElementById('tempCopy').href)
@@ -393,6 +393,26 @@ $(function () {
         getShortUrl(originUrl);
     });
 
+    function checkOssStatus(url) {
+        $('#download').button('loading')
+        fileApi.getcompressFileStatus(url).then(res => {
+            const { code } = res.data
+            if (code === 0) {
+                const { key } = res.data
+                // 获取下载链接
+                fileApi.getFileDownloadUrl(...key.split('/')).then(res => {
+                    const { url } = res.data
+                    // 开始下载
+                    downLoadByUrl(url)
+                    // 恢复下载按钮
+                    $('#download').button('reset')
+                })
+                return
+            }
+            // 为完成继续论询
+            setTimeout(checkOssStatus, 1000, url)
+        })
+    }
     /**
      * 下载指定任务中所有文件
      */
@@ -400,7 +420,7 @@ $(function () {
         let parent = document.getElementById('courseList').value;
         let child = document.getElementById('taskList').value;
         if (parent === '-1' || child === '-1') {
-            alert("请选择要下载的子类");
+            Alert("请选择要下载的子类");
             return 0;
         }
         //取得子类与父类的名称
@@ -417,34 +437,52 @@ $(function () {
             return v.course === parent && v.tasks === child;
         });
         if (!findResult) {
-            alert("没有可下载的文件");
+            Alert("没有可下载的文件");
         } else {
             //防止用户点击多次下载
             let $btn = $(this);
             $btn.button('loading');
-            //生成指定任务的压缩包 并下载
-            http.post('file/createZip', {
-                "course": parent,
-                "tasks": child,
-                "username": username
-            }).then(({ code }) => {
-                if (code === 200) {
-                    // 开始下载压缩文件文件
-                    let jsonArray = [];
-                    jsonArray.push({ "key": "course", "value": parent });
-                    jsonArray.push({ "key": "tasks", "value": "." });
-                    jsonArray.push({ "key": "username", "value": username });
-                    jsonArray.push({ "key": "filename", "value": child + ".zip" });
-                    downloadFile(baseUrl + "file/down", jsonArray);
-                    setTimeout(function () {
-                        $btn.button('reset');
-                    }, 2000);
+            fileApi.checkFileCount(username, parent, child).then(res => {
+                const { oss, server } = res.data
+                if (server !== 0) {
+                    //生成指定任务的压缩包 并下载
+                    http.post('file/createZip', {
+                        "course": parent,
+                        "tasks": child,
+                        "username": username
+                    }).then(({ code }) => {
+                        if (code === 200) {
+                            // 开始下载压缩文件文件
+                            let jsonArray = [];
+                            jsonArray.push({ "key": "course", "value": parent });
+                            jsonArray.push({ "key": "tasks", "value": "." });
+                            jsonArray.push({ "key": "username", "value": username });
+                            jsonArray.push({ "key": "filename", "value": child + ".zip" });
+                            downloadFile(baseUrl + "file/down", jsonArray);
+                            setTimeout(function () {
+                                $btn.button('reset');
+                            }, 2000);
+                        }
+                    }).catch(err => {
+                        setTimeout(function () {
+                            $btn.button('reset');
+                        }, 1000);
+                    });
                 }
-            }).catch(err => {
-                setTimeout(function () {
-                    $btn.button('reset');
-                }, 1000);
-            });
+
+                if (oss !== 0) {
+                    fileApi.compressOssFile(username, parent, child).then(res => {
+                        const { url } = res.data
+                        checkOssStatus(url)
+                    })
+                    // TODO
+                    // checkOssStatus('http://api.qiniu.com/status/get/prefop?id=z2.01z201c4an8eqp5fww00muo2j400016f')
+                }
+
+                if (oss === 0 && server === 0) {
+                    Alert('由于服务器迁移,老版平台上传的文件已经被清理', '源文件已经被删除')
+                }
+            })
         }
     })
 
@@ -513,7 +551,19 @@ $(function () {
         jsonArray.push({ "key": "tasks", "value": cells[3] });
         jsonArray.push({ "key": "filename", "value": cells[4] });
         jsonArray.push({ "key": "username", "value": username });
-        downloadFile(baseUrl + "file/down", jsonArray);
+        fileApi.checkFileIsExist(username, cells[2], cells[3], cells[4]).then(res => {
+            const { where } = res.data
+            if (where === 'server') {
+                downloadFile(baseUrl + "file/down", jsonArray);
+            } else if (where === 'oss') {
+                fileApi.getFileDownloadUrl(username, cells[2], cells[3], cells[4]).then(res => {
+                    const { url } = res.data
+                    downLoadByUrl(url)
+                })
+            } else {
+                Alert('由于服务器迁移,老版平台上传的文件已经被清理', '源文件已经被删除')
+            }
+        })
     })
 
     /**
@@ -535,7 +585,7 @@ $(function () {
                 success: function (res) {
                     if (res.code === 200) {
                         filesTable.row($(that).parents("tr")).remove().draw();
-
+                        Alert("删除成功！")
                         //异步获取最新的repors数据
                         $.ajax({
                             url: baseUrl + 'report/report' + `?time=${Date.now()}`,
@@ -596,7 +646,7 @@ $(function () {
                 }),
                 success: function (res) {
                     if (res.code === 200) {
-                        alert("已移除当前设置的文件模板");
+                        Alert("已移除当前设置的文件模板");
                         //清理设置的模板
                         $("#fileList").empty();
                         //禁用关闭按钮
@@ -625,7 +675,7 @@ $(function () {
                 }),
                 success: function (res) {
                     if (res.code === 200) {
-                        alert("已取消截止日期设置");
+                        Alert("已取消截止日期设置");
                         //清理设置的日期内容
                         const datePicker = document.querySelector('#datePicker');
                         datePicker.value = "";
@@ -897,7 +947,7 @@ $(function () {
                     }
                     return;
                 }
-                alert("删除失败" + res.errMsg);
+                Alert("删除失败" + res.errMsg);
             });
         }
         event.stopPropagation();
@@ -923,7 +973,7 @@ $(function () {
                     }
                     return;
                 }
-                alert("删除失败" + res.errMsg);
+                Alert("删除失败" + res.errMsg);
             });
 
         }
@@ -974,7 +1024,7 @@ $(function () {
             let value = $input.value.trim();
             value = stringEncode(value)
             if (!value) {
-                alert('内容不能为空');
+                Alert('内容不能为空');
                 return;
             }
 
@@ -984,7 +1034,7 @@ $(function () {
                 return element.getAttribute('text') === value;
             });
             if (isExist) {
-                alert("内容已存在");
+                Alert("内容已存在");
                 $input.value = "";
                 return;
             }
@@ -1001,7 +1051,7 @@ $(function () {
         let $input = this.parentElement.previousElementSibling;
         let value = $input.value.trim();
         if (!value) {
-            alert('内容不能为空');
+            Alert('内容不能为空');
             return;
         }
         value = stringEncode(value)
@@ -1011,7 +1061,7 @@ $(function () {
             return element.getAttribute('text') === value;
         });
         if (isExist) {
-            alert("内容已存在");
+            Alert("内容已存在");
             $input.value = "";
             return;
         }
@@ -1160,12 +1210,12 @@ $(function () {
             }),
             success: function (res) {
                 if (res.code !== 200) {
-                    alert('添加失败');
+                    Alert('添加失败');
                     return;
                 }
 
                 if (!res.data.status) {
-                    alert('内容已存在');
+                    Alert('内容已存在');
                 } else if (!parent) {
                     insertToPanel("#coursePanel", name, res.data.id, 'course');
                 } else {
@@ -1307,7 +1357,7 @@ $(function () {
         //判断登录是否失效
         let token = localStorage.getItem("token");
         if (token == null || token == '') {
-            alert("登录已经失效,请重新登录");
+            Alert("登录已经失效,请重新登录");
             redirectHome();
             return;
         }
@@ -1350,7 +1400,7 @@ $(function () {
                     refreshPageInfo();
                 } else {
                     localStorage.removeItem('token')
-                    alert('登录过期')
+                    Alert('登录过期')
                     redirectHome()
                 }
             })

@@ -1,6 +1,6 @@
 import '../../sass/modules/upload.scss'
-import { stringEncode, getRandomStr, AlertModal, getQiNiuUploadToken } from './../common/utils'
-
+import { stringEncode, getRandomStr, AlertModal, getQiNiuUploadToken,downLoadByUrl } from './../common/utils'
+import fileApi from './../apis/file.js'
 window.onload = function () {
 
     let baseUrl = "/EasyPicker/";
@@ -276,18 +276,35 @@ window.onload = function () {
                             $("#downlloadTemplate").unbind('click');
                             $("#downlloadTemplate").on('click', function () {
                                 let parent = $("#course").next().children().eq(0).find(".am-selected-status").html();
-                                let child = $("#task").next().children().eq(0).find(".am-selected-status").html();
-                                let jsonArray = new Array();
+                                let child = $("#task").next().children().eq(0).find(".am-selected-status").html() + "_Template";
+                                let jsonArray = []
+                                let { template } = res
                                 jsonArray.push({ "key": "course", "value": parent });
-                                jsonArray.push({ "key": "tasks", "value": child + "_Template" });
-                                jsonArray.push({ "key": "filename", "value": res.template });
+                                jsonArray.push({ "key": "tasks", "value": child });
+                                jsonArray.push({ "key": "filename", "value": template });
                                 jsonArray.push({ "key": "username", "value": account });
-                                downloadFile(baseUrl + "file/down", jsonArray);
-                                let $btn = $(this);
-                                $btn.button('loading');
-                                setTimeout(function () {
-                                    $btn.button('reset');
-                                }, 5000);
+                                const $btn = $(this);
+                                fileApi.checkFileIsExist(account, parent, child, template).then(res => {
+                                    const { where } = res.data
+                                    if (where === 'server') {
+                                        downloadFile(baseUrl + "file/down", jsonArray);
+                                        $btn.button('loading');
+                                        setTimeout(function () {
+                                            $btn.button('reset');
+                                        }, 5000);
+                                    } else if (where === 'oss') {
+                                        fileApi.getFileDownloadUrl(account, parent, child, template).then(res => {
+                                            const { url } = res.data
+                                            downLoadByUrl(url)
+                                            $btn.button('loading');
+                                            setTimeout(function () {
+                                                $btn.button('reset');
+                                            }, 5000);
+                                        })
+                                    } else {
+                                        Alert('由于历史原因,老版平台上传的文件已经被清理', '源文件已经被删除')
+                                    }
+                                })
                             });
                         } else {
                             $("#attributePanel").children('div[target="template"]').hide();

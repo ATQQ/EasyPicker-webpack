@@ -72,34 +72,11 @@ function openModel(id, close) {
  * @param {String} filename 文件名
  */
 function downLoadByUrl(url, filename) {
-    let xhr = new XMLHttpRequest();
-    //GET请求,请求路径url,async(是否异步)
-    xhr.open('GET', url, true);
-    //设置请求头参数的方式,如果没有可忽略此行代码
-    // xhr.setRequestHeader("token", token);
-    //设置响应类型为 blob
-    xhr.responseType = 'blob';
-    //关键部分
-    xhr.onload = function (e) {
-        //如果请求执行成功
-        if (this.status == 200) {
-            let blob = this.response;
-            // let filename = "我是文件名.xxx";//如123.xls
-            let a = document.createElement('a');
-
-            blob.type = "multipart/form-data";
-            //创键临时url对象
-            let url = URL.createObjectURL(blob);
-
-            a.href = url;
-            a.download = filename;
-            a.click();
-            //释放之前创建的URL对象
-            window.URL.revokeObjectURL(url);
-        }
-    };
-    //发送请求
-    xhr.send();
+    let a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.download = filename;
+    a.click();
 }
 
 /**

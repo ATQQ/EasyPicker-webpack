@@ -21,15 +21,17 @@
             <i class="am-icon-heartbeat"></i>
         </div>
         <div class="fw-flex fw-fdc fw-c-c">
+            <h4 style="margin:0;text-align:center;">空间选择</h4>
             <div class="fw-flex fw-c-c am-margin-top-sm">
-                <label>父类选择:
+                <label>
                     <select id="course" data-am-selected="{btnStyle: 'secondary'}">
                         <!--<option value="a">Apple</option>-->
                     </select>
                 </label>
             </div>
+            <h4 style="margin:0;text-align:center;">文件夹选择(可点击下拉)</h4>
             <div class="fw-flex fw-c-c am-margin-top-sm">
-                <label>子类选择:
+                <label>
                     <select id="task" data-am-selected="{btnStyle: 'secondary'}">
                         <!--<option value="a">Apple</option>-->
                     </select>
@@ -62,11 +64,11 @@
                         <!--用来存放文件信息-->
                         <div class="btns">
                             <label for="file">
-                                <button id="picker" class="am-btn am-btn-primary">选择文件
+                                <button id="picker" class="am-btn-sm am-btn am-btn-primary">选择文件
                                     <input type="file" name="file">
                                 </button>
                             </label>
-                            <button id="uploadBtn" class="am-btn am-btn-success am-margin-top-sm"
+                            <button id="uploadBtn" class="am-btn-sm am-btn am-btn-success am-margin-top-sm"
                                 data-am-loading="{spinner: 'circle-o-notch', loadingText: '文件上传中...'}">确认提交</button>
                         </div>
                     </div>
@@ -83,10 +85,9 @@
                     </div>
                 </div>
             </div>
-            <div class="fw-flex fw-c-c am-margin-top-sm am-footer" style="color: #45d9ec">
+            <!-- <div class="fw-flex fw-c-c am-margin-top-sm am-footer" style="color: #45d9ec">
                 IF（BOOL 学习= =FALSE）BOOL 落后=TRUE
-            </div>
-
+            </div> -->
             <footer class="footer-nav am-container">
                 <ul class="am-u-lg-5 am-u-md-6 am-u-sm-12 am-center" id="bottom-links">
                 </ul>
