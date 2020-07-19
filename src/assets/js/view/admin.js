@@ -8,7 +8,7 @@ import '../../sass/modules/admin.scss'
 import '../common/app'
 import '../common/theme'
 
-import { stringEncode, baseAddress } from './../common/utils'
+import { stringEncode, baseAddress, getRandomStr, AlertModal, getQiNiuUploadToken } from './../common/utils'
 
 $(function () {
     const baseUrl = "/EasyPicker/";
@@ -17,6 +17,10 @@ $(function () {
     let nodes = null; //存放所有类别信息(子类/父类)
     const token = localStorage.getItem("token");
     let filterFlag = null; //记录过滤的表名
+    const Alert = (() => {
+        let t = new AlertModal()
+        return t.show.bind(t)
+    })();
     //设置全局ajax设置
     $.ajaxSetup({
         // 默认添加请求头
@@ -180,93 +184,96 @@ $(function () {
     /**
      * 上传模板文件
      */
+    let templateFile = null
+    /**
+     * 选择模板文件
+     */
+    $('#choose-file input').on('change', function (e) {
+        const file = e.target.files[0]
 
-    let uploader = WebUploader.create({
-        //选择完文件或是否自动上传
-        auto: false,
-        //swf文件路径
-        swf: 'https://cdn.staticfile.org/webuploader/0.1.1/Uploader.swf',
-        //是否要分片处理大文件上传。
-        chunked: false,
-        // 如果要分片，分多大一片？ 默认大小为5M.
-        chunkSize: 5 * 1024 * 1024,
-        // 上传并发数。允许同时最大上传进程数[默认值：3]   即上传文件数
-        threads: 1,
-        //文件接收服务端
-        server: baseUrl + "file/saveTemplate",
-        // 内部根据当前运行是创建，可能是input元素，也可能是flash.
-        pick: '#choose-file',
-        method: "POST",
-        // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
-        resize: false
-    });
-    // 当有文件被添加进队列的时候
-    uploader.on('fileQueued', function (file) {
-        const docFrag = document.createDocumentFragment();
-        const fileLIst = document.getElementById('fileList');
-        //fileItem
-        let div = document.createElement('div');
-        div.id = file.id;
-        div.classList.add("item");
-        let h4 = document.createElement('h4');
-        h4.classList.add("info", "am-margin-bottom-sm");
-        h4.append(file.name);
-        let p = document.createElement('p');
-        p.classList.add('state', 'fw-text-c');
-        p.append('等待上传...');
-        div.append(h4, p);
-        docFrag.appendChild(div);
-        fileLIst.appendChild(docFrag);
-        uploader.options.formData = {}
-    });
-    // 文件上传过程中创建进度条实时显示。
-    uploader.on('uploadProgress', function (file, percentage) {
-        const p = document.getElementById(`${file.id}`).querySelector('p');
-        p.textContent = `上传中:${percentage.toFixed(2) * 100}`;
-    });
-
-    // 文件上传成功处理。
-    uploader.on('uploadSuccess', function (file, response) {
-        const p = document.getElementById(`${file.id}`).querySelector('p');
-        p.textContent = '已上传';
-        if (response.code === 200) {
-            //保存模板信息
-            http.put("childContent/childContext", {
-                "template": file.name,
-                "taskid": nowClickId,
-                "type": 3
-            }).then(res => {
-                if (res.code === 200) {
-                    alert("模板已设置成功:" + file.name);
-                    //启用删除模板按钮
-                    document.getElementById('cancel-Template').disabled = false;
-                    const docFrag = document.createDocumentFragment();
-                    const fileList = document.getElementById('fileList');
-                    //移除原来子节点
-                    clearpanel('#fileList');
-                    //创建新的节点并插入原文档
-                    const div = document.createElement('div');
-                    div.textContent = file.name;
-                    docFrag.appendChild(div);
-                    fileList.appendChild(docFrag);
-                }
-            });
+        if (file.name.indexOf(".") === -1 || file.name.indexOf(".") === file.name.length - 1) {
+            Alert("文件必须有后缀", "文件名称不支持")
+            return
         }
+        templateFile = {
+            status: 0, // -1 0 1 2|失败 待上传 上传成功 上传中
+            file,
+            id: getRandomStr(7)
+        }
+        let dom = `<li class="file-item" id="${templateFile.id}">
+                    <h4 class="am-margin-bottom-sm">${file.name}</h4>
+                        <div class="am-progress am-progress-striped am-active" style="height:2rem;">
+                            <div status="${templateFile.status}" class="progress am-progress-bar am-progress-bar-secondary" style="width: 100%">
+                                等待上传。。。
+                            </div>
+                        </div>
+                    </li>`;
 
-    });
-
-    //上传出错
-    uploader.on('uploadError', function (file) {
-        const p = document.getElementById(file.id).querySelector('p');
-        p.textContent = '上传出错';
-    });
+        $('#fileList').empty().append(dom);
+    })
 
     // 开始上传
     $('#sure-Template').on('click', function () {
-        uploader.options.formData.parent = document.getElementById('courseActive').textContent;
-        uploader.options.formData.child = document.getElementById('taskActive').textContent;
-        uploader.options.formData.username = username;
-        uploader.upload();
+        const { file, status, id } = templateFile
+        const fileItem = $(`#${id}`)
+        const process = fileItem.find(".progress")[0]
+        const $btn = $(this)
+        if (status !== 1 && status !== 2) {
+            getQiNiuUploadToken().then(res => {
+                $btn.button("loading");
+                const ucourse = document.getElementById('courseActive').textContent;
+                const utask = document.getElementById('taskActive').textContent + '_template';
+                let key = `${username}/${ucourse}/${utask}/${file.name}`
+                const observable = qiniu.upload(file, key, res.data.data)
+                templateFile.status = 2
+                const subscription = observable.subscribe({
+                    next(res) {
+                        const { total: { percent } } = res
+                        const width = percent.toFixed(2) + '%'
+                        process.style.width = width
+                        process.textContent = width
+                    },
+                    error(err) {
+                        templateFile.status = -1
+                        process.textContent = "上传失败"
+                        process.classList.replace('am-progress-bar-secondary', 'am-progress-bar-danger')
+                        Alert(JSON.stringify(err));
+                        $btn.button('reset')
+                    },
+                    complete(res) {
+                        $btn.button('reset')
+                        templateFile.status = 1
+                        const { hash, key } = res
+                        process.textContent = "上传成功"
+                        process.classList.replace('am-progress-bar-secondary', 'am-progress-bar-success')
+                        //保存模板信息
+                        http.put("childContent/childContext", {
+                            "template": file.name,
+                            "taskid": nowClickId,
+                            "type": 3
+                        }).then(res => {
+                            if (res.code === 200) {
+                                alert("模板已设置成功:" + file.name);
+                                //启用删除模板按钮
+                                document.getElementById('cancel-Template').disabled = false;
+                                const docFrag = document.createDocumentFragment();
+                                const fileList = document.getElementById('fileList');
+                                //移除原来子节点
+                                clearpanel('#fileList');
+                                //创建新的节点并插入原文档
+                                const div = document.createElement('div');
+                                div.textContent = file.name;
+                                docFrag.appendChild(div);
+                                fileList.appendChild(docFrag);
+                            }
+                        });
+                    }
+                })
+                // subscription.close() // 取消上传  
+            })
+        } else {
+            Alert("没有可上传的文件")
+        }
     });
     //=========================================华丽的分割线(上传人员名单部分)=========================================
     /**
@@ -1050,6 +1057,7 @@ $(function () {
      * 初始化面板内容
      */
     function resetModalPanel() {
+        templateFile = null
         //    默认datePicker
         document.getElementById('datePicker').value = '';
         document.getElementById('cancel-Date').disabled = true;

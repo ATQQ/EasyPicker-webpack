@@ -1,8 +1,7 @@
 import '../../sass/modules/upload.scss'
-import '../../css/webuploader.css'
-import { stringEncode, getRandomStr, AlertModal } from './../common/utils'
+import { stringEncode, getRandomStr, AlertModal, getQiNiuUploadToken } from './../common/utils'
 
-$(document).ready(function () {
+window.onload = function () {
 
     let baseUrl = "/EasyPicker/";
     let uname = null; //提交者姓名
@@ -28,34 +27,6 @@ $(document).ready(function () {
     /**
      * 上传文件
      */
-
-    // 当有文件被添加进队列的时候
-    // uploader.on('fileQueued', function (file) {
-    //     let $list = $('#thelist');
-    //     $list.append('<div id="' + file.id + '" class="item">' +
-    //         '<h4 class="info am-margin-bottom-sm">' + file.name + '</h4>' +
-    //         '<p class="state fw-text-c">等待上传...</p>' +
-    //         '</div>');
-    // });
-    // // 文件上传过程中创建进度条实时显示。
-    // uploader.on('uploadProgress', function (file, percentage) {
-    //     let $li = $('#' + file.id);
-    //     $li.find('p.state').text(`上传中:${percentage.toFixed(2) * 100}`);
-    // });
-
-
-    // // 文件上传成功处理。
-    // uploader.on('uploadSuccess', function (file, response) {
-    //     $('#' + file.id).find('p.state').text('上传完成');
-    //     const { filename } = response.data;
-    //     addReport(uname, ucourse, utask, filename, account);
-    //     $("#name").val("");
-    // });
-
-    // //上传出错
-    // uploader.on('uploadError', function (file) {
-    //     $('#' + file.id).find('p.state').text('上传出错');
-    // });
     const fileList = []
 
     function checkFileIsExist(key) {
@@ -67,7 +38,6 @@ $(document).ready(function () {
                     key
                 },
                 success(res) {
-                    console.log(key, res.data.isExist);
                     resolve(res.data.isExist)
                 },
                 error(err) {
@@ -141,6 +111,9 @@ $(document).ready(function () {
      */
     $('#picker input').on('change', function (e) {
         const file = e.target.files[0]
+        if (!file) {
+            return
+        }
         const isExist = fileList.filter(f => {
             return f.file.name === file.name && file.size === f.file.size
         }).length !== 0
@@ -196,50 +169,43 @@ $(document).ready(function () {
             Alert("没有可上传的文件")
             return
         }
-        $('#name').attr('disabled', 'disabled')
-        $.ajax({
-            type: "get",
-            url: baseUrl + "file/qiniu/token"
-        }).then(res => {
-            $("#uploadBtn").button("loading");
-            beforeUpload().then(() => {
-                startUpload(res.data.data)
+        const start = () => {
+            getQiNiuUploadToken().then(res => {
+                $("#uploadBtn").button("loading");
+                $('#name').attr('disabled', 'disabled')
+                beforeUpload().then(() => {
+                    startUpload(res.data.data)
+                })
             })
-        })
-        // if (limited) {
-        //     //    检查是否在提交名单中
-        //     $.ajax({
-        //         url: baseUrl + "people/people" + `?time=${Date.now()}`,
-        //         type: "GET",
-        //         data: {
-        //             "username": account,
-        //             "parent": ucourse,
-        //             "child": utask,
-        //             "name": uname
-        //         }
-        //     }).then(res => {
-        //         const { code } = res;
-        //         if (code === 200) {
-        //             const { isSubmit } = res.data;
-        //             if (!isSubmit) {
-        //                 $("#uploadBtn").button("loading");
-        //                 // uploader.upload();
-        //             } else if (confirm("你已经提交过,是否再次提交")) {
-        //                 $("#uploadBtn").button("loading");
-        //             }
-        //         } else {
-        //             Alert("抱歉你不在提交名单之中,如有疑问请联系管理员.");
-        //         }
-        //     });
-        // } else {
-        //     // uploader.upload();
-        // }
+        }
 
+        if (limited) {
+            //    检查是否在提交名单中
+            $.ajax({
+                url: baseUrl + "people/people" + `?time=${Date.now()}`,
+                type: "GET",
+                data: {
+                    "username": account,
+                    "parent": ucourse,
+                    "child": utask,
+                    "name": uname
+                }
+            }).then(res => {
+                const { code } = res;
+                if (code === 200) {
+                    const { isSubmit } = res.data;
+                    if (!isSubmit || confirm("你已经提交过,是否再次提交")) {
+                        $("#uploadBtn").button("loading");
+                        start()
+                    }
+                } else {
+                    Alert("抱歉你不在提交名单之中,如有疑问请联系管理员.");
+                }
+            });
+        } else {
+            start()
+        }
     });
-    //上传之前
-    // uploader.on('uploadBeforeSend', function (block, data) {
-    //     $("#uploadBtn").button("loading");
-    // });
     //页面初始化
     init();
 
@@ -395,18 +361,7 @@ $(document).ready(function () {
         return day + "天" + hour + "时" + minute + "分" + seconds + "秒";
     }
 
-
     /**
-     * 判断字符串是否为空
-     * @param str
-     * @returns {boolean}
-     */
-    function isEmpty(str) {
-        return (str == null || str.trim() == '');
-    }
-
-    /**
-     * 增加报告
      * @param name
      * @param course
      * @param tasks
@@ -516,21 +471,6 @@ $(document).ready(function () {
         })
         //加载导航数据
         loadBottomLinks();
-    }
-
-    /**
-     * 获取Url中的参数
-     * @param url 地址Url 或者 Url中参数部分
-     * @param paramName
-     */
-    function getUrlParam(url, paramName) {
-        let isExist = false;
-        let res = null;
-        isExist = url.lastIndexOf(paramName + '=') !== -1;
-        if (isExist) {
-            res = url.substring(url.indexOf(paramName + '=') + paramName.length + 1, (url.indexOf('&') > url.indexOf(paramName + '=') ? url.indexOf('&') : url.length));
-        }
-        return res;
     }
 
     /**
@@ -759,53 +699,4 @@ $(document).ready(function () {
         // //关闭新窗口
         // newTab.close();
     }
-
-    /**
-     * 向指定路径发送下载请求
-     * @param{String} url 请求路径
-     * @param {String} filename 文件名
-     */
-    function downLoadByUrl(url, filename) {
-        let xhr = new XMLHttpRequest();
-        //GET请求,请求路径url,async(是否异步)
-        xhr.open('GET', url, true);
-        //设置请求头参数的方式,如果没有可忽略此行代码
-        // xhr.setRequestHeader("token", token);
-        //设置响应类型为 blob
-        xhr.responseType = 'blob';
-        //关键部分
-        xhr.onload = function (e) {
-            //如果请求执行成功
-            if (this.status == 200) {
-                let blob = this.response;
-                // let filename = "我是文件名.xxx";//如123.xls
-                let a = document.createElement('a');
-
-                blob.type = "multipart/form-data";
-                //创键临时url对象
-                let url = URL.createObjectURL(blob);
-
-                a.href = url;
-                a.download = filename;
-                a.click();
-                //释放之前创建的URL对象
-                window.URL.revokeObjectURL(url);
-            }
-        };
-        //发送请求
-        xhr.send();
-    }
-
-    /**
-     * 打开指定弹出层
-     * @param {String} id 弹出层id
-     * @param {boolean} close 设置点击遮罩层是否可以关闭
-     */
-    function openModel(id, close) {
-        $(id).modal({
-            closeViaDimmer: close //设置点击遮罩层无法关闭
-        });
-        $(id).modal('open');
-    }
-
-});
+};
