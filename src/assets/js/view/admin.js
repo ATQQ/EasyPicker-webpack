@@ -481,6 +481,9 @@ $(function () {
 
                 if (oss === 0 && server === 0) {
                     Alert('由于服务器迁移,老版平台上传的文件已经被清理', '源文件已经被删除')
+                    setTimeout(function () {
+                        $btn.button('reset');
+                    }, 1000);
                 }
             })
         }
