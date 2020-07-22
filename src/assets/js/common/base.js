@@ -1,9 +1,5 @@
-// 动画库
-// import '../../css/animate.css'
 import '../../css/app.css'
-
 import '../../sass/common/fw.scss'
-
 
 //对Date进行扩展
 Date.prototype.Format = function (fmt) { //author: meizz
