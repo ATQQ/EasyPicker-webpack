@@ -1,5 +1,7 @@
 const path = require('path')
 const fs = require('fs')
+// 打包html
+const htmlWebpackPlugin = require('html-webpack-plugin');
 /**
  * 递归获取指定目录中的所有文件路径
  * @param {String} dir 目录名 
@@ -35,8 +37,47 @@ let getDirFilesWithFullPath = (dir) => {
     return getDirFiles(dir).map(file => path.resolve(file))
 }
 
+
+function getEntry(url) {
+    const files = getDirFileByType(url, '.js')
+    return files.reduce((pre, file) => {
+        const filename = path.basename(file)
+        const key = filename.slice(0, filename.lastIndexOf('.js'))
+        pre[key] = './' + file
+        return pre
+    }, {})
+}
+
+function getHtml(filename, chunks, template, title = 'EasyPicker') {
+    const minify = process.env.NODE_ENV === 'production'
+    return new htmlWebpackPlugin({
+        filename,
+        minify: {
+            collapseWhitespace: minify,
+            removeComments: minify,
+            removeRedundantAttributes: minify,
+            removeScriptTypeAttributes: minify,
+            removeStyleLinkTypeAttributes: minify,
+            useShortDoctype: minify
+        },
+        chunks, //引入对应的js
+        template,
+        title: title,
+        scriptLoading: 'defer',
+        favicon: './src/assets/img/i/favicon.png',
+        meta: {
+            viewport: 'width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1, user-scalable=no',
+            description: 'EasyPicker-轻取，方便的在线文件收取助手',
+            keywords: '文件收取, 轻取, 在线文件收取, EasyPicker, 文件搜集, 文件收取, 文档收取, 在线文档收取',
+            render: 'webkit'
+        },
+        hash: true // 清除缓存
+    })
+}
 module.exports = {
     getDirFiles,
     getDirFileByType,
-    getDirFilesWithFullPath
+    getDirFilesWithFullPath,
+    getEntry,
+    getHtml
 }

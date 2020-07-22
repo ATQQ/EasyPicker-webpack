@@ -1,6 +1,4 @@
 //css
-import '../../css/amazeui.datatables.min.css'
-import '../../css/Ecalendar/style.css'
 import '../../sass/modules/admin.scss'
 
 //js

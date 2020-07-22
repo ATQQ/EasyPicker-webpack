@@ -1,23 +1,42 @@
 const path = require('path');
 const webpack = require('webpack')
-const { getDirFileByType } = require('./fileUtil')
-// 打包html
-const htmlWebpackPlugin = require('html-webpack-plugin');
-//分离css
-const extractTextPlugin = require('extract-text-webpack-plugin');
+const os = require('os')
+const { getEntry,getHtml } = require('./fileUtil')
+
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 //清理打包
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 // 静态资源拷贝
 const copyWebpackPlugin = require('copy-webpack-plugin');
-console.log(process.env.NODE_ENV);
+// 文件大小可视化
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+// 压缩css
+const optimizeCssAssetsWebpackPlugin = require('optimize-css-assets-webpack-plugin')
+// happypack
+const HappyPack = require('happypack')
+// 创建线程池
+const happypackThreadPool = HappyPack.ThreadPool({
+    size: os.cpus().length
+})
+
+const happyPackLoaders = [
+    new HappyPack({
+        id: 'happyBabel',
+        threadPool: happypackThreadPool,
+        loaders: ['babel-loader?cacheDirectory']
+    })
+    // new HappyPack({
+    //     id: 'happyScss',
+    //     threadPool: happypackThreadPool,
+    //     loaders: ['style-loader', 'css-loader', 'sass-loader']
+    // })
+]
 
 module.exports = {
-    mode: "production",
+    mode: 'production',
     entry: {
         base: './src/assets/js/common/base.js',
-        index: './src/assets/js/view/index.js',
-        admin: './src/assets/js/view/admin.js',
-        upload: './src/assets/js/view/upload.js'
+        ...getEntry('./src/assets/js/view')
     },
     output: {
         filename: 'js/[name]-[hash].js',
@@ -27,119 +46,62 @@ module.exports = {
         modules: [
             "node_modules",
             path.resolve(__dirname, 'src')
-        ],
-        alias: {
-            jQuery: path.resolve(__dirname, '../src/assets/js/lib/jquery.min.js'), //引入jQuery
-            webUploader: path.join(__dirname, '../src/assets/js/plunge/webuploader.js')
-        }
+        ]
     },
     module: {
         // 配置loader
-        rules: [{
-            test: /\.css/,
-            use: extractTextPlugin.extract({
-                fallback: 'style-loader',
+        rules: [
+            {
+                test: /\.(sa|sc|c)ss$/,
                 use: [
-                    'css-loader'
+                     MiniCssExtractPlugin.loader,
+                    'css-loader',
+                    // 'postcss-loader',
+                    'sass-loader',
+                ]
+            },
+            {
+                test: /\.(png|jpg|gif|jpeg)$/,
+                loader: 'file-loader',
+                options: {
+                    name: '[hash].[ext]',
+                    outputPath: './img',
+                    esModule: false
+                }
+            },
+            {
+                test: /\.js?$/,
+                include: [
+                    path.resolve(__dirname, '../src/assets/js/view')
                 ],
-                publicPath: '../'
-            })
-        }, {
-            test: /\.less$/,
-            use: extractTextPlugin.extract({
-                fallback: 'style-loader',
-                use: ['css-loader', 'less-loader']
-            })
-        }, {
-            test: /\.scss$/,
-            include: [
-                path.resolve(__dirname, '../src/assets/sass')
-            ],
-            use: extractTextPlugin.extract({
-                fallback: 'style-loader',
-                use: ['css-loader', 'sass-loader']
-            })
-        },
-        {
-            test: /\.(png|jpg|gif|jpeg)$/,
-            loader: 'file-loader',
-            options: {
-                name: '[name].[ext]',
-                outputPath: './img',
-                esModule: false
-            }
-        },
-        {
-            test: /\.(html)$/,
-            loader: 'html-loader',
-            options: {
-                attrs: ['img:src', 'img:data-src', 'audio:src']
-            }
-        },
-        {
-            test: /\.js?$/,
-            include: [
-                path.resolve(__dirname, '../src/assets/js/views')
-            ],
-            loader: 'babel-loader'
-        },
-        { //字体文件
-            test: /\.(eot|svg|ttf|woff|woff2)$/,
-            use: [{
+                exclude: /node_modules/,
+                loader: 'happypack/loader?id=happyBabel'
+            },
+            { //字体文件
+                test: /\.(eot|svg|ttf|woff|woff2)$/,
                 loader: 'file-loader',
                 options: {
                     name: "[name].[ext]",
                     outputPath: './fonts'
                 }
-            }]
-        }
+            }
         ]
     },
     // 配置插件
     plugins: [
-        new htmlWebpackPlugin({
-            filename: 'index.html',
-            minify: {
-                removeAttributeQuotes: true,
-                removeComments: true, //去掉注释
-                collapseWhitespace: true //去掉空白
-            },
-            chunks: ['base', 'index'], //引入对应的js
-            template: 'src/index.html'
-        }),
-        new htmlWebpackPlugin({
-            filename: 'admin/index.html',
-            minify: {
-                removeAttributeQuotes: true,
-                removeComments: true, //去掉注释
-                collapseWhitespace: true //去掉空白
-            },
-            chunks: ['base', 'admin'], //引入对应的js
-            template: 'src/admin.html'
-        }),
-        new htmlWebpackPlugin({
-            filename: 'upload/index.html',
-            minify: {
-                removeAttributeQuotes: true,
-                removeComments: true, //去掉注释
-                collapseWhitespace: true //去掉空白
-            },
-            chunks: ['base', 'upload'], //引入对应的js
-            template: 'src/upload.html'
-        }),
+        getHtml('index.html', ['base', 'index'], 'src/index.html', 'EasyPicker-轻取 首页'),
+        getHtml('admin/index.html', ['base', 'admin'], 'src/admin.html', 'EasyPicker-轻取 管理'),
+        getHtml('upload/index.html', ['base', 'upload'], 'src/upload.html', 'EasyPicker-轻取 提交文件'),
         new CleanWebpackPlugin(),
-        new copyWebpackPlugin([
-            {
-                from: path.join(__dirname, "../src/assets/js/plunge/amazeui.datatables.js"),
-                to: path.join(__dirname, "../dist/js")
-            },
-            {
-                from: path.join(__dirname, "../src/assets/js/lib/dataTables.responsive.min.js"),
-                to: path.join(__dirname, "../dist/js")
-            }
-        ]),
+        ...happyPackLoaders,
         //css分离(输出文件名))
-        new extractTextPlugin('css/[name]-[hash].css'),
-        new webpack.HotModuleReplacementPlugin()
-    ]
+        new MiniCssExtractPlugin({
+            // 类似 webpackOptions.output里面的配置 可以忽略
+            filename: 'css/[name]-[hash].css',
+            chunkFilename: 'css/[id]-[hash].css',
+        }),
+        new webpack.HotModuleReplacementPlugin(),
+        new optimizeCssAssetsWebpackPlugin(),
+        new BundleAnalyzerPlugin()
+    ],
 }

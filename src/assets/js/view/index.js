@@ -1,5 +1,4 @@
 //引入样式
-import '../../css/index.css'
 import '../../sass/modules/index.scss'
 
 $(document).ready(function () {
