@@ -36,7 +36,8 @@ module.exports = {
     mode: 'production',
     entry: {
         base: './src/assets/js/common/base.js',
-        ...getEntry('./src/assets/js/view')
+        ...getEntry('./src/assets/js/view'),
+        ...getEntry('./src/assets/js/view','.ts')
     },
     output: {
         filename: 'js/[name]-[hash].js',
@@ -77,6 +78,10 @@ module.exports = {
                 exclude: /node_modules/,
                 loader: 'happypack/loader?id=happyBabel'
             },
+            {
+                test: /\.ts$/,
+                use:['ts-loader']
+            },
             { //字体文件
                 test: /\.(eot|svg|ttf|woff|woff2)$/,
                 loader: 'file-loader',
@@ -102,6 +107,6 @@ module.exports = {
         }),
         new webpack.HotModuleReplacementPlugin(),
         new optimizeCssAssetsWebpackPlugin(),
-        new BundleAnalyzerPlugin()
+        // new BundleAnalyzerPlugin()
     ],
 }
