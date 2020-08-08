@@ -26,11 +26,42 @@
 
 >体验地址(PC端效果更佳喔):[https://ep.sugarat.top](https://ep.sugarat.top)<br>
 
+## 本地运行
+### 1. clone本仓库到bend
+```sh
+git clone https://github.com/ATQQ/EasyPicker-webpack.git
+```
+### 2. 安装依赖
+```sh
+# npm
+npm install
+# or
+
+# yarn
+yarn
+```
+
+### 3. 本地启动
+tips：本地启动采用的服务端API是依赖的线上的测试环境
+```sh
+npm run dev
+```
+
+### 4. 相关指令
+|   名称    | 作用               |
+| :-------: | :----------------- |
+|    dev    | 本地启动服务 |
+| dev:dist  | 开发环境打包       |
+|   build   | 生产环境打包       |
+|  deploy   | 生产环境部署       |
+| deploydev | 测试环境打包       |
+
 ## 相关地址
 1. 正式环境：https://ep.sugarat.top
 2. 测试环境：https://ep.dev.sugarat.top
 
 注：两环境数据不互通,新功能会先在测试环境进行实验
+
 ## 技术栈
 由于历史原因项目经历了2个大的阶段：
 1. 前后端不分离-SSM/jQuery/amazeUI/sass
