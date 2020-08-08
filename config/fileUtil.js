@@ -38,11 +38,11 @@ let getDirFilesWithFullPath = (dir) => {
 }
 
 
-function getEntry(url) {
-    const files = getDirFileByType(url, '.js')
+function getEntry(url, suffix = ".js") {
+    const files = getDirFileByType(url, suffix)
     return files.reduce((pre, file) => {
         const filename = path.basename(file)
-        const key = filename.slice(0, filename.lastIndexOf('.js'))
+        const key = filename.slice(0, filename.lastIndexOf(suffix))
         pre[key] = './' + file
         return pre
     }, {})

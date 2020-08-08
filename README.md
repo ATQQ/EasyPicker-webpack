@@ -40,4 +40,4 @@
 >新功能建议:[https://github.com/ATQQ/EasyPicker/issues/1](https://github.com/ATQQ/EasyPicker/issues/1)
 ## 欢迎体验分享,反馈Bug
 
-![TIM图片20191015225526-20191015](http://img.cdn.sugarat.top/TIM图片20191015225526-20191015.gif)
+![TIM图片20191015225526-20191015](https://img.cdn.sugarat.top/TIM图片20191015225526-20191015.gif)

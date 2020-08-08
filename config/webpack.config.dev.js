@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack')
 const os = require('os')
-const { getEntry,getHtml } = require('./fileUtil')
+const { getEntry, getHtml } = require('./fileUtil')
 
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 //清理打包
@@ -49,7 +49,8 @@ module.exports = {
     },
     entry: {
         base: './src/assets/js/common/base.js',
-        ...getEntry('./src/assets/js/view')
+        ...getEntry('./src/assets/js/view'),
+        ...getEntry('./src/assets/js/view','.ts')
     },
     output: {
         filename: 'js/[name]-[hash].js',
@@ -67,7 +68,7 @@ module.exports = {
             {
                 test: /\.(sa|sc|c)ss$/,
                 use: [
-                     MiniCssExtractPlugin.loader,
+                    MiniCssExtractPlugin.loader,
                     'css-loader',
                     // 'postcss-loader',
                     'sass-loader',
@@ -81,6 +82,10 @@ module.exports = {
                     outputPath: './img',
                     esModule: false
                 }
+            },
+            {
+                test: /\.ts$/,
+                use:['ts-loader']
             },
             {
                 test: /\.js?$/,

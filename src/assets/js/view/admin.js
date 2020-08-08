@@ -1157,7 +1157,7 @@ $(function () {
      */
     function getShortUrl(url) {
         // url = 'http://ep.sugarat.top/upload?dXNlcm5hbWU9YWRtaW4mcGFyZW50PUMjJUU2JUExJThDJUU5JTlEJUEyJUU1JUJBJTk0JUU3JTk0JUE4'
-        jsonp(`http://api.ft12.com/api.php?format=jsonp&url=${url}&apikey=Pvn45SmLR3FmTfFSyz@ddd`, 'shortLink', function (res) {
+        jsonp(`https://api.ft12.com/api.php?format=jsonp&url=${url}&apikey=Pvn45SmLR3FmTfFSyz@ddd`, 'shortLink', function (res) {
             const tempCopy = document.getElementById('tempCopy');
             tempCopy.setAttribute('href', res.url);
             tempCopy.textContent = res.url;
