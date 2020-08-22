@@ -6,7 +6,7 @@ import '../../sass/modules/admin.scss'
 import '../common/app'
 import '../common/theme'
 
-import { stringEncode, baseAddress, getRandomStr, AlertModal, getQiNiuUploadToken, downLoadByUrl } from './../common/utils'
+import { stringEncode, baseAddress, getRandomStr, getQiNiuUploadToken, downLoadByUrl,amModal } from './../common/utils'
 import fileApi from './../apis/file.js'
 $(function () {
     const baseUrl = "/EasyPicker/";
@@ -15,10 +15,6 @@ $(function () {
     let nodes = null; //存放所有类别信息(子类/父类)
     const token = localStorage.getItem("token");
     let filterFlag = null; //记录过滤的表名
-    const Alert = (() => {
-        let t = new AlertModal()
-        return t.show.bind(t)
-    })();
     //设置全局ajax设置
     $.ajaxSetup({
         // 默认添加请求头
@@ -26,7 +22,7 @@ $(function () {
             "token": token
         },
         error: function () {
-            Alert("网络错误");
+            amModal.alert("网络错误");
         }
     });
     //初始化用户名
@@ -168,7 +164,7 @@ $(function () {
                     "type": 1
                 }).then(({ code }) => {
                     if (code === 200) {
-                        Alert(`截止日期已设置为:${new Date(newDate).Format("yyyy-MM-dd hh:mm:ss")}`);
+                        amModal.alert(`截止日期已设置为:${new Date(newDate).Format("yyyy-MM-dd hh:mm:ss")}`);
                         //关闭按钮启用
                         document.querySelector('#cancel-Date').disabled = false;
                     }
@@ -190,7 +186,7 @@ $(function () {
         const file = e.target.files[0]
 
         if (file.name.indexOf(".") === -1 || file.name.indexOf(".") === file.name.length - 1) {
-            Alert("文件必须有后缀", "文件名称不支持")
+            amModal.alert("文件必须有后缀", "文件名称不支持")
             return
         }
         templateFile = {
@@ -235,7 +231,7 @@ $(function () {
                         templateFile.status = -1
                         process.textContent = "上传失败"
                         process.classList.replace('am-progress-bar-secondary', 'am-progress-bar-danger')
-                        Alert(JSON.stringify(err));
+                        amModal.alert(JSON.stringify(err));
                         $btn.button('reset')
                     },
                     complete(res) {
@@ -251,7 +247,7 @@ $(function () {
                             "type": 3
                         }).then(res => {
                             if (res.code === 200) {
-                                Alert("模板已设置成功:" + file.name);
+                                amModal.alert("模板已设置成功:" + file.name);
                                 //启用删除模板按钮
                                 document.getElementById('cancel-Template').disabled = false;
                                 const docFrag = document.createDocumentFragment();
@@ -270,7 +266,7 @@ $(function () {
                 // subscription.close() // 取消上传  
             })
         } else {
-            Alert("没有可上传的文件")
+            amModal.alert("没有可上传的文件")
         }
     });
     //=========================================华丽的分割线(上传人员名单部分)=========================================
@@ -319,7 +315,7 @@ $(function () {
         if (code === 200) {
             const { failCount } = response.data;
             if (failCount > 0) {
-                Alert(`有${failCount}条数据未导入成功`);
+                amModal.alert(`有${failCount}条数据未导入成功`);
                 // 自动下载未导入成功数据文件
                 let tempData = peoplePicker.options.formData;
                 let filename = file.name;
@@ -331,12 +327,12 @@ $(function () {
                 jsonArray.push({ "key": "filename", "value": filename });
                 downloadFile(baseUrl + "file/down", jsonArray);
             } else {
-                Alert("全部导入成功");
+                amModal.alert("全部导入成功");
             }
         } else {
             span.classList.replace("am-badge-success", "am-badge-warning");
             span.textContent = "不支持的文件类型";
-            Alert("文件格式不符合要求,目前只支持.txt,.xls,.xlsx等文件类型");
+            amModal.alert("文件格式不符合要求,目前只支持.txt,.xls,.xlsx等文件类型");
         }
 
     });
@@ -377,7 +373,7 @@ $(function () {
             document.execCommand('copy');
         }
         document.body.removeChild(input);
-        Alert("结果已成功复制到剪贴板")
+        amModal.alert("结果已成功复制到剪贴板")
     }
     $('#copyLink').on('click', function (e) {
         copyRes(document.getElementById('tempCopy').href)
@@ -418,7 +414,7 @@ $(function () {
         let parent = document.getElementById('courseList').value;
         let child = document.getElementById('taskList').value;
         if (parent === '-1' || child === '-1') {
-            Alert("请选择要下载的子类");
+            amModal.alert("请选择要下载的子类");
             return 0;
         }
         //取得子类与父类的名称
@@ -435,7 +431,7 @@ $(function () {
             return v.course === parent && v.tasks === child;
         });
         if (!findResult) {
-            Alert("没有可下载的文件");
+            amModal.alert("没有可下载的文件");
         } else {
             //防止用户点击多次下载
             let $btn = $(this);
@@ -478,7 +474,7 @@ $(function () {
                 }
 
                 if (oss === 0 && server === 0) {
-                    Alert('由于服务器迁移,老版平台上传的文件已经被清理', '源文件已经被删除')
+                    amModal.alert('由于服务器迁移,老版平台上传的文件已经被清理', '源文件已经被删除')
                     setTimeout(function () {
                         $btn.button('reset');
                     }, 1000);
@@ -562,7 +558,7 @@ $(function () {
                     downLoadByUrl(url)
                 })
             } else {
-                Alert('由于服务器迁移,老版平台上传的文件已经被清理', '源文件已经被删除')
+                amModal.alert('由于服务器迁移,老版平台上传的文件已经被清理', '源文件已经被删除')
             }
         })
     })
@@ -586,7 +582,7 @@ $(function () {
                 success: function (res) {
                     if (res.code === 200) {
                         filesTable.row($(that).parents("tr")).remove().draw();
-                        Alert("删除成功！")
+                        amModal.alert("删除成功！")
                         //异步获取最新的repors数据
                         $.ajax({
                             url: baseUrl + 'report/report' + `?time=${Date.now()}`,
@@ -647,7 +643,7 @@ $(function () {
                 }),
                 success: function (res) {
                     if (res.code === 200) {
-                        Alert("已移除当前设置的文件模板");
+                        amModal.alert("已移除当前设置的文件模板");
                         //清理设置的模板
                         $("#fileList").empty();
                         //禁用关闭按钮
@@ -676,7 +672,7 @@ $(function () {
                 }),
                 success: function (res) {
                     if (res.code === 200) {
-                        Alert("已取消截止日期设置");
+                        amModal.alert("已取消截止日期设置");
                         //清理设置的日期内容
                         const datePicker = document.querySelector('#datePicker');
                         datePicker.value = "";
@@ -948,7 +944,7 @@ $(function () {
                     }
                     return;
                 }
-                Alert("删除失败" + res.errMsg);
+                amModal.alert("删除失败" + res.errMsg);
             });
         }
         event.stopPropagation();
@@ -974,7 +970,7 @@ $(function () {
                     }
                     return;
                 }
-                Alert("删除失败" + res.errMsg);
+                amModal.alert("删除失败" + res.errMsg);
             });
 
         }
@@ -1025,7 +1021,7 @@ $(function () {
             let value = $input.value.trim();
             value = stringEncode(value)
             if (!value) {
-                Alert('内容不能为空');
+                amModal.alert('内容不能为空');
                 return;
             }
 
@@ -1035,7 +1031,7 @@ $(function () {
                 return element.getAttribute('text') === value;
             });
             if (isExist) {
-                Alert("内容已存在");
+                amModal.alert("内容已存在");
                 $input.value = "";
                 return;
             }
@@ -1052,7 +1048,7 @@ $(function () {
         let $input = this.parentElement.previousElementSibling;
         let value = $input.value.trim();
         if (!value) {
-            Alert('内容不能为空');
+            amModal.alert('内容不能为空');
             return;
         }
         value = stringEncode(value)
@@ -1062,7 +1058,7 @@ $(function () {
             return element.getAttribute('text') === value;
         });
         if (isExist) {
-            Alert("内容已存在");
+            amModal.alert("内容已存在");
             $input.value = "";
             return;
         }
@@ -1211,12 +1207,12 @@ $(function () {
             }),
             success: function (res) {
                 if (res.code !== 200) {
-                    Alert('添加失败');
+                    amModal.alert('添加失败');
                     return;
                 }
 
                 if (!res.data.status) {
-                    Alert('内容已存在');
+                    amModal.alert('内容已存在');
                 } else if (!parent) {
                     insertToPanel("#coursePanel", name, res.data.id, 'course');
                 } else {
@@ -1358,7 +1354,7 @@ $(function () {
         //判断登录是否失效
         let token = localStorage.getItem("token");
         if (token == null || token == '') {
-            Alert("登录已经失效,请重新登录");
+            amModal.alert("登录已经失效,请重新登录");
             redirectHome();
             return;
         }
@@ -1401,7 +1397,7 @@ $(function () {
                     refreshPageInfo();
                 } else {
                     localStorage.removeItem('token')
-                    Alert('登录过期')
+                    amModal.alert('登录过期')
                     redirectHome()
                 }
             })

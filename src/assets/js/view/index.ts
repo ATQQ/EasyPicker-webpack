@@ -1,193 +1,167 @@
 //引入样式
 import '../../sass/modules/index.scss'
-import { AlertModal } from './../common/utils.js'
 
+import { amModal } from './../common/utils'
+import { userApi } from 'apis/index'
+import { rMobile, rCode, rPassword } from '@/lib/regExp'
+import jqUtils from '@/lib/jqUtils'
+import { themeColor } from '@/lib/enums'
 
 $(document).ready(function () {
-    const baseurl = "/EasyPicker/";
     var isGetCode = false;
-
-    //全局默认处理ajax
-    $.ajaxSetup({
-        error: err => {
-            console.error(err);
-            alert("网络错误,请检查网络");
-        }
-    });
-    const Alert = (() => {
-        let t = new AlertModal()
-        return t.show.bind(t)
-    })();
-
     /**
      * 页面初次完成渲染后
      */
     loadLocatAccount();
 
     /**
-     * 输入框内容发生改变时候
+     * 输入框内容发生改变时，改变展示的背景色
      */
-    $('input').on('change', function () {
-        if ($(this).attr('id') === 'userMobile') {
+    $('input').on('change', function (e) {
+        const { id, value } = e.currentTarget as HTMLInputElement
+        // 不处理注册框的手机号绑定框
+        if (id === 'userMobile') {
             return;
         }
-        if ($(this).val() != '') {
-            changeInputGroupColor($(this).parent(), 'secondary');
+        // 不为空则恢复原色（蓝色）
+        if (value) {
+            changeInputGroupColor($(this).parent(), themeColor.secondary);
         }
     });
 
+    let yzTimes = 90; // 注册框验证码时间
     /**
-     * 手机号输入框内容改变
+     * 注册框的手机号输入发生变动时
      */
     $('#userMobile').on('input', function (e) {
-        var rMobile = /^0?(13|15|18|14|17)[0-9]{9}$/;
-        const target = e.target as HTMLInputElement
-        if (rMobile.test(target.value)) {
-            if (yzTimes == 90) {
-                $('#getCode').removeAttr("disabled");
+        const { value } = e.target as HTMLInputElement
+        const $inputGroup = $(this).parent()
+        const $getCode = $('#getCode')
+        // 手机号有效
+        if (rMobile.test(value)) {
+            if (yzTimes === 90) {
+                jqUtils.unFreezeBtn($getCode)
             }
-            changeInputGroupColor($(this).parent(), 'secondary');
-        } else {
-            if ($('#getCode').attr("disabled")) {
-                return;
-            }
-            $('#getCode').attr("disabled", "disabled");
-            changeInputGroupColor($(this).parent(), 'danger');
+            changeInputGroupColor($inputGroup, themeColor.secondary);
+            return
         }
+        // 手机号无效
+        jqUtils.freezeBtn($getCode)
+        changeInputGroupColor($inputGroup, themeColor.danger);
     });
 
-    var yzTimes2 = 90; //重置密码验证码等待时间
+    let yzTimes2 = 90; //重置密码验证码等待时间
     /**
      * 忘记密码手机号输入框内容改变
      */
     $('#bindPhone').on('input', function (e) {
-        var rMobile = /^0?(13|15|18|14|17)[0-9]{9}$/;
-        const target = e.target as HTMLInputElement
-        if (rMobile.test(target.value)) {
+        const { value } = e.target as HTMLInputElement
+        const $inputGroup = $(this).parent()
+        const $getForgetCode = $('#getForgetCode')
+        if (rMobile.test(value)) {
             if (yzTimes2 === 90) {
-                $('#getForgetCode').removeAttr("disabled");
+                jqUtils.unFreezeBtn($getForgetCode)
             }
-            changeInputGroupColor($(this).parent(), 'secondary');
-        } else {
-            if ($('#getForgetCode').attr("disabled")) {
-                return;
-            }
-            $('#getForgetCode').attr("disabled", "disabled");
-            changeInputGroupColor($(this).parent(), 'danger');
+            changeInputGroupColor($inputGroup, themeColor.secondary);
+            return
         }
+
+        jqUtils.freezeBtn($getForgetCode)
+        changeInputGroupColor($inputGroup, themeColor.danger);
     });
 
     /**
      * 忘记密码获取验证码
      */
     $('#getForgetCode').on('click', function (e) {
-        var that = this;
+        const $getForgetCode = $(this)
         var fun = function () {
             yzTimes2--;
-            $(that).html(yzTimes2 + "(s)");
+            $getForgetCode.html(yzTimes2 + "(s)");
             if (yzTimes2 === 0) {
                 yzTimes2 = 90;
-                $(that).removeAttr('disabled');
-                $(that).html("获取验证码");
+                jqUtils.unFreezeBtn($getForgetCode)
+                $getForgetCode.html("获取验证码");
                 return;
             }
             setTimeout(fun, 1000);
         };
 
-        var mobile = $(this).parent().parent().prev().find('input').val();
-        //ajax
-        $.ajax({
-            url: baseurl + "user/getCode" + `?time=${Date.now()}`,
-            type: "GET",
-            data: {
-                "mobile": mobile
-            },
-            success: function (res) {
-                if (res.code === 200) {
-                    $(that).attr('disabled', 'disabled');
-                    //开始执行
-                    fun();
-                } else {
-                    alert(res.errMsg);
-                }
-            },
-            error: function () {
-                alert("网络错误");
-            }
-        });
+        const mobile = $(this).parent().parent().prev().find('input').val() as string;
 
+        if (!rMobile.test(mobile)) {
+            return
+        }
+
+        userApi.getCode(mobile).then(res => {
+            if (res.code === 200) {
+                jqUtils.freezeBtn($getForgetCode)
+                //开始执行
+                fun();
+            } else {
+                amModal.alert(res.errMsg);
+            }
+        })
     });
 
     /**
      * 确认重置密码
      */
     $('#sureReset').on('click', function () {
-        var that = this;
+        const $sureReset = $(this)
         var $inputs = $('#forgetPanel').find('input');
         const phoneNumber = $inputs.eq(0).val() as string; //手机号
-        var code = $inputs.eq(1).val() as string; //验证码
-        var newPwd = $inputs.eq(2).val() as string; //新密码
+        const code = $inputs.eq(1).val() as string; //验证码
+        const newPwd = $inputs.eq(2).val() as string; //新密码
 
-        //判断手机号是否合格
         if (phoneNumber.length !== 11) {
             $inputs.eq(0).val('');
             resetPlaceHolder($inputs.eq(0), "手机号格式不正确");
-            changeInputGroupColor($inputs.eq(0).parent(), 'danger');
+            changeInputGroupColor($inputs.eq(0).parent(), themeColor.danger);
             return;
         }
-        if (code.length !== 4) {
+        if (!rCode.test(code)) {
             $inputs.eq(1).val('');
             resetPlaceHolder($inputs.eq(1), "验证码格式不正确");
-            changeInputGroupColor($inputs.eq(1).parent(), 'danger');
+            changeInputGroupColor($inputs.eq(1).parent(), themeColor.danger);
             return;
         }
-        if (newPwd.length > 16 || newPwd.length < 6) {
+        if (!rPassword.test(newPwd)) {
             $inputs.eq(2).val('');
-            resetPlaceHolder($inputs.eq(2), "密码长度应为(6-16)");
-            changeInputGroupColor($inputs.eq(2).parent(), 'danger');
+            resetPlaceHolder($inputs.eq(2), "6-16位(数字/字母/@#$%)");
+            changeInputGroupColor($inputs.eq(2).parent(), themeColor.danger);
             return;
         }
-        const submitData = {
-            mobile: phoneNumber,
-            password: newPwd
-        }
-        // console.log(submitData);
-        $.ajax({
-            url: baseurl + "user/update/" + code,
-            type: "PUT",
-            headers: {
-                "content-Type": "application/json;charset=utf-8"
-            },
-            data: JSON.stringify(submitData)
-        }).then(res => {
+
+        userApi.resetPassword(phoneNumber, newPwd, code).then(res => {
             switch (res.code) {
                 case 20023:
                     $inputs.eq(1).val('');
                     resetPlaceHolder($inputs.eq(1), "验证码不不匹配");
-                    changeInputGroupColor($inputs.eq(1).parent(), 'danger');
+                    changeInputGroupColor($inputs.eq(1).parent(), themeColor.danger);
                     break;
                 case 200:
-                    $(that).next().click();
-                    alert("重置成功");
+                    $sureReset.next().click();
+                    amModal.alert("重置成功");
                     yzTimes2 = 1;
                     break;
                 case 20020:
                     $inputs.eq(1).val('');
                     resetPlaceHolder($inputs.eq(1), "验证码不正确");
-                    changeInputGroupColor($inputs.eq(1).parent(), 'danger');
+                    changeInputGroupColor($inputs.eq(1).parent(), themeColor.danger);
                     break;
                 case 20014:
                     $inputs.eq(0).val('');
                     resetPlaceHolder($inputs.eq(0), "手机号不存在");
-                    changeInputGroupColor($inputs.eq(0).parent(), 'danger');
+                    changeInputGroupColor($inputs.eq(0).parent(), themeColor.danger);
                     break;
                 case 20012:
                     $inputs.eq(0).val('');
                     resetPlaceHolder($inputs.eq(0), "手机号已经存在");
-                    changeInputGroupColor($inputs.eq(0).parent(), 'danger');
+                    changeInputGroupColor($inputs.eq(0).parent(), themeColor.danger);
                     break;
                 default:
-                    alert("未知异常,请联系管理员");
+                    amModal.alert("未知异常,请联系管理员");
                     break;
             }
         })
@@ -207,26 +181,24 @@ $(document).ready(function () {
     /**
      * 用户登录
      */
-    $('#login').on('click', function (e) {
+    $('#login').on('click', function () {
         var $inputs = $('#loginPanel').find('input');
         var username = $inputs.eq(0).val() as string;
         var pwd = $inputs.eq(1).val() as string;
         if (isEmpty(username)) {
             resetPlaceHolder($inputs.eq(0), "账号为空");
-            changeInputGroupColor($inputs.eq(0).parent(), 'danger');
+            changeInputGroupColor($inputs.eq(0).parent(), themeColor.danger);
             return;
         }
         if (isEmpty(pwd)) {
             resetPlaceHolder($inputs.eq(1), "密码为空");
-            changeInputGroupColor($inputs.eq(1).parent(), 'danger');
+            changeInputGroupColor($inputs.eq(1).parent(), themeColor.danger);
             return;
         }
         login(username, pwd);
-        e.stopPropagation();
     })
 
 
-    var yzTimes = 90; //验证码时间
     /**
      * 新用户注册获取验证码
      */
@@ -245,25 +217,17 @@ $(document).ready(function () {
             setTimeout(fun, 1000);
         };
 
-        const mobile = $(this).parent().parent().prev().find('input').val();
-        //ajax
-        $.ajax({
-            url: baseurl + "user/getCode" + `?time=${Date.now()}`,
-            type: "GET",
-            data: {
-                mobile
-            }
-        }).then(res => {
+        const mobile = $(this).parent().parent().prev().find('input').val() as string;
+        userApi.getCode(mobile).then(res => {
             if (res.code === 200) {
                 $(that).attr('disabled', 'disabled');
                 //开始执行
                 fun();
                 isGetCode = true;
             } else {
-                alert(res.errMsg);
+                amModal.alert(res.errMsg);
             }
-        });
-
+        })
     });
 
     /**
@@ -280,69 +244,47 @@ $(document).ready(function () {
         //判断账号是否符合条件
         if (isEmpty(username) || username.length > 12) {
             resetPlaceHolder($inputs.eq(0), "账号为空");
-            changeInputGroupColor($inputs.eq(0).parent(), 'danger');
+            changeInputGroupColor($inputs.eq(0).parent(), themeColor.danger);
             return;
         }
         if (isEmpty(pwd1) || pwd1.length > 16 || pwd1.length < 6) {
             $inputs.eq(1).val('');
             resetPlaceHolder($inputs.eq(1), "密码不符合规范(6-16位)");
-            changeInputGroupColor($inputs.eq(1).parent(), 'danger');
+            changeInputGroupColor($inputs.eq(1).parent(), themeColor.danger);
             return;
         }
         if (pwd1 != pwd2) {
             $inputs.eq(2).val('');
             resetPlaceHolder($inputs.eq(2), "两次密码不一致");
-            changeInputGroupColor($inputs.eq(2).parent(), 'danger');
+            changeInputGroupColor($inputs.eq(2).parent(), themeColor.danger);
             return;
         }
-        interface SubmitData {
-            username: string
-            password: string
-            mobile?: string
-            code?: string
-        }
 
-        var submitData: SubmitData = {
-            "username": username,
-            "password": pwd1
-        };
         //判断是否需要绑定手机号
         if ($('#isBindMobile').is(':checked')) {
             //判断手机号
-            var rMobile = /^0?(13|15|18|14|17)[0-9]{9}$/;
             if (!rMobile.test(mobile)) {
                 // console.log("success");
-                changeInputGroupColor($inputs.eq(3).parent(), 'danger');
+                changeInputGroupColor($inputs.eq(3).parent(), themeColor.danger);
                 return;
             }
             //判断验证码
             if (code.length != 4) {
                 $inputs.eq(5).val('');
                 resetPlaceHolder($inputs.eq(5), "验证码格式不正确");
-                changeInputGroupColor($inputs.eq(5).parent(), 'danger');
+                changeInputGroupColor($inputs.eq(5).parent(), themeColor.danger);
                 return;
             }
-            submitData = {
-                username,
-                mobile,
-                code,
-                "password": pwd1,
-            }
+        } else {
+            mobile = ''
+            code = ''
         }
 
-        //提交客户端数据
-        $.ajax({
-            url: baseurl + 'user/user',
-            type: "POST",
-            headers: {
-                "content-type": "application/json"
-            },
-            data: JSON.stringify(submitData)
-        }).then(res => {
+        userApi.register(username, pwd1, mobile, code).then(res => {
             const { code } = res;
             switch (code) {
                 case 200:
-                    alert('注册成功');
+                    amModal.alert('注册成功');
                     $('input').val('');
                     $(that).next().click();
                     isGetCode = false;
@@ -350,17 +292,17 @@ $(document).ready(function () {
                 case 20013:
                     $inputs.eq(0).val('');
                     resetPlaceHolder($inputs.eq(0), "账号已存在");
-                    changeInputGroupColor($inputs.eq(0).parent(), 'danger');
+                    changeInputGroupColor($inputs.eq(0).parent(), themeColor.danger);
                     break;
                 case 20012:
                     $inputs.eq(3).val('');
                     resetPlaceHolder($inputs.eq(3), "手机号已存在");
-                    changeInputGroupColor($inputs.eq(3).parent(), 'danger');
+                    changeInputGroupColor($inputs.eq(3).parent(), themeColor.danger);
                     break;
                 case 20020:
                     $inputs.eq(5).val('');
                     resetPlaceHolder($inputs.eq(5), "验证码不正确");
-                    changeInputGroupColor($inputs.eq(5).parent(), 'danger');
+                    changeInputGroupColor($inputs.eq(5).parent(), themeColor.danger);
                     break;
                 default:
                     break;
@@ -414,15 +356,7 @@ $(document).ready(function () {
             storageAccount(username, password);
         }
 
-        $.ajax({
-            url: baseurl + 'user/login',
-            type: "POST",
-            contentType: 'application/json;charset=utf-8',
-            data: JSON.stringify({
-                "username": username,
-                "password": password
-            })
-        }).then(res => {
+        userApi.login(username, password).then(res => {
             const { code } = res;
             switch (code) {
                 case 200:
@@ -433,19 +367,19 @@ $(document).ready(function () {
                         localStorage.setItem("username", username);
                         window.location.href = 'admin';
                     } else {
-                        alert("登录失败,没有权限");
+                        amModal.alert("登录失败,没有权限");
                     }
                     break;
                 //登录失败
                 case 20010:
                     $inputs.eq(0).val('');
                     resetPlaceHolder($inputs.eq(0), "用户不存在");
-                    changeInputGroupColor($inputs.eq(0).parent(), 'danger');
+                    changeInputGroupColor($inputs.eq(0).parent(), themeColor.danger);
                     break;
                 case 20011:
                     $inputs.eq(1).val('');
                     resetPlaceHolder($inputs.eq(1), "密码错误");
-                    changeInputGroupColor($inputs.eq(1).parent(), 'danger');
+                    changeInputGroupColor($inputs.eq(1).parent(), themeColor.danger);
                     break;
                 default:
                     break;
@@ -458,7 +392,7 @@ $(document).ready(function () {
      * @param str
      * @returns {boolean}
      */
-    function isEmpty(str:string) {
+    function isEmpty(str: string) {
         return (str === null || str.trim() === '' || str === undefined);
     }
 
@@ -467,46 +401,18 @@ $(document).ready(function () {
      * @param {Object} $group 输入框对象
      * @param {String} color 颜色/success/danger/secondary/default/primary
      */
-    function changeInputGroupColor($group:JQuery<HTMLElement>, color:string) {
-        var colors = ['success', 'danger', 'secondary', 'primary'];
-        colors.forEach(key => {
+    function changeInputGroupColor($group: JQuery<HTMLElement>, color: themeColor) {
+        var colors = Object.keys(themeColor);
+        for (const key of colors) {
             $group.removeClass('am-input-group-' + key);
-        });
+        }
         $group.addClass('am-input-group-' + color);
     }
 
     /**
-     * 重定向到首页
-     */
-    function redirectHome() {
-        window.location.href = "home";
-    }
-
-
-    // /**
-    //  * 关闭指定弹出层
-    //  * @param {String} id 弹出层id
-    //  */
-    // function closeModel(id:string) {
-    //     $(id).modal('close');
-    // }
-
-    // /**
-    //  * 打开指定弹出层
-    //  * @param {String} id 弹出层id
-    //  * @param {boolean} close 设置点击遮罩层是否可以关闭
-    //  */
-    // function openModel(id:string, close:boolean) {
-    //     $(id).modal({
-    //         closeViaDimmer: close //设置点击遮罩层无法关闭
-    //     });
-    //     $(id).modal('open');
-    // }
-
-    /**
      * 本地存储账号信息
      */
-    function storageAccount(username:string, password:string) {
+    function storageAccount(username: string, password: string) {
         localStorage.setItem("user", JSON.stringify({ "username": username, "password": password }));
     }
 
@@ -523,7 +429,6 @@ $(document).ready(function () {
             $('#login-username').val(username);
             $('#login-password').val(password);
         } catch (err) {
-            console.error(err);
             localStorage.removeItem("user")
         }
         if (localStorage.getItem('token')) {
