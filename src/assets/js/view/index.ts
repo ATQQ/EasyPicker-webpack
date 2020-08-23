@@ -3,9 +3,10 @@ import '../../sass/modules/index.scss'
 
 import { amModal } from './../common/utils'
 import { userApi } from 'apis/index'
-import { rMobile, rCode, rPassword } from '@/lib/regExp'
+import { rMobile, rCode, rPassword, rUsername } from '@/lib/regExp'
 import jqUtils from '@/lib/jqUtils'
 import { themeColor } from '@/lib/enums'
+import { placeholders } from '@/lib/utils'
 
 $(document).ready(function () {
     var isGetCode = false;
@@ -76,8 +77,7 @@ $(document).ready(function () {
     $('#getForgetCode').on('click', function (e) {
         const $getForgetCode = $(this)
         var fun = function () {
-            yzTimes2--;
-            $getForgetCode.html(yzTimes2 + "(s)");
+            $getForgetCode.html(--yzTimes2 + "(s)");
             if (yzTimes2 === 0) {
                 yzTimes2 = 90;
                 jqUtils.unFreezeBtn($getForgetCode)
@@ -87,7 +87,7 @@ $(document).ready(function () {
             setTimeout(fun, 1000);
         };
 
-        const mobile = $(this).parent().parent().prev().find('input').val() as string;
+        const mobile = $getForgetCode.parent().parent().prev().find('input').val() as string;
 
         if (!rMobile.test(mobile)) {
             return
@@ -113,32 +113,24 @@ $(document).ready(function () {
         const phoneNumber = $inputs.eq(0).val() as string; //手机号
         const code = $inputs.eq(1).val() as string; //验证码
         const newPwd = $inputs.eq(2).val() as string; //新密码
-
-        if (phoneNumber.length !== 11) {
-            $inputs.eq(0).val('');
-            resetPlaceHolder($inputs.eq(0), "手机号格式不正确");
-            changeInputGroupColor($inputs.eq(0).parent(), themeColor.danger);
+        const reserInputByIndex = getResetPlaceHolderArr($inputs)
+        if (!rMobile.test(phoneNumber)) {
+            reserInputByIndex(0, placeholders.mobile.errFormat)
             return;
         }
         if (!rCode.test(code)) {
-            $inputs.eq(1).val('');
-            resetPlaceHolder($inputs.eq(1), "验证码格式不正确");
-            changeInputGroupColor($inputs.eq(1).parent(), themeColor.danger);
+            reserInputByIndex(1, placeholders.code.errFormat)
             return;
         }
         if (!rPassword.test(newPwd)) {
-            $inputs.eq(2).val('');
-            resetPlaceHolder($inputs.eq(2), "6-16位(数字/字母/@#$%)");
-            changeInputGroupColor($inputs.eq(2).parent(), themeColor.danger);
+            reserInputByIndex(2, placeholders.password.errFormat)
             return;
         }
 
         userApi.resetPassword(phoneNumber, newPwd, code).then(res => {
             switch (res.code) {
                 case 20023:
-                    $inputs.eq(1).val('');
-                    resetPlaceHolder($inputs.eq(1), "验证码不不匹配");
-                    changeInputGroupColor($inputs.eq(1).parent(), themeColor.danger);
+                    reserInputByIndex(1, placeholders.code.notMatch)
                     break;
                 case 200:
                     $sureReset.next().click();
@@ -146,19 +138,13 @@ $(document).ready(function () {
                     yzTimes2 = 1;
                     break;
                 case 20020:
-                    $inputs.eq(1).val('');
-                    resetPlaceHolder($inputs.eq(1), "验证码不正确");
-                    changeInputGroupColor($inputs.eq(1).parent(), themeColor.danger);
+                    reserInputByIndex(1, placeholders.code.notRight)
                     break;
                 case 20014:
-                    $inputs.eq(0).val('');
-                    resetPlaceHolder($inputs.eq(0), "手机号不存在");
-                    changeInputGroupColor($inputs.eq(0).parent(), themeColor.danger);
+                    reserInputByIndex(0, placeholders.mobile.notExist)
                     break;
                 case 20012:
-                    $inputs.eq(0).val('');
-                    resetPlaceHolder($inputs.eq(0), "手机号已经存在");
-                    changeInputGroupColor($inputs.eq(0).parent(), themeColor.danger);
+                    reserInputByIndex(0, placeholders.mobile.alreadyExist)
                     break;
                 default:
                     amModal.alert("未知异常,请联系管理员");
@@ -171,28 +157,28 @@ $(document).ready(function () {
      * 是否开启绑定手机号的面板
      */
     $('#isBindMobile').on('change', function (e) {
+        const $getCodePanel = $(this).parent().prev()
         if ($(this).is(':checked')) {
-            $(this).parent().prev().removeAttr('readonly').parent().next().show();
-        } else {
-            $(this).parent().prev().attr('readonly', 'readonly').parent().next().hide();
+            $getCodePanel.removeAttr('readonly').parent().next().show();
+            return;
         }
+        $getCodePanel.attr('readonly', 'readonly').parent().next().hide();
     });
 
     /**
      * 用户登录
      */
     $('#login').on('click', function () {
-        var $inputs = $('#loginPanel').find('input');
-        var username = $inputs.eq(0).val() as string;
-        var pwd = $inputs.eq(1).val() as string;
-        if (isEmpty(username)) {
-            resetPlaceHolder($inputs.eq(0), "账号为空");
-            changeInputGroupColor($inputs.eq(0).parent(), themeColor.danger);
+        const $inputs = $('#loginPanel').find('input');
+        const username = $inputs.eq(0).val() as string;
+        const pwd = $inputs.eq(1).val() as string;
+        const reserInputByIndex = getResetPlaceHolderArr($inputs)
+        if (!rUsername.test(username)) {
+            reserInputByIndex(0, placeholders.username.errFormat)
             return;
         }
-        if (isEmpty(pwd)) {
-            resetPlaceHolder($inputs.eq(1), "密码为空");
-            changeInputGroupColor($inputs.eq(1).parent(), themeColor.danger);
+        if (!rPassword.test(pwd)) {
+            reserInputByIndex(1, placeholders.password.errFormat)
             return;
         }
         login(username, pwd);
@@ -202,16 +188,14 @@ $(document).ready(function () {
     /**
      * 新用户注册获取验证码
      */
-    $('#getCode').on('click', function (e) {
-
-        let that = this;
+    $('#getCode').on('click', function () {
+        const $getCode = $(this)
         const fun = function () {
-            yzTimes--;
-            $(that).html(yzTimes + "(s)");
+            $getCode.html(--yzTimes + "(s)");
             if (yzTimes === 0) {
                 yzTimes = 90;
-                $(that).removeAttr('disabled');
-                $(that).html("获取验证码");
+                jqUtils.unFreezeBtn($getCode)
+                $getCode.html("获取验证码");
                 return;
             }
             setTimeout(fun, 1000);
@@ -220,7 +204,7 @@ $(document).ready(function () {
         const mobile = $(this).parent().parent().prev().find('input').val() as string;
         userApi.getCode(mobile).then(res => {
             if (res.code === 200) {
-                $(that).attr('disabled', 'disabled');
+                jqUtils.freezeBtn($getCode)
                 //开始执行
                 fun();
                 isGetCode = true;
@@ -234,29 +218,26 @@ $(document).ready(function () {
      * 确认新用户注册
      */
     $('#register').on('click', function () {
-        var that = this;
-        var $inputs = $('#registerPanel').find('input');
-        var username = $inputs.eq(0).val() as string;
-        var pwd1 = $inputs.eq(1).val() as string; //第一次密码
-        var pwd2 = $inputs.eq(2).val() as string; //第二次密码
-        var mobile = $inputs.eq(3).val() as string; //手机号
-        var code = $inputs.eq(5).val() as string; //验证码
+        const $registerBtn = $(this)
+        const $inputs = $('#registerPanel').find('input');
+        const username = $inputs.eq(0).val() as string;
+        const pwd1 = $inputs.eq(1).val() as string; //第一次密码
+        const pwd2 = $inputs.eq(2).val() as string; //第二次密码
+        let mobile = $inputs.eq(3).val() as string; //手机号
+        let code = $inputs.eq(5).val() as string; //验证码
+        const reserInputByIndex = getResetPlaceHolderArr($inputs)
+
         //判断账号是否符合条件
-        if (isEmpty(username) || username.length > 12) {
-            resetPlaceHolder($inputs.eq(0), "账号为空");
-            changeInputGroupColor($inputs.eq(0).parent(), themeColor.danger);
+        if (!rUsername.test(username)) {
+            reserInputByIndex(0, placeholders.username.errFormat)
             return;
         }
-        if (isEmpty(pwd1) || pwd1.length > 16 || pwd1.length < 6) {
-            $inputs.eq(1).val('');
-            resetPlaceHolder($inputs.eq(1), "密码不符合规范(6-16位)");
-            changeInputGroupColor($inputs.eq(1).parent(), themeColor.danger);
+        if (!rPassword.test(pwd1)) {
+            reserInputByIndex(1, placeholders.password.errFormat)
             return;
         }
         if (pwd1 != pwd2) {
-            $inputs.eq(2).val('');
-            resetPlaceHolder($inputs.eq(2), "两次密码不一致");
-            changeInputGroupColor($inputs.eq(2).parent(), themeColor.danger);
+            reserInputByIndex(2, placeholders.password.twoDiff)
             return;
         }
 
@@ -264,15 +245,12 @@ $(document).ready(function () {
         if ($('#isBindMobile').is(':checked')) {
             //判断手机号
             if (!rMobile.test(mobile)) {
-                // console.log("success");
-                changeInputGroupColor($inputs.eq(3).parent(), themeColor.danger);
+                reserInputByIndex(3, placeholders.mobile.errFormat)
                 return;
             }
             //判断验证码
-            if (code.length != 4) {
-                $inputs.eq(5).val('');
-                resetPlaceHolder($inputs.eq(5), "验证码格式不正确");
-                changeInputGroupColor($inputs.eq(5).parent(), themeColor.danger);
+            if (!rCode.test(code)) {
+                reserInputByIndex(5, placeholders.code.errFormat)
                 return;
             }
         } else {
@@ -286,23 +264,17 @@ $(document).ready(function () {
                 case 200:
                     amModal.alert('注册成功');
                     $('input').val('');
-                    $(that).next().click();
+                    $registerBtn.next().click();
                     isGetCode = false;
                     break;
                 case 20013:
-                    $inputs.eq(0).val('');
-                    resetPlaceHolder($inputs.eq(0), "账号已存在");
-                    changeInputGroupColor($inputs.eq(0).parent(), themeColor.danger);
+                    reserInputByIndex(0, placeholders.username.alreadyExist)
                     break;
                 case 20012:
-                    $inputs.eq(3).val('');
-                    resetPlaceHolder($inputs.eq(3), "手机号已存在");
-                    changeInputGroupColor($inputs.eq(3).parent(), themeColor.danger);
+                    reserInputByIndex(3, placeholders.mobile.alreadyExist)
                     break;
                 case 20020:
-                    $inputs.eq(5).val('');
-                    resetPlaceHolder($inputs.eq(5), "验证码不正确");
-                    changeInputGroupColor($inputs.eq(5).parent(), themeColor.danger);
+                    reserInputByIndex(5, placeholders.code.notRight)
                     break;
                 default:
                     break;
@@ -319,10 +291,8 @@ $(document).ready(function () {
         resetPlaceHolder($inputs.eq(1), "请输入密码");
         resetPlaceHolder($inputs.eq(2), "请再次输入密码");
         resetPlaceHolder($inputs.eq(3), "(可选)绑定手机号");
-        // resetPlaceHolder($inputs.e)
         resetPlaceHolder($inputs.eq(5), "输入验证码");
         isGetCode = false;
-        // yzTimes=90;
     }
 
     /**
@@ -345,12 +315,36 @@ $(document).ready(function () {
     }
 
     /**
+     * 获取一个方法来重置指定￥input的placeholder
+     * @param $inputs 多个输入框
+     */
+    function getResetPlaceHolderArr($inputs: JQuery<HTMLInputElement>) {
+        /**
+         * 修改目标$input的placeholder且初始化值
+         * @param index 下标
+         * @param placeholder 提示内容
+         * @param themeColor 颜色 
+         */
+        function resetByIndex(index: number, placeholder: string, color = themeColor.danger) {
+            const $input = $inputs.eq(index)
+            $input.val('')
+            resetPlaceHolder($input, placeholder)
+            if (color) {
+                changeInputGroupColor($input.parent(), color);
+            }
+        }
+
+        return resetByIndex
+    }
+    /**
      * 用户登录
      * @param username
      * @param password
      */
     function login(username: string, password: string) {
         let $inputs = $('#loginPanel').find('input');
+        const reserInputByIndex = getResetPlaceHolderArr($inputs)
+        
         //如果勾选了记住密码
         if ($('#rememberAccount').is(':checked')) {
             storageAccount(username, password);
@@ -372,28 +366,15 @@ $(document).ready(function () {
                     break;
                 //登录失败
                 case 20010:
-                    $inputs.eq(0).val('');
-                    resetPlaceHolder($inputs.eq(0), "用户不存在");
-                    changeInputGroupColor($inputs.eq(0).parent(), themeColor.danger);
+                    reserInputByIndex(0,placeholders.username.notExist)
                     break;
                 case 20011:
-                    $inputs.eq(1).val('');
-                    resetPlaceHolder($inputs.eq(1), "密码错误");
-                    changeInputGroupColor($inputs.eq(1).parent(), themeColor.danger);
+                    reserInputByIndex(1,placeholders.password.notRight)
                     break;
                 default:
                     break;
             }
         })
-    }
-
-    /**
-     * 判断字符串是否为空
-     * @param str
-     * @returns {boolean}
-     */
-    function isEmpty(str: string) {
-        return (str === null || str.trim() === '' || str === undefined);
     }
 
     /**
@@ -413,7 +394,7 @@ $(document).ready(function () {
      * 本地存储账号信息
      */
     function storageAccount(username: string, password: string) {
-        localStorage.setItem("user", JSON.stringify({ "username": username, "password": password }));
+        localStorage.setItem("user", JSON.stringify({ username, password }));
     }
 
     /**
