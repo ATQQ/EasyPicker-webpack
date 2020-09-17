@@ -5,7 +5,9 @@ interface Date {
 }
 
 interface JQuery {
-    button: (status: string) => void
+    button: (status: string) => void,
+    modal: (cf: any) => void,
+    selected: (cf: any) => void,
 }
 
 interface Report {
