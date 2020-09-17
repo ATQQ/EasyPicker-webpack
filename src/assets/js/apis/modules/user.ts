@@ -1,9 +1,4 @@
 import ajax from '../ajax'
-interface BaseResponse<T = any> {
-    code: number,
-    errMsg: string,
-    data: T
-}
 
 interface LoginData {
     power: number,

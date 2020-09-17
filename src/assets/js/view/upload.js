@@ -1,8 +1,8 @@
 import '../../sass/modules/upload.scss'
-import { stringEncode, getRandomStr, AlertModal, getQiNiuUploadToken,downLoadByUrl } from './../common/utils'
+import { stringEncode, getRandomStr, AlertModal, getQiNiuUploadToken, downLoadByUrl } from './../common/utils'
 import fileApi from './../apis/file.js'
 window.onload = function () {
-
+    console?.log(666)
     let baseUrl = "/EasyPicker/";
     let uname = null; //提交者姓名
     let ucourse = null; //父类目名称
