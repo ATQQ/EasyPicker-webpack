@@ -8,6 +8,10 @@ import jqUtils from '@/lib/jqUtils'
 import { themeColor } from '@/lib/enums'
 import { placeholders } from '@/lib/utils'
 
+import('./../common/tongji').then(res=>{
+    res.default.init()
+})
+
 $(document).ready(function () {
     var isGetCode = false;
     /**

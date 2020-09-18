@@ -3,7 +3,18 @@ type dateFormat = (fmt: string) => string
 interface Date {
     Format: dateFormat
 }
+interface SuperFile {
+    file: File,
+    status: number,
+    id: string,
+    filename?: string
+}
 
+interface UploadParamData {
+    username?: string,
+    parent?: string,
+    child?: string
+}
 interface JQuery {
     button: (status: string) => void,
     modal: (cf: any) => void,

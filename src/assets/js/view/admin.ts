@@ -11,6 +11,10 @@ import { amModal } from '@/lib/utils'
 import jqUtils from '@/lib/jqUtils'
 import { childContentApi, fileApi2, reportApi, peopleApi, courseApi } from 'apis/index'
 
+import('./../common/tongji').then(res=>{
+    res.default.init()
+})
+
 $(function () {
     const baseUrl = "/EasyPicker/";
     const username = localStorage.getItem("username") as string;

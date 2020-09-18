@@ -1,13 +1,18 @@
 import '../../sass/modules/upload.scss'
-import { stringEncode, getRandomStr, AlertModal, getQiNiuUploadToken, downLoadByUrl } from './../common/utils'
-import fileApi from './../apis/file.js'
+import { stringEncode, getRandomStr, AlertModal, getQiNiuUploadToken, downLoadByUrl } from '../common/utils'
+import fileApi from '../apis/file.js'
+import jqUtils from '@/lib/jqUtils'
+
+import('../common/tongji').then(res => {
+    res.default.init()
+})
+
 window.onload = function () {
-    console?.log(666)
     let baseUrl = "/EasyPicker/";
-    let uname = null; //提交者姓名
-    let ucourse = null; //父类目名称
-    let utask = null; //子类目名称
-    let account = null; //管理员账号
+    let uname: string; //提交者姓名
+    let ucourse: string; //父类目名称
+    let utask: string; //子类目名称
+    let account: string; //管理员账号
     let limited = false; //是否限了制提交人员
     let loadParentComplete = false; //父类是否加载完成
 
@@ -27,7 +32,7 @@ window.onload = function () {
     /**
      * 上传文件
      */
-    const fileList = []
+    const fileList: SuperFile[] = []
 
     function checkFileIsExist(key) {
         return new Promise((resolve, reject) => {
@@ -109,8 +114,8 @@ window.onload = function () {
     /**
      * 选择文件
      */
-    $('#picker input').on('change', function (e) {
-        const file = e.target.files[0]
+    $<HTMLInputElement>('#picker input').on('change', function (e) {
+        const file = e.target.files?.[0]
         if (!file) {
             return
         }
@@ -159,7 +164,7 @@ window.onload = function () {
     $('#uploadBtn').on('click', function () {
         ucourse = $('option[value="' + $("#course").val() + '"]').html();
         utask = $('option[value="' + $("#task").val() + '"]').html();
-        uname = $('#name').val();
+        uname = $('#name').val() as string;
         uname = stringEncode(uname)
         if (uname.trim() == null || uname.trim() == "") {
             Alert('姓名不能为空');
@@ -238,7 +243,7 @@ window.onload = function () {
                     if (key !== tempFlag) {
                         return
                     }
-                    $('#uploadBtn').attr("disabled", false);
+                    jqUtils.unFreezeBtn($('#uploadBtn'))
                     //如果有数据
                     const { code } = res;
                     if (code === 200) {
@@ -255,7 +260,7 @@ window.onload = function () {
                                 let str = "已经截止!!!"
                                 //计算日期间隔
                                 if (Date.now() > res.ddl) {
-                                    $('#uploadBtn').attr("disabled", true);
+                                    jqUtils.freezeBtn($('#uploadBtn'))
                                     $ddl.children().eq(1).html(str);
                                     return
                                 }
@@ -277,7 +282,7 @@ window.onload = function () {
                             $("#downlloadTemplate").on('click', function () {
                                 let parent = $("#course").next().children().eq(0).find(".am-selected-status").html();
                                 let child = $("#task").next().children().eq(0).find(".am-selected-status").html() + "_Template";
-                                let jsonArray = []
+                                let jsonArray: any[] = []
                                 let { template } = res
                                 jsonArray.push({ "key": "course", "value": parent });
                                 jsonArray.push({ "key": "tasks", "value": child });
@@ -350,7 +355,7 @@ window.onload = function () {
             li.appendChild(a);
             docFrag.appendChild(li);
         });
-        document.getElementById('bottom-links').appendChild(docFrag);
+        document.getElementById('bottom-links')?.appendChild(docFrag);
     }
 
 
@@ -423,17 +428,17 @@ window.onload = function () {
             redirectHome()
             return
         }
-        console.log(params);
-        params = params.split('&').reduce((pre, now) => {
-            now = now.split('=')
-            pre[now[0]] = now[1]
+
+        const paramsData: UploadParamData = params.split('&').reduce((pre, now) => {
+            const kv = now.split('=')
+            pre[kv[0]] = kv[1]
             return pre
         }, {})
-        let type = null; //三种情况
+        let type: number = 1; //三种情况
         //1 :获取全部父类
         //2 :获取指定父类
         //3: 获取指定子类
-        let { username, parent, child } = params
+        let { username, parent, child } = paramsData
         if (location.search.includes('?')) {
             if (parent) {
                 type = 2;
@@ -446,13 +451,11 @@ window.onload = function () {
             type = 1;
         }
 
-
         if (!username || !type || type === 1) {
             Alert("链接失效!!!");
             redirectHome();
             return
         }
-
 
         account = username;
         //查询账号是否有效
