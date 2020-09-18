@@ -4,21 +4,26 @@ import '../../sass/modules/admin.scss'
 //js
 
 import '../common/app'
-import '../common/theme'
 
-import { stringEncode, baseAddress, getRandomStr, AlertModal, getQiNiuUploadToken, downLoadByUrl } from './../common/utils'
-import fileApi from './../apis/file.js'
+import { stringEncode, baseAddress, getRandomStr, getQiNiuUploadToken, downLoadByUrl } from '../common/utils'
+import fileApi from '../apis/file.js'
+import { amModal } from '@/lib/utils'
+import jqUtils from '@/lib/jqUtils'
+import { childContentApi, fileApi2, reportApi, peopleApi, courseApi } from 'apis/index'
+
+import('./../common/tongji').then(res=>{
+    res.default.init()
+})
+
 $(function () {
     const baseUrl = "/EasyPicker/";
-    const username = localStorage.getItem("username");
-    let reports = null; //存放所有文件信息
-    let nodes = null; //存放所有类别信息(子类/父类)
+    const username = localStorage.getItem("username") as string;
+    let reports: Report[]; //存放所有文件信息
+    let nodes: any[]; //存放所有类别信息(子类/父类)
     const token = localStorage.getItem("token");
-    let filterFlag = null; //记录过滤的表名
-    const Alert = (() => {
-        let t = new AlertModal()
-        return t.show.bind(t)
-    })();
+    let filterFlag: string = ''; //记录过滤的表名
+    //tempTest
+    let nowClickId: string | undefined = '';
     //设置全局ajax设置
     $.ajaxSetup({
         // 默认添加请求头
@@ -26,7 +31,7 @@ $(function () {
             "token": token
         },
         error: function () {
-            Alert("网络错误");
+            amModal.alert("网络错误");
         }
     });
     //初始化用户名
@@ -77,12 +82,12 @@ $(function () {
             const handleFilter = {
                 //人员名单列表过滤
                 people() {
-                    const value = Number.parseInt($('#peopleFilter').val());
-                    if (value === -1) {
+                    const value = $('#peopleFilter').val();
+                    if (value == -1) {
                         return true;
                     } else {
-                        const type = value === 1 ? "已提交" : "未提交";
-                        return data[2] === type;
+                        const type = value == 1 ? "已提交" : "未提交";
+                        return data[2] == type;
                     }
                 },
                 //父类
@@ -109,6 +114,7 @@ $(function () {
     );
 
     class Request {
+        private baseUrl: string
         constructor() {
             this.baseUrl = "/EasyPicker/";
         }
@@ -162,52 +168,58 @@ $(function () {
             //绑定设置时间按钮事件
             $('#sure-Date').unbind('click')
             $('#sure-Date').on('click', function () {
-                http.put("childContent/childContext", {
-                    "ddl": newDate,
-                    "taskid": nowClickId,
-                    "type": 1
-                }).then(({ code }) => {
-                    if (code === 200) {
-                        Alert(`截止日期已设置为:${new Date(newDate).Format("yyyy-MM-dd hh:mm:ss")}`);
-                        //关闭按钮启用
-                        document.querySelector('#cancel-Date').disabled = false;
-                    }
-                })
+                if (nowClickId) {
+                    childContentApi.update(nowClickId, 1, {
+                        ddl: newDate
+                    }).then(({ code }) => {
+                        if (code === 200) {
+                            amModal.alert(`截止日期已设置为:${new Date(newDate).Format("yyyy-MM-dd hh:mm:ss")}`);
+                            jqUtils.unFreezeBtn($('#cancel-Date'))
+                        }
+                    })
+                }
             })
         }
     });
 
 
     //=================================华丽的分割线(上传文件模板)
+    interface TempFile {
+        status: number,
+        file: File,
+        id: string
+    }
     /**
      * 上传模板文件
      */
-    let templateFile = null
+    let templateFile: TempFile | any;
     /**
      * 选择模板文件
      */
-    $('#choose-file input').on('change', function (e) {
-        const file = e.target.files[0]
-
-        if (file.name.indexOf(".") === -1 || file.name.indexOf(".") === file.name.length - 1) {
-            Alert("文件必须有后缀", "文件名称不支持")
-            return
-        }
-        templateFile = {
-            status: 0, // -1 0 1 2|失败 待上传 上传成功 上传中
-            file,
-            id: getRandomStr(7)
-        }
-        let dom = `<li class="file-item" id="${templateFile.id}">
-                    <h4 class="am-margin-bottom-sm">${file.name}</h4>
-                        <div class="am-progress am-progress-striped am-active" style="height:2rem;">
-                            <div status="${templateFile.status}" class="progress am-progress-bar am-progress-bar-secondary" style="width: 100%">
-                                等待上传。。。
+    $<HTMLInputElement>('#choose-file input').on('change', function (e) {
+        const files = e?.target?.files
+        if (files) {
+            const file = files[0]
+            if (file.name.indexOf(".") === -1 || file.name.indexOf(".") === file.name.length - 1) {
+                amModal.alert("文件必须有后缀", "文件名称不支持")
+                return
+            }
+            templateFile = {
+                status: 0, // -1 0 1 2|失败 待上传 上传成功 上传中
+                file,
+                id: getRandomStr(7)
+            }
+            let dom = `<li class="file-item" id="${templateFile.id}">
+                        <h4 class="am-margin-bottom-sm">${file.name}</h4>
+                            <div class="am-progress am-progress-striped am-active" style="height:2rem;">
+                                <div status="${templateFile.status}" class="progress am-progress-bar am-progress-bar-secondary" style="width: 100%">
+                                    等待上传。。。
+                                </div>
                             </div>
-                        </div>
-                    </li>`;
+                        </li>`;
 
-        $('#fileList').empty().append(dom);
+            $('#fileList').empty().append(dom);
+        }
     })
 
     // 开始上传
@@ -219,8 +231,8 @@ $(function () {
         if (status !== 1 && status !== 2) {
             getQiNiuUploadToken().then(res => {
                 $btn.button("loading");
-                const ucourse = document.getElementById('courseActive').textContent;
-                const utask = document.getElementById('taskActive').textContent + '_Template';
+                const ucourse = document.getElementById('courseActive')?.textContent;
+                const utask = document.getElementById('taskActive')?.textContent + '_Template';
                 let key = `${username}/${ucourse}/${utask}/${file.name}`
                 const observable = qiniu.upload(file, key, res.data.data)
                 templateFile.status = 2
@@ -235,7 +247,7 @@ $(function () {
                         templateFile.status = -1
                         process.textContent = "上传失败"
                         process.classList.replace('am-progress-bar-secondary', 'am-progress-bar-danger')
-                        Alert(JSON.stringify(err));
+                        amModal.alert(JSON.stringify(err));
                         $btn.button('reset')
                     },
                     complete(res) {
@@ -244,16 +256,13 @@ $(function () {
                         const { hash, key } = res
                         process.textContent = "上传成功"
                         process.classList.replace('am-progress-bar-secondary', 'am-progress-bar-success')
-                        //保存模板信息
-                        http.put("childContent/childContext", {
-                            "template": file.name,
-                            "taskid": nowClickId,
-                            "type": 3
+                        nowClickId && childContentApi.update(nowClickId, 3, {
+                            template: file.name
                         }).then(res => {
                             if (res.code === 200) {
-                                Alert("模板已设置成功:" + file.name);
+                                amModal.alert("模板已设置成功:" + file.name);
+                                jqUtils.unFreezeBtn($('#cancel-Template'))
                                 //启用删除模板按钮
-                                document.getElementById('cancel-Template').disabled = false;
                                 const docFrag = document.createDocumentFragment();
                                 const fileList = document.getElementById('fileList');
                                 //移除原来子节点
@@ -262,15 +271,15 @@ $(function () {
                                 const div = document.createElement('div');
                                 div.textContent = file.name;
                                 docFrag.appendChild(div);
-                                fileList.appendChild(docFrag);
+                                fileList?.appendChild(docFrag);
                             }
-                        });
+                        })
                     }
                 })
                 // subscription.close() // 取消上传  
             })
         } else {
-            Alert("没有可上传的文件")
+            amModal.alert("没有可上传的文件")
         }
     });
     //=========================================华丽的分割线(上传人员名单部分)=========================================
@@ -279,7 +288,7 @@ $(function () {
      */
     let peoplePicker = WebUploader.create({
         auto: false,
-        swf: 'https://cdn.staticfile.org/webuploader/0.1.1/Uploader.swf',
+        swf: 'https://img.cdn.sugarat.top/webuploader/0.1.1/Uploader.swf',
         threads: 1,
         server: baseUrl + "file/people",
         pick: '#filePicker',
@@ -302,57 +311,69 @@ $(function () {
         p.appendChild(span);
         outerDiv.append(p, innerDiv);
         docFrag.append(outerDiv);
-        fileList.append(docFrag);
+        fileList?.append(docFrag);
     });
     // 文件上传过程中
     peoplePicker.on('uploadProgress', function (file, percentage) {
-        document.getElementById(file.id).querySelector('span').textContent = `上传中:${percentage.toFixed(2) * 100}`;
+        const fileDom = document.getElementById(file.id)
+        if (fileDom) {
+            const span = fileDom?.querySelector('span')
+            if (span) {
+                span.textContent = `上传中:${percentage.toFixed(2) * 100}`;
+            }
+        }
     });
 
     // 文件上传成功处理。
     peoplePicker.on('uploadSuccess', function (file, response) {
-        const span = document.getElementById(file.id).querySelector('span');
-        span.classList.replace("am-badge-primary", "am-badge-success");
-        span.textContent = "上传成功";
-
-        const { code } = response;
-        if (code === 200) {
-            const { failCount } = response.data;
-            if (failCount > 0) {
-                Alert(`有${failCount}条数据未导入成功`);
-                // 自动下载未导入成功数据文件
-                let tempData = peoplePicker.options.formData;
-                let filename = file.name;
-                filename = filename.substring(0, filename.lastIndexOf(".")) + "_fail.xls";
-                let jsonArray = [];
-                jsonArray.push({ "key": "course", "value": tempData.parent });
-                jsonArray.push({ "key": "tasks", "value": tempData.child + "_peopleFile" });
-                jsonArray.push({ "key": "username", "value": tempData.username });
-                jsonArray.push({ "key": "filename", "value": filename });
-                downloadFile(baseUrl + "file/down", jsonArray);
-            } else {
-                Alert("全部导入成功");
+        const fileDom = document.getElementById(file.id)
+        if (fileDom) {
+            const span = fileDom?.querySelector('span')
+            if (span) {
+                span.classList.replace("am-badge-primary", "am-badge-success");
+                span.textContent = "上传成功";
+                const { code } = response;
+                if (code === 200) {
+                    const { failCount } = response.data;
+                    if (failCount > 0) {
+                        amModal.alert(`有${failCount}条数据未导入成功`);
+                        // 自动下载未导入成功数据文件
+                        let tempData = peoplePicker.options.formData;
+                        let filename = file.name;
+                        filename = filename.substring(0, filename.lastIndexOf(".")) + "_fail.xls";
+                        let jsonArray: any[] = [];
+                        jsonArray.push({ "key": "course", "value": tempData.parent });
+                        jsonArray.push({ "key": "tasks", "value": tempData.child + "_peopleFile" });
+                        jsonArray.push({ "key": "username", "value": tempData.username });
+                        jsonArray.push({ "key": "filename", "value": filename });
+                        downloadFile(baseUrl + "file/down", jsonArray);
+                    } else {
+                        amModal.alert("全部导入成功");
+                    }
+                } else {
+                    span.classList.replace("am-badge-success", "am-badge-warning");
+                    span.textContent = "不支持的文件类型";
+                    amModal.alert("文件格式不符合要求,目前只支持.txt,.xls,.xlsx等文件类型");
+                }
             }
-        } else {
-            span.classList.replace("am-badge-success", "am-badge-warning");
-            span.textContent = "不支持的文件类型";
-            Alert("文件格式不符合要求,目前只支持.txt,.xls,.xlsx等文件类型");
         }
 
     });
 
     //上传出错
     peoplePicker.on('uploadError', function (file) {
-        const span = document.getElementById(file.id).querySelector('span');
-        span.classList.replace("am-badge-primary", "am-badge-danger");
-        span.textContent = "上传出错";
+        const span = document.getElementById(file.id)?.querySelector('span');
+        span?.classList.replace("am-badge-primary", "am-badge-danger");
+        if (span) {
+            span.textContent = "上传出错";
+        }
     });
 
     // 开始上传
     $('#uploadPeople').on('click', function () {
         let { formData } = peoplePicker.options;
-        formData.parent = document.getElementById('courseActive').textContent;
-        formData.child = document.getElementById('taskActive').textContent;
+        formData.parent = document.getElementById('courseActive')?.textContent;
+        formData.child = document.getElementById('taskActive')?.textContent;
         formData.username = username;
         peoplePicker.upload();
     });
@@ -377,17 +398,18 @@ $(function () {
             document.execCommand('copy');
         }
         document.body.removeChild(input);
-        Alert("结果已成功复制到剪贴板")
+        amModal.alert("结果已成功复制到剪贴板")
     }
     $('#copyLink').on('click', function (e) {
-        copyRes(document.getElementById('tempCopy').href)
+        const a = document.getElementById('tempCopy') as HTMLLinkElement
+        copyRes(a?.href)
     })
 
     /**
      * 调用第三方接口短地址生成  https://www.ft12.com/
      */
     $('#createShortLink').on('click', function () {
-        let originUrl = document.getElementById('tempCopy').getAttribute('href');
+        let originUrl = document.getElementById('tempCopy')?.getAttribute('href');
         getShortUrl(originUrl);
     });
 
@@ -415,10 +437,12 @@ $(function () {
      * 下载指定任务中所有文件
      */
     $('#download').on('click', function () {
-        let parent = document.getElementById('courseList').value;
-        let child = document.getElementById('taskList').value;
+        const parentEL = document.getElementById('courseList') as HTMLSelectElement
+        const childEl = document.getElementById('taskList') as HTMLSelectElement
+        let parent = parentEL?.value
+        let child = childEl?.value;
         if (parent === '-1' || child === '-1') {
-            Alert("请选择要下载的子类");
+            amModal.alert("请选择要下载的子类");
             return 0;
         }
         //取得子类与父类的名称
@@ -435,7 +459,7 @@ $(function () {
             return v.course === parent && v.tasks === child;
         });
         if (!findResult) {
-            Alert("没有可下载的文件");
+            amModal.alert("没有可下载的文件");
         } else {
             //防止用户点击多次下载
             let $btn = $(this);
@@ -444,14 +468,10 @@ $(function () {
                 const { oss, server } = res.data
                 if (server !== 0) {
                     //生成指定任务的压缩包 并下载
-                    http.post('file/createZip', {
-                        "course": parent,
-                        "tasks": child,
-                        "username": username
-                    }).then(({ code }) => {
+                    fileApi2.createZip(parent, child, username).then(({ code }) => {
                         if (code === 200) {
                             // 开始下载压缩文件文件
-                            let jsonArray = [];
+                            let jsonArray: any[] = [];
                             jsonArray.push({ "key": "course", "value": parent });
                             jsonArray.push({ "key": "tasks", "value": "." });
                             jsonArray.push({ "key": "username", "value": username });
@@ -465,7 +485,7 @@ $(function () {
                         setTimeout(function () {
                             $btn.button('reset');
                         }, 1000);
-                    });
+                    })
                 }
 
                 if (oss !== 0) {
@@ -478,7 +498,7 @@ $(function () {
                 }
 
                 if (oss === 0 && server === 0) {
-                    Alert('由于服务器迁移,老版平台上传的文件已经被清理', '源文件已经被删除')
+                    amModal.alert('由于服务器迁移,老版平台上传的文件已经被清理', '源文件已经被删除')
                     setTimeout(function () {
                         $btn.button('reset');
                     }, 1000);
@@ -505,15 +525,16 @@ $(function () {
      * 搜索table中的内容
      */
     $('#searchVal').on('click', function () {
-        filesTable.search(this.parentElement.previousElementSibling.value).draw();
+        const val = $(this).parent().prev().val() as string
+        filesTable.search(val || ' ').draw();
     });
 
     /**
      * 搜索人员名单中的内容
      */
     $('#searchPeople').on('click', function () {
-        const { value } = this.parentElement.previousElementSibling;
-        peopleListTable.search(value).draw();
+        const val = $(this).parent().prev().val() as string
+        peopleListTable.search(val || ' ').draw();
     });
 
     /**
@@ -530,16 +551,19 @@ $(function () {
     $('#navMenu').on('click', 'li.sidebar-nav-link', function () {
         let key = this.getAttribute('key');
         // 面板切换
-        Array.from(document.getElementsByClassName('tpl-content-wrapper')).forEach(function (e) {
+        Array.from<HTMLDivElement>(document.getElementsByClassName('tpl-content-wrapper') as HTMLCollectionOf<HTMLDivElement>).forEach(function (e) {
             e.style.display = 'none';
         });
-        document.getElementById(`panel-${key}`).style.display = 'block';
+        const panelEL = document.getElementById(`panel-${key}`)
+        if (panelEL) {
+            panelEL.style.display = 'block';
+        }
 
         //侧边导航栏样式切换
         $('#navMenu').find('a').removeClass('active');
         $(this).find('a').addClass('active');
 
-        $('.tpl-header-switch-button').click();
+        // $('.tpl-header-switch-button').click();
     });
 
     /**
@@ -547,7 +571,7 @@ $(function () {
      */
     $('#filesTable').on('click', '.download', function () {
         let cells = filesTable.row($(this).parents('tr')).data();
-        let jsonArray = [];
+        let jsonArray: any = [];
         jsonArray.push({ "key": "course", "value": cells[2] });
         jsonArray.push({ "key": "tasks", "value": cells[3] });
         jsonArray.push({ "key": "filename", "value": cells[4] });
@@ -562,7 +586,7 @@ $(function () {
                     downLoadByUrl(url)
                 })
             } else {
-                Alert('由于服务器迁移,老版平台上传的文件已经被清理', '源文件已经被删除')
+                amModal.alert('由于服务器迁移,老版平台上传的文件已经被清理', '源文件已经被删除')
             }
         })
     })
@@ -574,6 +598,7 @@ $(function () {
         if (confirm("确认删除此文件,删除后将无法复原,请谨慎操作?")) {
             let cells = filesTable.row($(this).parents('tr')).data();
             let that = this;
+            // TODO: 待完善axios的delete传参
             $.ajax({
                 url: baseUrl + "report/report",
                 type: "DELETE",
@@ -585,19 +610,13 @@ $(function () {
                 }),
                 success: function (res) {
                     if (res.code === 200) {
-                        filesTable.row($(that).parents("tr")).remove().draw();
-                        Alert("删除成功！")
+                        filesTable.row($(that).parents("tr")).remove();
+                        filesTable.draw()
+                        amModal.alert("删除成功！")
                         //异步获取最新的repors数据
-                        $.ajax({
-                            url: baseUrl + 'report/report' + `?time=${Date.now()}`,
-                            type: "GET",
-                            data: {
-                                "username": username
-                            }
-                        }).then(res => {
+                        reportApi.getReports(username).then(res => {
                             if (res.code === 200) {
-                                let { reportList } = res.data;
-                                reports = reportList;
+                                reports = res.data.reportList
                             }
                         })
                     }
@@ -634,25 +653,15 @@ $(function () {
      */
     $("#cancel-Template").on('click', function (e) {
         if (confirm("确定移除当前设置的文件模板吗?")) {
-            $.ajax({
-                url: baseUrl + "childContent/childContext",
-                type: "PUT",
-                headers: {
-                    "Content-Type": "application/json;charset=utf-8"
-                },
-                data: JSON.stringify({
-                    "template": null,
-                    "taskid": nowClickId,
-                    "type": 3
-                }),
-                success: function (res) {
-                    if (res.code === 200) {
-                        Alert("已移除当前设置的文件模板");
-                        //清理设置的模板
-                        $("#fileList").empty();
-                        //禁用关闭按钮
-                        document.getElementById('cancel-Template').disabled = true;
-                    }
+            childContentApi.update(nowClickId as string, 3, {
+                template: null
+            }).then(res => {
+                if (res.code === 200) {
+                    amModal.alert("已移除当前设置的文件模板");
+                    //清理设置的模板
+                    $("#fileList").empty();
+                    //禁用关闭按钮
+                    jqUtils.freezeBtn($('#cancel-Template'))
                 }
             })
         }
@@ -663,29 +672,21 @@ $(function () {
      */
     $('#cancel-Date').on('click', function (e) {
         if (confirm("确定关闭截止日期吗?")) {
-            $.ajax({
-                url: baseUrl + "childContent/childContext",
-                type: "PUT",
-                headers: {
-                    "Content-Type": "application/json;charset=utf-8"
-                },
-                data: JSON.stringify({
-                    "ddl": null,
-                    "taskid": nowClickId,
-                    "type": 1
-                }),
-                success: function (res) {
-                    if (res.code === 200) {
-                        Alert("已取消截止日期设置");
-                        //清理设置的日期内容
-                        const datePicker = document.querySelector('#datePicker');
+            childContentApi.update(nowClickId as string, 1, {
+                ddl: null
+            }).then(res => {
+                if (res.code === 200) {
+                    amModal.alert("已取消截止日期设置");
+                    //清理设置的日期内容
+                    const datePicker = document.querySelector<HTMLInputElement>('#datePicker');
+                    if (datePicker) {
                         datePicker.value = "";
                         datePicker.placeholder = '点击设置截止日期';
-                        //禁用取消设置按钮
-                        document.querySelector('#cancel-Date').disabled = true;
-                        //解绑确定设置事件
-                        $("#sure-Date").unbind('click');
                     }
+                    //禁用取消设置按钮
+                    jqUtils.freezeBtn($('#cancel-Date'))
+                    //解绑确定设置事件
+                    $("#sure-Date").unbind('click');
                 }
             })
         }
@@ -696,25 +697,18 @@ $(function () {
      *  关闭人员限制
      */
     $('#closePeople').on('click', function () {
-        let that = this;
-        $.ajax({
-            url: baseUrl + "childContent/childContext",
-            type: "PUT",
-            headers: {
-                "Content-Type": "application/json;charset=utf-8"
-            },
-            data: JSON.stringify({
-                "people": null,
-                "taskid": nowClickId,
-                "type": 2
-            }),
-            success: function (res) {
-                if (res.code === 200) {
-                    //禁用当前按钮,启用打开按钮
-                    that.disabled = true;
-                    that.nextElementSibling.disabled = false;
-                    //隐藏面板
-                    document.querySelector('#showPeople').style.display = 'none';
+        const $btn = $(this)
+        childContentApi.update(nowClickId as string, 2, {
+            people: null
+        }).then(res => {
+            if (res.code === 200) {
+                //禁用当前按钮,启用打开按钮
+                jqUtils.freezeBtn($btn)
+                jqUtils.unFreezeBtn($btn.next())
+                //隐藏面板
+                const panelEL = document.querySelector<HTMLDivElement>('#showPeople')
+                if (panelEL) {
+                    panelEL.style.display = 'none';
                 }
             }
         })
@@ -725,25 +719,18 @@ $(function () {
      *  打开人员限制
      */
     $('#openPeople').on('click', function () {
-        let that = this;
-        $.ajax({
-            url: baseUrl + "childContent/childContext",
-            type: "PUT",
-            headers: {
-                "Content-Type": "application/json;charset=utf-8"
-            },
-            data: JSON.stringify({
-                "people": 'true',
-                "taskid": nowClickId,
-                "type": 2
-            }),
-            success: function (res) {
-                if (res.code === 200) {
-                    //禁用当前按钮,启用打开按钮
-                    that.disabled = true;
-                    that.previousElementSibling.disabled = false;
+        const $btn = $(this)
+        childContentApi.update(nowClickId as string, 2, {
+            people: 'true'
+        }).then(res => {
+            if (res.code === 200) {
+                //禁用当前按钮,启用打开按钮
+                jqUtils.freezeBtn($btn)
+                jqUtils.unFreezeBtn($btn.prev())
+                const panelEl = document.querySelector<HTMLDivElement>('#showPeople')
+                if (panelEl) {
                     //隐藏面板
-                    document.querySelector('#showPeople').style.display = 'flex';
+                    panelEl.style.display = 'flex';
                 }
             }
         })
@@ -753,53 +740,46 @@ $(function () {
      * 查看名单详细提交情况
      */
     $('#checkPeopleModal').on('click', function () {
-        $.ajax({
-            url: baseUrl + "people/peopleList" + `?time=${Date.now()}`,
-            type: "GET",
-            data: {
-                "parent": $("#courseActive").html(),
-                "child": $('#taskActive').html(),
-                "username": username
-            },
-            success: function (res) {
-                if (res.code === 200) {
-                    res = res.data;
-                    //清空原有数据
-                    peopleListTable.rows().remove().draw();
-                    //记录未提交人数
-                    let no_submit = 0;
-                    //加载最新数据
-                    for (let i = 0; i < res.length; i++) {
-                        const btn = document.createElement('div');
-                        const a = document.createElement('a');
-                        const $i = document.createElement('i');
-                        btn.classList.add('tpl-table-black-operation');
-                        a.setAttribute("people-key", res[i].id);
-                        a.classList.add('delete', 'tpl-table-black-operation-del', 'am-margin-sm');
-                        a.href = 'javascript:void(0)';
-                        $i.classList.add('am-icon-trash');
-                        a.append($i, "删除");
-                        btn.append(a);
-                        const date = res[i].date ? new Date(res[i].date).Format("yyyy-MM-dd hh:mm:ss") : "暂无记录";
+        const parent = $("#courseActive").html() as string
+        const child = $('#taskActive').html() as string
 
-                        if (!res[i].status)
-                            no_submit++;
+        peopleApi.getList(parent, child, username).then(res => {
+            if (res.code === 200) {
+                const { data } = res;
+                //清空原有数据
+                peopleListTable.rows().remove().draw();
+                //记录未提交人数
+                let no_submit = 0;
+                //加载最新数据
+                for (let i = 0; i < data.length; i++) {
+                    const d = data[i]
+                    const btn = document.createElement('div');
+                    const a = document.createElement('a');
+                    const $i = document.createElement('i');
+                    btn.classList.add('tpl-table-black-operation');
+                    a.setAttribute("people-key", d.id + '');
+                    a.classList.add('delete', 'tpl-table-black-operation-del', 'am-margin-sm');
+                    a.href = 'javascript:void(0)';
+                    $i.classList.add('am-icon-trash');
+                    a.append($i, "删除");
+                    btn.append(a);
+                    const date = d.date ? new Date(d.date).Format("yyyy-MM-dd hh:mm:ss") : "暂无记录";
 
-                        let rowNode = peopleListTable.row.add([
-                            i + 1,
-                            res[i].name,
-                            GetState(res[i].status),
-                            date,
-                            btn.outerHTML
-                        ]).node();
+                    if (!d.status)
+                        no_submit++;
 
-                        $(rowNode)
-                            .css('class', 'gradeX');
-                    }
-                    peopleListTable.draw();
-                    document.getElementById('amountPeople').textContent = res.length;
-                    document.getElementById('noSubmit').textContent = no_submit;
+                    peopleListTable.row.add([
+                        i + 1,
+                        d.name,
+                        GetState(d.status),
+                        date,
+                        btn.outerHTML
+                    ])
+
                 }
+                peopleListTable.draw();
+                $('#amountPeople').text(data.length);
+                $('#noSubmit').text(no_submit);
             }
         })
         openModel("#people-modal", false);
@@ -826,12 +806,11 @@ $(function () {
             })
         }).then(res => {
             if (res.code === 200) {
-                peopleListTable.row($(that).parents("tr")).remove().draw();
+                peopleListTable.row($(that).parents("tr")).remove();
+                peopleListTable.draw()
             }
         })
     })
-    //tempTest
-    let nowClickId = null;
 
     /**
      * 打开子类附加功能设置面板
@@ -843,65 +822,55 @@ $(function () {
         nowClickId = taskid;
         // openModel("#settings-panel",false);
         resetModalPanel();
-        $.ajax({
-            url: baseUrl + "childContent/childContent" + `?time=${Date.now()}`,
-            type: "GET",
-            data: {
-                "taskid": taskid
-            },
-            success: function (res) {
-                const { code } = res;
-                if (code === 200) {
-                    const $datePicker = document.getElementById('datePicker');
-                    const $cancelDate = document.getElementById('cancel-Date');
-                    res = res.data;
-                    //加载ddl
-                    if (res.ddl) {
-                        const newDate = new Date(res.ddl);
-                        $cancelDate.disabled = false;
-                        $datePicker.setAttribute('data-ec', newDate.toString());
-                        $datePicker.value = newDate.Format("yyyy-MM-dd hh:mm:ss");
-                    } else {
-                        $cancelDate.disabled = true;
-                        $datePicker.placeholder = "点击设置截止日期";
-                        $datePicker.value = "";
-                    }
-                    //    加载Template
-                    const $fileList = document.getElementById('fileList');
-                    const $cancelTemplate = document.getElementById('cancel-Template');
-                    if (res.template) {
-                        clearpanel('#fileList');
-                        $cancelTemplate.disabled = false;
-                        const div = document.createElement('div');
-                        div.textContent = res.template;
-                        $fileList.append(div);
-                    } else {
-                        $cancelTemplate.disabled = true;
-                    }
-
-                    //如果设置限制了提交者
-                    const $showPeople = document.getElementById('showPeople');
-                    const $openPeople = document.getElementById('openPeople');
-                    const $closePeople = document.getElementById('closePeople');
-                    if (res.people) {
-                        $showPeople.style.display = 'flex';
-                        $openPeople.disabled = true;
-                        $closePeople.disabled = false;
-                    } else {
-                        $showPeople.style.display = 'none';
-                        $openPeople.disabled = false;
-                        $closePeople.disabled = true;
-                    }
+        childContentApi.getInitData(taskid as string).then(res => {
+            const { code, data } = res;
+            if (code === 200) {
+                const $datePicker = $('#datePicker')
+                const $cancelDate = $('#cancel-Date')
+                //加载ddl
+                if (data.ddl) {
+                    const newDate = new Date(data.ddl);
+                    jqUtils.unFreezeBtn($cancelDate)
+                    $datePicker.attr('data-ec', newDate.toString())
+                    $datePicker.val(newDate.Format("yyyy-MM-dd hh:mm:ss"))
                 } else {
-                    //    如果没有数据
-                    //    初始化面板内容
-                    resetModalPanel();
+                    jqUtils.freezeBtn($cancelDate)
+                    $datePicker.attr('placeholder', "点击设置截止日期")
+                    $datePicker.val('')
                 }
-                //如果有数据
+                //    加载Template
+                const $fileList = $('#fileList');
+                const $cancelTemplate = $('#cancel-Template');
+                if (data.template) {
+                    clearpanel('#fileList');
+                    jqUtils.unFreezeBtn($cancelTemplate)
+                    const div = document.createElement('div');
+                    div.textContent = data.template;
+                    $fileList.append(div);
+                } else {
+                    jqUtils.freezeBtn($cancelTemplate)
+                }
 
-                openModel("#settings-panel", false);
+                //如果设置限制了提交者
+                const $showPeople = $('#showPeople');
+                const $openPeople = $('#openPeople');
+                const $closePeople = $('#closePeople');
+                if (data.people) {
+                    $showPeople.show()
+                    jqUtils.freezeBtn($openPeople)
+                    jqUtils.unFreezeBtn($closePeople)
+                } else {
+                    $showPeople.hide()
+                    jqUtils.unFreezeBtn($openPeople)
+                    jqUtils.freezeBtn($closePeople)
+                }
+            } else {
+                resetModalPanel();
             }
-        });
+            //如果有数据
+
+            openModel("#settings-panel", false);
+        })
         event.stopPropagation();
     });
 
@@ -909,20 +878,22 @@ $(function () {
      *  展开父类的属性
      */
     $("#coursePanel,#taskPanel").on('click', '.show-hide', function () {
-        let className = $(this).attr("class");
-        let isShow = className.includes("arrow-right");
-        if (isShow) {
-            Array.from($(this).siblings(".am-hide")).forEach(btn => {
-                $(btn).removeClass('am-hide');
-                $(btn).addClass('am-show');
-            });
-            $(this).attr("class", className.replace("arrow-right", "arrow-left"));
-        } else {
-            Array.from($(this).siblings(".am-show")).forEach(btn => {
-                $(btn).addClass('am-hide');
-                $(btn).removeClass('am-show');
-            });
-            $(this).attr("class", className.replace("arrow-left", "arrow-right"));
+        const className = $(this).attr("class");
+        if (className) {
+            let isShow = className.includes("arrow-right");
+            if (isShow) {
+                Array.from($(this).siblings(".am-hide")).forEach(btn => {
+                    $(btn).removeClass('am-hide');
+                    $(btn).addClass('am-show');
+                });
+                $(this).attr("class", className.replace("arrow-right", "arrow-left"));
+            } else {
+                Array.from($(this).siblings(".am-show")).forEach(btn => {
+                    $(btn).addClass('am-hide');
+                    $(btn).removeClass('am-show');
+                });
+                $(this).attr("class", className.replace("arrow-left", "arrow-right"));
+            }
         }
     });
     /**
@@ -939,16 +910,16 @@ $(function () {
                     if (status) {
                         parentElement.remove();
                         clearpanel('#taskPanel');
-                        document.getElementById('taskPanel').previousElementSibling.style.display = 'block';
+                        $('#taskPanel').prev().show()
                         $('#addTask').unbind('click');
-                        const coursePanel = document.getElementById('coursePanel');
-                        if (coursePanel.children.length === 0) {
-                            coursePanel.previousElementSibling.style.display = 'block';
+                        const coursePanel = $('#coursePanel');
+                        if (coursePanel.children().length === 0) {
+                            coursePanel.show()
                         }
                     }
                     return;
                 }
-                Alert("删除失败" + res.errMsg);
+                amModal.alert("删除失败" + res.errMsg);
             });
         }
         event.stopPropagation();
@@ -967,14 +938,14 @@ $(function () {
                     const { data: { status } } = res;
                     if (status) {
                         parentElement.remove();
-                        const taskPanel = document.getElementById('taskPanel');
-                        if (taskPanel.children.length === 0) {
-                            taskPanel.previousElementSibling.style.display = 'block';
+                        const taskPanel = $('#taskPanel');
+                        if (taskPanel.children().length === 0) {
+                            taskPanel.show()
                         }
                     }
                     return;
                 }
-                Alert("删除失败" + res.errMsg);
+                amModal.alert("删除失败" + res.errMsg);
             });
 
         }
@@ -986,7 +957,7 @@ $(function () {
      * 生成任务/子类分享链接
      */
     $('#taskPanel').on('click', 'button.share', function () {
-        let parent = document.getElementById('courseActive').textContent;
+        let parent = document.getElementById('courseActive')?.textContent;
         let child = this.previousElementSibling.textContent;
         let key = btoa(encodeURI(`username=${username}&parent=${parent}&child=${child}`))
         let shareUrl = `${baseAddress}/upload?${key}`;
@@ -1009,39 +980,39 @@ $(function () {
      * 显示当前点击了的子类
      */
     $('#taskPanel').on('click', 'button.checkChildren', function () {
-        document.getElementById('taskActive').textContent = this.textContent;
+        $('#taskActive').text(this.textContent);
     });
     /**
      * 查看子类/选择课程
      */
     $('#coursePanel').on('click', '.checkChildren', function () {
-        document.getElementById('courseActive').textContent = this.textContent;
+        $('#courseActive').text(this.textContent)
         let parentsId = this.parentElement.parentElement.value;
         setdataPanel('children', parentsId, username);
         //增加任务
         $('#addTask').unbind('click');
         $('#addTask').on('click', function (e) {
-            let $input = e.currentTarget.parentElement.previousElementSibling;
-            let value = $input.value.trim();
+            let $input = e.currentTarget.parentElement?.previousElementSibling as HTMLInputElement;
+            let value = $input?.value.trim();
             value = stringEncode(value)
             if (!value) {
-                Alert('内容不能为空');
+                amModal.alert('内容不能为空');
                 return;
             }
 
-            const $taskPanel = document.getElementById('taskPanel');
-            const $lis = Array.from($taskPanel.children);
-            const isExist = !!$lis.find(function (element) {
-                return element.getAttribute('text') === value;
+            const $taskPanel = $('#taskPanel');
+            const $lis = Array.from($taskPanel?.children());
+            const isExist = !!$lis.find((el) => {
+                return el.getAttribute('text') === value;
             });
             if (isExist) {
-                Alert("内容已存在");
+                amModal.alert("内容已存在");
                 $input.value = "";
                 return;
             }
 
             addCourseOrTask(value, 0, parentsId, username);
-            $taskPanel.previousElementSibling.style.display = 'none';
+            $taskPanel.prev().hide()
         })
     });
 
@@ -1049,26 +1020,26 @@ $(function () {
      * 添加课程
      */
     $('#addCourse').on('click', function () {
-        let $input = this.parentElement.previousElementSibling;
-        let value = $input.value.trim();
+        let $input = this.parentElement?.previousElementSibling as HTMLInputElement;
+        let value = $input?.value?.trim();
         if (!value) {
-            Alert('内容不能为空');
+            amModal.alert('内容不能为空');
             return;
         }
         value = stringEncode(value)
-        const $coursePanel = document.getElementById('coursePanel');
-        const $lis = Array.from($coursePanel.children);
-        const isExist = !!$lis.find(function (element) {
-            return element.getAttribute('text') === value;
+        const $coursePanel = $('#coursePanel');
+        const $lis = Array.from($coursePanel.children());
+        const isExist = !!$lis.find((e) => {
+            return e.getAttribute('text') === value;
         });
         if (isExist) {
-            Alert("内容已存在");
+            amModal.alert("内容已存在");
             $input.value = "";
             return;
         }
 
         addCourseOrTask(value, 1, null, username);
-        $coursePanel.previousElementSibling.style.display = 'none';
+        $coursePanel.prev().hide();
     });
 
     /**
@@ -1094,8 +1065,8 @@ $(function () {
             [0, { color: "#f35842", text: '未提交' }]
         ]);
         if (stateMap.has(state)) {
-            str_state = stateMap.get(state).text;
-            color = stateMap.get(state).color;
+            str_state = stateMap.get(state)?.text as string;
+            color = stateMap.get(state)?.color as string;
         }
         temp.style.color = color;
         temp.setAttribute('state', state);
@@ -1110,13 +1081,13 @@ $(function () {
     function resetModalPanel() {
         templateFile = null
         //    默认datePicker
-        document.getElementById('datePicker').value = '';
-        document.getElementById('cancel-Date').disabled = true;
+        $('#datePicker').val('')
+        jqUtils.freezeBtn($('#cancel-Date'))
 
         //清空fileList
         clearpanel("#fileList");
-        document.getElementById('cancel-Template').disabled = true;
-        document.getElementById('showPeople').style.display = 'none';
+        jqUtils.freezeBtn($('#cancel-Template'))
+        jqUtils.unFreezeBtn($('#showPeople'))
         // 重置filePicker
         peoplePicker.reset();
         //清空peopleFileList
@@ -1136,12 +1107,14 @@ $(function () {
      */
     function setCopyContent(shareUrl) {
         const tempCopy = document.getElementById('tempCopy');
-        tempCopy.setAttribute('href', shareUrl);
-        tempCopy.textContent = shareUrl;
+        if (tempCopy) {
+            tempCopy.setAttribute('href', shareUrl);
+            tempCopy.textContent = shareUrl;
+        }
     }
 
 
-    function jsonp(url, jsonpCallback, success) {
+    function jsonp(url: string, jsonpCallback: string, success) {
         const $script = document.createElement('script')
         $script.src = url + `&callback=${jsonpCallback}`
         $script.async = true
@@ -1156,20 +1129,14 @@ $(function () {
      * @param url
      */
     function getShortUrl(url) {
-        // url = 'http://ep.sugarat.top/upload?dXNlcm5hbWU9YWRtaW4mcGFyZW50PUMjJUU2JUExJThDJUU5JTlEJUEyJUU1JUJBJTk0JUU3JTk0JUE4'
-        jsonp(`https://api.ft12.com/api.php?format=jsonp&url=${url}&apikey=Pvn45SmLR3FmTfFSyz@ddd`, 'shortLink', function (res) {
+        url = 'http://ep.sugarat.top/upload?dXNlcm5hbWU9YWRtaW4mcGFyZW50PUMjJUU2JUExJThDJUU5JTlEJUEyJUU1JUJBJTk0JUU3JTk0JUE4'
+        jsonp(`https://api.ft12.com/api.php?format=jsonp&url=${url}&apikey=15196520474@811a2f8e6e0f2424975993679ac041c5`, 'shortLink', function (res) {
             const tempCopy = document.getElementById('tempCopy');
-            tempCopy.setAttribute('href', res.url);
-            tempCopy.textContent = res.url;
+            if (tempCopy) {
+                tempCopy.setAttribute('href', res.url);
+                tempCopy.textContent = res.url;
+            }
         })
-    }
-
-    /**
-     * 关闭指定弹出层
-     * @param {String} id 弹出层id
-     */
-    function closeModel(id) {
-        $(id).modal('close');
     }
 
     /**
@@ -1177,7 +1144,7 @@ $(function () {
      * @param {String} id 弹出层id
      * @param {boolean} close 设置点击遮罩层是否可以关闭
      */
-    function openModel(id, close) {
+    function openModel(id, close = true) {
         $(id).modal({
             closeViaDimmer: close //设置点击遮罩层无法关闭
         });
@@ -1211,12 +1178,12 @@ $(function () {
             }),
             success: function (res) {
                 if (res.code !== 200) {
-                    Alert('添加失败');
+                    amModal.alert('添加失败');
                     return;
                 }
 
                 if (!res.data.status) {
-                    Alert('内容已存在');
+                    amModal.alert('内容已存在');
                 } else if (!parent) {
                     insertToPanel("#coursePanel", name, res.data.id, 'course');
                 } else {
@@ -1232,7 +1199,7 @@ $(function () {
      * @param id 待删除的id
      */
     function delCourseOrTask(type, id) {
-        return new Promise(resolve => {
+        return new Promise<BaseResponse>(resolve => {
             $.ajax({
                 url: baseUrl + 'course/del',
                 contentType: "application/json",
@@ -1257,43 +1224,31 @@ $(function () {
      * @param range
      * @param parentid
      */
-    function setdataPanel(range, parentid, username) {
-        $.ajax({
-            url: baseUrl + 'course/check' + `?time=${Date.now()}`,
-            async: true,
-            contentType: "application/json",
-            type: "GET",
-            data: {
-                "range": range,
-                "contentid": parentid,
-                "username": username
-            },
-            success: function (res) {
-                const { code, data: { courseList } } = res;
-                if (code === 200 && !courseList.length) {
-                    if (range === 'parents') {
-                        clearpanel('#coursePanel');
-                        document.getElementById('coursePanel').previousElementSibling.style.display = 'block';
-                        document.getElementById('taskPanel').previousElementSibling.style.display = 'block';
-                    } else {
-                        clearpanel("#taskPanel");
-                        document.getElementById('taskPanel').previousElementSibling.style.display = 'block';
-                    }
-                    return;
-                }
+    function setdataPanel(range: string, parentid: number, username: string) {
+        courseApi.getCourseList(range, parentid, username).then(res => {
+            const { code, data: { courseList } } = res;
+            if (code === 200 && !courseList.length) {
                 if (range === 'parents') {
-                    document.getElementById('coursePanel').previousElementSibling.style.display = 'none';
                     clearpanel('#coursePanel');
-                    courseList.forEach(v => {
-                        insertToPanel("#coursePanel", v.name, v.id, 'course');
-                    });
-                } else if (range === 'children') {
-                    document.getElementById('taskPanel').previousElementSibling.style.display = 'none';
+                    $('#coursePanel').prev().show()
+                } else {
                     clearpanel("#taskPanel");
-                    courseList.forEach(v => {
-                        insertToPanel("#taskPanel", v.name, v.id, 'task');
-                    });
                 }
+                $('#taskPanel').prev().show()
+                return;
+            }
+            if (range === 'parents') {
+                $('#coursePanel').prev().hide();
+                clearpanel('#coursePanel');
+                courseList.forEach(v => {
+                    insertToPanel("#coursePanel", v.name, v.id, 'course');
+                });
+            } else if (range === 'children') {
+                $('#taskPanel').prev().hide();
+                clearpanel("#taskPanel");
+                courseList.forEach(v => {
+                    insertToPanel("#taskPanel", v.name, v.id, 'task');
+                });
             }
         })
     }
@@ -1346,9 +1301,7 @@ $(function () {
      * @param {String} selectid
      */
     function clearpanel(panelid) {
-        Array.from(document.getElementById(panelid.substring(1)).children).forEach(function (element) {
-            element.remove();
-        });
+        $(panelid).empty()
     }
 
     /**
@@ -1358,7 +1311,7 @@ $(function () {
         //判断登录是否失效
         let token = localStorage.getItem("token");
         if (token == null || token == '') {
-            Alert("登录已经失效,请重新登录");
+            amModal.alert("登录已经失效,请重新登录");
             redirectHome();
             return;
         }
@@ -1401,7 +1354,7 @@ $(function () {
                     refreshPageInfo();
                 } else {
                     localStorage.removeItem('token')
-                    Alert('登录过期')
+                    amModal.alert('登录过期')
                     redirectHome()
                 }
             })
@@ -1425,7 +1378,7 @@ $(function () {
             '<i class="am-icon-trash" ></i> 删除</a></div> ';
 
         date = new Date(date).Format("yyyy-MM-dd hh:mm:ss");
-        let rowNode = filesTable.row.add([
+        filesTable.row.add([
             id,
             name,
             course,
@@ -1433,15 +1386,12 @@ $(function () {
             filename,
             date,
             $btns
-        ]).node();
-
-        $(rowNode)
-            .css('class', 'gradeX');
+        ])
     }
 
     function refreshPageInfo() {
         const { recordsDisplay, recordsTotal } = filesTable.page.info();
-        document.getElementById('page-info').textContent = `展示:${recordsDisplay},总共:${recordsTotal}`;
+        $('#page-info').text(`展示:${recordsDisplay},总共:${recordsTotal}`)
     }
 
     /**
@@ -1468,9 +1418,9 @@ $(function () {
                 resetselect("#courseList", "success");
 
                 //父类下拉框绑定事件
-                $('#courseList').on('change', function (e) {
+                $<HTMLSelectElement>('#courseList').on('change', function (e) {
                     filterFlag = "parentType";
-                    let parentId = Number.parseInt(this.value);
+                    let parentId = +this.value;
                     clearselect("#taskList");
                     insertToSelect("#taskList", "全部", -1);
                     //如果选择的不是全部

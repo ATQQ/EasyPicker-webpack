@@ -44,6 +44,11 @@ module.exports = {
         path: path.resolve(__dirname, './../dist')
     },
     resolve: {
+        extensions: [".ts", ".js"],
+        alias: {
+            "@": path.resolve(__dirname, '../src'),
+            "apis": path.resolve(__dirname, "../src/assets/js/apis"),
+        },
         modules: [
             "node_modules",
             path.resolve(__dirname, 'src')

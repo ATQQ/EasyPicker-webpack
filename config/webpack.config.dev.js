@@ -27,7 +27,6 @@ const happyPackLoaders = [
     //     loaders: ['style-loader', 'css-loader', 'sass-loader']
     // })
 ]
-
 module.exports = {
     mode: 'development',
     devServer: {
@@ -50,13 +49,18 @@ module.exports = {
     entry: {
         base: './src/assets/js/common/base.js',
         ...getEntry('./src/assets/js/view'),
-        ...getEntry('./src/assets/js/view','.ts')
+        ...getEntry('./src/assets/js/view', '.ts')
     },
     output: {
         filename: 'js/[name]-[hash].js',
         path: path.resolve(__dirname, './../dist')
     },
     resolve: {
+        extensions: [".ts", ".js"],
+        alias: {
+            "@": path.resolve(__dirname, '../src'),
+            "apis": path.resolve(__dirname, "../src/assets/js/apis"),
+        },
         modules: [
             "node_modules",
             path.resolve(__dirname, 'src')
@@ -85,13 +89,17 @@ module.exports = {
             },
             {
                 test: /\.ts$/,
-                use:['ts-loader']
+                use: [
+                    {
+                        loader: 'ts-loader',
+                        options: {
+                            configFile: path.resolve(__dirname, '../tsconfig.json'),
+                        }
+                    }],
+                exclude: /node_modules/,
             },
             {
                 test: /\.js?$/,
-                include: [
-                    path.resolve(__dirname, '../src/assets/js/view')
-                ],
                 exclude: /node_modules/,
                 loader: 'happypack/loader?id=happyBabel'
             },
