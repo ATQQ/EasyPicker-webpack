@@ -1,8 +1,7 @@
 import '../../sass/modules/upload.scss'
-import { stringEncode, getRandomStr, AlertModal, getQiNiuUploadToken, downLoadByUrl } from '../common/utils'
 import fileApi from '../apis/file.js'
 import jqUtils from '@/lib/jqUtils'
-
+import { amModal, downLoadByUrl, getQiNiuUploadToken, stringEncode, getRandomStr } from '@/lib/utils'
 import('../common/tongji').then(res => {
     res.default.init()
 })
@@ -16,16 +15,12 @@ window.onload = function () {
     let limited = false; //是否限了制提交人员
     let loadParentComplete = false; //父类是否加载完成
 
-    const Alert = (() => {
-        let t = new AlertModal()
-        return t.show.bind(t)
-    })();
 
     //设置全局ajax设置
     $.ajaxSetup({
         // 默认添加请求头
         error: function () {
-            Alert("网络错误");
+            amModal.alert("网络错误");
         }
     });
 
@@ -96,7 +91,7 @@ window.onload = function () {
                         f.status = -1
                         process.textContent = "上传失败"
                         process.classList.replace('am-progress-bar-secondary', 'am-progress-bar-danger')
-                        Alert(JSON.stringify(err));
+                        amModal.alert(JSON.stringify(err));
                         fileItem.append(deleteDom)
                     },
                     complete(res) {
@@ -123,11 +118,11 @@ window.onload = function () {
             return f.file.name === file.name && file.size === f.file.size
         }).length !== 0
         if (isExist) {
-            Alert("该文件已存在")
+            amModal.alert("该文件已存在")
             return
         }
         if (file.name.indexOf(".") === -1 || file.name.indexOf(".") === file.name.length - 1) {
-            Alert("文件必须有后缀", "文件名称不支持")
+            amModal.alert("文件必须有后缀", "文件名称不支持")
             return
         }
         const tFile = {
@@ -167,11 +162,11 @@ window.onload = function () {
         uname = $('#name').val() as string;
         uname = stringEncode(uname)
         if (uname.trim() == null || uname.trim() == "") {
-            Alert('姓名不能为空');
+            amModal.alert('姓名不能为空');
             return;
         }
         if (fileList.filter(v => v.status !== 1 && v.status !== 2).length === 0) {
-            Alert("没有可上传的文件")
+            amModal.alert("没有可上传的文件")
             return
         }
         const start = () => {
@@ -204,7 +199,7 @@ window.onload = function () {
                         start()
                     }
                 } else {
-                    Alert("抱歉你不在提交名单之中,如有疑问请联系管理员.");
+                    amModal.alert("抱歉你不在提交名单之中,如有疑问请联系管理员.");
                 }
             });
         } else {
@@ -300,14 +295,14 @@ window.onload = function () {
                                     } else if (where === 'oss') {
                                         fileApi.getFileDownloadUrl(account, parent, child, template).then(res => {
                                             const { url } = res.data
-                                            downLoadByUrl(url)
+                                            downLoadByUrl(url, template)
                                             $btn.button('loading');
                                             setTimeout(function () {
                                                 $btn.button('reset');
                                             }, 5000);
                                         })
                                     } else {
-                                        Alert('由于历史原因,老版平台上传的文件已经被清理', '源文件已经被删除')
+                                        amModal.alert('由于历史原因,老版平台上传的文件已经被清理', '源文件已经被删除')
                                     }
                                 })
                             });
@@ -404,9 +399,9 @@ window.onload = function () {
             })
         }).then(res => {
             if (res.code === 200) {
-                Alert(`${filename}提交成功`)
+                amModal.alert(`${filename}提交成功`)
             } else {
-                Alert(`${filename}提交失败`);
+                amModal.alert(`${filename}提交失败`);
             }
             $("#uploadBtn").button("reset");
             $('#name').removeAttr('disabled')
@@ -424,7 +419,7 @@ window.onload = function () {
         try {
             params = decodeURI(decodeURI(decodeURI(atob(location.search.slice(1)))))
         } catch (err) {
-            Alert('链接无效!!!,请联系管理员')
+            amModal.alert('链接无效!!!,请联系管理员')
             redirectHome()
             return
         }
@@ -452,7 +447,7 @@ window.onload = function () {
         }
 
         if (!username || !type || type === 1) {
-            Alert("链接失效!!!");
+            amModal.alert("链接失效!!!");
             redirectHome();
             return
         }
@@ -480,12 +475,12 @@ window.onload = function () {
                             break;
                     }
                 } else {
-                    Alert("链接失效!!!");
+                    amModal.alert("链接失效!!!");
                     redirectHome();
                 }
             },
             error: function () {
-                Alert("网络错误");
+                amModal.alert("网络错误");
                 redirectHome();
             }
         })
@@ -534,7 +529,7 @@ window.onload = function () {
                     } else {
                         clearselect("#task");
                         resetselect("#task");
-                        Alert("链接失效!!!");
+                        amModal.alert("链接失效!!!");
                         redirectHome();
                     }
                     return;
@@ -584,7 +579,7 @@ window.onload = function () {
                     insertToSelect("#course", node.name, node.id);
                     resetselect("#course");
                 } else {
-                    Alert("链接失效");
+                    amModal.alert("链接失效");
                     redirectHome();
                 }
             }
@@ -640,12 +635,12 @@ window.onload = function () {
                         }, 1);
 
                     } else {
-                        Alert("链接失效");
+                        amModal.alert("链接失效");
                         redirectHome();
                     }
                 });
             } else {
-                Alert("链接失效");
+                amModal.alert("链接失效");
                 redirectHome();
             }
         })

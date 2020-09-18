@@ -1,3 +1,5 @@
+let baseUrl = "/EasyPicker/";
+
 class AmazeUIModal {
     private alertEl
 
@@ -57,4 +59,82 @@ export const placeholders = {
         notExist: "账号不存在",
         alreadyExist: "账号已存在"
     }
+}
+
+/**
+* 向指定路径发送下载请求
+* @param{String} url 请求路径
+* @param {String} filename 文件名
+*/
+export function downLoadByUrl(url: string, filename = Date.now() + '') {
+    let a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.download = filename;
+    a.click();
+}
+
+export function getQiNiuUploadToken() {
+    return $.get(baseUrl + "file/qiniu/token")
+}
+
+export function stringEncode(str) {
+    var div = document.createElement('div');
+    if (div.innerText) {
+        div.innerText = str;
+    } else {
+        div.textContent = str;//Support firefox
+    }
+    return div.innerHTML;
+}
+
+export const baseAddress = location.protocol + '//' + location.host
+
+
+export function getRandomStr(length) {
+    const str = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    const res: string[] = []
+    while (length) {
+        const index = ~~(Math.random() * (length + 1) * 1000) % str.length
+        res.push(str[index])
+        length--
+    }
+    return res.join('')
+}
+
+/**
+ * 判断字符串是否为空
+ * @param str
+ * @returns {boolean}
+ */
+export function isEmpty(str) {
+    return (str == null || str.trim() == '');
+}
+
+/**
+ * 打开指定弹出层
+ * @param {String} id 弹出层id
+ * @param {boolean} close 设置点击遮罩层是否可以关闭
+ */
+export function openModel(id, close) {
+    $(id).modal({
+        closeViaDimmer: close //设置点击遮罩层无法关闭
+    });
+    $(id).modal('open');
+}
+
+
+/**
+ * 获取Url中的参数
+ * @param url 地址Url 或者 Url中参数部分
+ * @param paramName
+ */
+export function getUrlParam(url, paramName) {
+    let isExist = false;
+    let res = null;
+    isExist = url.lastIndexOf(paramName + '=') !== -1;
+    if (isExist) {
+        res = url.substring(url.indexOf(paramName + '=') + paramName.length + 1, (url.indexOf('&') > url.indexOf(paramName + '=') ? url.indexOf('&') : url.length));
+    }
+    return res;
 }

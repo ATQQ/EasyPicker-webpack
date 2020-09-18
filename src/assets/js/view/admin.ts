@@ -5,13 +5,12 @@ import '../../sass/modules/admin.scss'
 
 import '../common/app'
 
-import { stringEncode, baseAddress, getRandomStr, getQiNiuUploadToken, downLoadByUrl } from '../common/utils'
 import fileApi from '../apis/file.js'
-import { amModal } from '@/lib/utils'
+import { amModal, downLoadByUrl, getQiNiuUploadToken, stringEncode, baseAddress,getRandomStr } from '@/lib/utils'
 import jqUtils from '@/lib/jqUtils'
 import { childContentApi, fileApi2, reportApi, peopleApi, courseApi } from 'apis/index'
 
-import('./../common/tongji').then(res=>{
+import('./../common/tongji').then(res => {
     res.default.init()
 })
 

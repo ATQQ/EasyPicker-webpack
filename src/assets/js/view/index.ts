@@ -1,19 +1,18 @@
 //引入样式
 import '../../sass/modules/index.scss'
 
-import { amModal } from './../common/utils'
 import { userApi } from 'apis/index'
 import { rMobile, rCode, rPassword, rUsername } from '@/lib/regExp'
 import jqUtils from '@/lib/jqUtils'
 import { themeColor } from '@/lib/enums'
-import { placeholders } from '@/lib/utils'
+import { placeholders,amModal } from '@/lib/utils'
 
 import('./../common/tongji').then(res=>{
     res.default.init()
 })
 
 $(document).ready(function () {
-    var isGetCode = false;
+    let isGetCode = false;
     /**
      * 页面初次完成渲染后
      */
