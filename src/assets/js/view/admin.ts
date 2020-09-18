@@ -4,7 +4,6 @@ import '../../sass/modules/admin.scss'
 //js
 
 import '../common/app'
-import '../common/theme'
 
 import { stringEncode, baseAddress, getRandomStr, getQiNiuUploadToken, downLoadByUrl } from '../common/utils'
 import fileApi from '../apis/file.js'
@@ -285,7 +284,7 @@ $(function () {
      */
     let peoplePicker = WebUploader.create({
         auto: false,
-        swf: 'https://cdn.staticfile.org/webuploader/0.1.1/Uploader.swf',
+        swf: 'https://img.cdn.sugarat.top/webuploader/0.1.1/Uploader.swf',
         threads: 1,
         server: baseUrl + "file/people",
         pick: '#filePicker',
@@ -560,7 +559,7 @@ $(function () {
         $('#navMenu').find('a').removeClass('active');
         $(this).find('a').addClass('active');
 
-        $('.tpl-header-switch-button').click();
+        // $('.tpl-header-switch-button').click();
     });
 
     /**

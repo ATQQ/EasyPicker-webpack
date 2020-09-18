@@ -8,14 +8,23 @@
     <title><%= htmlWebpackPlugin.options.title %></title>
     <meta http-equiv="Cache-Control" content="no-siteapp" />
     <meta name="apple-mobile-web-app-title" content="<%= htmlWebpackPlugin.options.title %>" />
-    <link rel="stylesheet" href="https://cdn.staticfile.org/amazeui/2.2.1/css/amazeui.min.css">
-    <link rel="stylesheet" href="https://cdn.staticfile.org/animate.css/3.7.2/animate.min.css">
+    <script defer src="https://img.cdn.sugarat.top/jquery/2.1.4/jquery.min.js"></script>
+    <!-- 日期插件 -->
+    <script defer src="https://img.cdn.sugarat.top/js/Ecalendar.jquery.min.js"></script>
+    <!-- amazeui -->
+    <script defer src="https://img.cdn.sugarat.top/amazeui/2.7.2/js/amazeui.min.js"></script>
+    <!--WebUploader-->
+    <script defer src="https://img.cdn.sugarat.top/webuploader/0.1.1/webuploader.min.js"></script>
+    <script defer src="https://img.cdn.sugarat.top/js/amazeui/amazeui.datatables.min.js"></script>
+    <script defer src="https://img.cdn.sugarat.top/js/amazeui/dataTables.responsive.min.js"></script>
+    <script defer src="https://img.cdn.sugarat.top/qiniu-js/3.0.3/qiniu.min.js"></script>
+    <link rel="stylesheet" href="https://img.cdn.sugarat.top/amazeui/2.7.2/css/amazeui.min.css">
+    <link rel="stylesheet" href="https://img.cdn.sugarat.top/animate.css/3.7.2/animate.min.css">
     <link rel="stylesheet" href="https://img.cdn.sugarat.top/css/amazeui/amazeui.datatables.min.css">
     <link rel="stylesheet" href="https://img.cdn.sugarat.top/css/Ecalendar/style.css">
-    <!-- <link rel="stylesheet" href="https://cdn.staticfile.org/amazeui/2.2.1/css/amazeui.flat.min.css"> -->
 </head>
 
-<body data-type="index">
+<body data-type="index" class="theme-black">
     <div class="am-g tpl-g">
         <!-- 头部 -->
         <header>
@@ -55,20 +64,6 @@
             </div>
 
         </header>
-        <!-- 风格切换 -->
-        <div class="tpl-skiner">
-            <div class="tpl-skiner-toggle am-icon-cog">
-            </div>
-            <div class="tpl-skiner-content">
-                <div class="tpl-skiner-content-title">
-                    选择主题
-                </div>
-                <div class="tpl-skiner-content-bar">
-                    <span class="skiner-color skiner-white" data-color="theme-white"></span>
-                    <span class="skiner-color skiner-black" data-color="theme-black"></span>
-                </div>
-            </div>
-        </div>
         <!-- 侧边导航栏 -->
         <div class="left-sidebar">
             <!-- 用户信息 -->
@@ -410,7 +405,7 @@
                                 <!--<a href="https://github.com/ATQQ/reportsPicker" target="_blank" style="color: #fff;">-->
                                 <!--<i class="am-icon-question-circle am-icon-fw"></i>-->
                                 <!--</a>-->
-                                <a href="javascript:alert('目前仅支持 .txt|.xls|.xlsx类型文件导入,格式为每行一个名字')" target="_blank"
+                                <a href="javascript:alert('目前仅支持 .txt|.xls|.xlsx类型文件导入,格式为每行一个名字')"
                                     style="color: #fff;">
                                     <i class="am-icon-question-circle am-icon-fw"></i>
                                 </a>
@@ -458,7 +453,7 @@
 
     <!--人员名单面板-->
     <div class="am-modal am-modal-no-btn" tabindex="-1" id="people-modal">
-        <div class="am-modal-dialog ">
+        <div class="am-modal-dialog" style="width: 90%;">
             <div class="am-modal-hd">
                 <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
             </div>
@@ -549,16 +544,6 @@
             justify-content: center;
         }
     </style>
-    <script src="https://cdn.staticfile.org/jquery/2.1.4/jquery.min.js"></script>
-    <!-- 日期插件 -->
-    <script src="https://img.cdn.sugarat.top/js/Ecalendar.jquery.min.js"></script>
-    <!-- amazeui -->
-    <script src="https://cdn.staticfile.org/amazeui/2.2.1/js/amazeui.min.js"></script>
-    <!--WebUploader-->
-    <script src="https://cdn.staticfile.org/webuploader/0.1.1/webuploader.min.js"></script>
-    <script src="https://img.cdn.sugarat.top/js/amazeui/amazeui.datatables.min.js"></script>
-    <script src="https://img.cdn.sugarat.top/js/amazeui/dataTables.responsive.min.js"></script>
-    <script src="https://cdn.staticfile.org/qiniu-js/3.0.3/qiniu.min.js"></script>
 </body>
 
 </html>
