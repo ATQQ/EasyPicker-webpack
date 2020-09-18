@@ -1,3 +1,4 @@
+# /bin/bash
 compressDir="./dist"               # 压缩目录 
 compressFile="result.tar.gz"        # 压缩后的文件名
 user="root"                         # 远程登录用户
