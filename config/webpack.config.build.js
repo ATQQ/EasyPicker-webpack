@@ -35,7 +35,7 @@ const happyPackLoaders = [
 module.exports = {
     mode: 'production',
     entry: {
-        base: './src/assets/js/common/base.js',
+        base: './src/assets/js/common/base.ts',
         ...getEntry('./src/assets/js/view'),
         ...getEntry('./src/assets/js/view','.ts')
     },

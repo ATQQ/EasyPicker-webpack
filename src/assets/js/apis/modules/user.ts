@@ -63,9 +63,16 @@ function register(username: string, password: string, mobile?: string, code?: st
     }
     return ajax.post<any, BaseResponse>(urlPath, data)
 }
+
+function checkAccount(username:string){
+    return ajax.post('user/check',{
+        username
+    })
+}
 export default {
     login,
     getCode,
     resetPassword,
-    register
+    register,
+    checkAccount
 }

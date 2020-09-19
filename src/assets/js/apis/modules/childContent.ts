@@ -7,7 +7,7 @@ interface Params {
 
 }
 
-function update(taskid: string, type: number, config: Params) {
+function update(taskid: string, type: number, config: Params): Promise<BaseResponse<any>> {
     const data = {
         taskid,
         type,
@@ -22,13 +22,14 @@ interface TaskInfo {
     template: string
 }
 
-function getInitData(taskid: string) {
+function getInitData(taskid: string) :Promise<BaseResponse<TaskInfo>>{
     return ajax.get<any, BaseResponse<TaskInfo>>('childContent/childContent', {
         params: {
             taskid
         }
     })
 }
+
 export default {
     update,
     getInitData

@@ -69,3 +69,16 @@ declare namespace WebUploader {
     type create = (cf: Config) => any
     const create: create
 }
+
+interface JQuery {
+    ECalendar(opts?: ECalendar.Settings): DataTables.Api;
+}
+declare namespace ECalendar {
+    interface Settings {
+        type: string,
+        stamp: boolean, //回调函数value值格式 单位为秒
+        skin: number,
+        format: string,
+        callback: (v: number) => void
+    }
+}

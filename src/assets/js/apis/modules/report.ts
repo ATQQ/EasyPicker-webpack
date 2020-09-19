@@ -10,17 +10,25 @@ function getReports(username: string) {
         }
     })
 }
-// TODO 待完善传参
 function deleteByid(id: number) {
     return ajax.delete<any, BaseResponse>('report/report', {
-        data: {
-            data: {
-                id
-            }
+        params: {
+            id
         }
+    })
+}
+
+function addReport(name: string, course: string, tasks: string, filename: string, username: string) {
+    return ajax.post<any, BaseResponse>('report/save', {
+        name,
+        course,
+        tasks,
+        filename,
+        username
     })
 }
 export default {
     getReports,
-    deleteByid
+    deleteByid,
+    addReport
 }
