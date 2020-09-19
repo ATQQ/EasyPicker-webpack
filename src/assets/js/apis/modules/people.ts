@@ -27,7 +27,16 @@ function checkIsLimited(username: string, parent: string, child: string, name: s
         }
     })
 }
+
+function deletePeople(id:number){
+    return ajax.delete<any, BaseResponse>('people/people',{
+        params:{
+            id
+        }
+    })
+}
 export default {
     getList,
-    checkIsLimited
+    checkIsLimited,
+    deletePeople
 }

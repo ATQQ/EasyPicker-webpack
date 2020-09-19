@@ -58,9 +58,19 @@ function getNodeList(type: number, username: string, parent: string, child?: str
         params: data
     })
 }
+
+function deleteCourse(id: number, type: number) {
+    return ajax.delete<any, BaseResponse>('course/del', {
+        params: {
+            id,
+            type
+        }
+    })
+}
 export default {
     getCourseList,
     addCourse,
     getCourseNode,
-    getNodeList
+    getNodeList,
+    deleteCourse
 }

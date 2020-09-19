@@ -15,12 +15,19 @@ instance.interceptors.request.use((config) => {
         token: localStorage.getItem("token")
     }
     // 不缓存get请求
-    if (method?.toLowerCase() === 'get') {
+    if ('get' === method) {
         headers['Cache-Control'] = 'no-cache'
     }
+    // TODO : 传入的data不明原因消失，固先放入params
+    // delete请求参数放入body中
+    if ('delete' === method) {
+        headers['Content-type'] = 'application/json;'
+        config.data = params
+        config.params = {}
+    }
+
     return ({
         ...config,
-        params,
         headers
     })
 });

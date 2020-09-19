@@ -18,20 +18,9 @@ $(function () {
     const username = localStorage.getItem("username") as string;
     let reports: Report[]; //存放所有文件信息
     let nodes: any[]; //存放所有类别信息(子类/父类)
-    const token = localStorage.getItem("token");
     let filterFlag: string = ''; //记录过滤的表名
     //tempTest
     let nowClickId: string | undefined = '';
-    //设置全局ajax设置
-    $.ajaxSetup({
-        // 默认添加请求头
-        headers: {
-            "token": token
-        },
-        error: function () {
-            amModal.alert("网络错误");
-        }
-    });
     //初始化用户名
     setUsername(username);
 
@@ -111,48 +100,6 @@ $(function () {
         }
     );
 
-    class Request {
-        private baseUrl: string
-        constructor() {
-            this.baseUrl = "/EasyPicker/";
-        }
-
-        base(url, method, data, options = {}) {
-            return new Promise((resolve, reject) => {
-                $.ajax({
-                    url: this.baseUrl + url,
-                    type: method,
-                    headers: {
-                        "token": token,
-                        "Content-Type": "application/json;charset=utf-8"
-                    },
-                    data: JSON.stringify(data),
-                    ...options,
-                    success: res => {
-                        resolve(res);
-                    },
-                    error: err => {
-                        reject(err);
-                    }
-                })
-            })
-        }
-        put(url, data, options = {}) {
-            return this.base(url, "PUT", data, options);
-        }
-        delete(url, data, options = {}) {
-            return this.base(url, "DELETE", data, options);
-        }
-        post(url, data, options = {}) {
-            return this.base(url, "POST", data, options);
-        }
-
-        get() {
-
-        }
-    }
-
-    const http = new Request();
 
     //初始化时间选择时间控件
     $("#datePicker").ECalendar({
@@ -492,8 +439,6 @@ $(function () {
                         const { url } = res.data
                         checkOssStatus(url)
                     })
-                    // TODO
-                    // checkOssStatus('http://api.qiniu.com/status/get/prefop?id=z2.01z201c4an8eqp5fww00muo2j400016f')
                 }
 
                 if (oss === 0 && server === 0) {
@@ -597,29 +542,17 @@ $(function () {
         if (confirm("确认删除此文件,删除后将无法复原,请谨慎操作?")) {
             let cells = filesTable.row($(this).parents('tr')).data();
             let that = this;
-            // TODO: 待完善axios的delete传参
-            $.ajax({
-                url: baseUrl + "report/report",
-                type: "DELETE",
-                headers: {
-                    "Content-Type": "application/json;charset=utf-8"
-                },
-                data: JSON.stringify({
-                    "id": cells[0]
-                }),
-                success: function (res) {
-                    if (res.code === 200) {
-                        filesTable.row($(that).parents("tr")).remove();
-                        filesTable.draw()
-                        amModal.alert("删除成功！")
-                        //异步获取最新的repors数据
-                        reportApi.getReports(username).then(res => {
-                            if (res.code === 200) {
-                                reports = res.data.reportList
-                            }
-                        })
-                    }
-
+            reportApi.deleteByid(cells[0]).then(res => {
+                if (res.code === 200) {
+                    filesTable.row($(that).parents("tr")).remove();
+                    filesTable.draw()
+                    amModal.alert("删除成功！")
+                    //异步获取最新的repors数据
+                    reportApi.getReports(username).then(res => {
+                        if (res.code === 200) {
+                            reports = res.data.reportList
+                        }
+                    })
                 }
             })
         }
@@ -794,17 +727,7 @@ $(function () {
         }
         const id = e.currentTarget.getAttribute("people-key");
         const that = this;
-        // TODO: 待完善axios的delete传参
-        $.ajax({
-            url: baseUrl + "people/people",
-            type: "DELETE",
-            headers: {
-                "Content-Type": "application/json;charset=utf-8"
-            },
-            data: JSON.stringify({
-                id
-            })
-        }).then(res => {
+        peopleApi.deletePeople(id).then(res=>{
             if (res.code === 200) {
                 peopleListTable.row($(that).parents("tr")).remove();
                 peopleListTable.draw()
@@ -1190,22 +1113,9 @@ $(function () {
      */
     function delCourseOrTask(type, id) {
         return new Promise<BaseResponse>(resolve => {
-            // TODO:delete
-            $.ajax({
-                url: baseUrl + 'course/del',
-                contentType: "application/json",
-                headers: {
-                    "token": token
-                },
-                type: 'DELETE',
-                data: JSON.stringify({
-                    "id": id,
-                    "type": type
-                }),
-                success: function (res) {
-                    resolve(res);
-                }
-            })
+            courseApi.deleteCourse(id,type).then(res=>{
+                resolve(res);
+            })    
         });
 
     }

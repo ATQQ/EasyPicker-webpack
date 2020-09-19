@@ -10,13 +10,10 @@ function getReports(username: string) {
         }
     })
 }
-// TODO 待完善传参
 function deleteByid(id: number) {
     return ajax.delete<any, BaseResponse>('report/report', {
-        data: {
-            data: {
-                id
-            }
+        params: {
+            id
         }
     })
 }
