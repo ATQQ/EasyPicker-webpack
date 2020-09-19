@@ -12,13 +12,13 @@ instance.interceptors.request.use((config) => {
     const { method, params } = config
     // 附带鉴权的token
     const headers = {
-        token: localStorage.getItem("token")
+        token: localStorage.getItem('token')
     }
     // 不缓存get请求
     if ('get' === method) {
         headers['Cache-Control'] = 'no-cache'
     }
-    // TODO : 传入的data不明原因消失，固先放入params
+    // TODO ddl: 2020-09-30 传入的data不明原因消失，固先放入params
     // delete请求参数放入body中
     if ('delete' === method) {
         headers['Content-type'] = 'application/json;'
@@ -30,7 +30,7 @@ instance.interceptors.request.use((config) => {
         ...config,
         headers
     })
-});
+})
 
 /**
  * 响应拦截

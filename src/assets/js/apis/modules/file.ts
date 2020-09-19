@@ -21,7 +21,7 @@ function checkFileIsExistQiniu(key: string) {
  * 查询文件是否存在
  */
 function checkFileIsExist(username: string, course: string, tasks: string, filename: string) {
-    return ajax.get<any, BaseResponse>("file/check", {
+    return ajax.get<any, BaseResponse>('file/check', {
         params: {
             username,
             course,
@@ -38,7 +38,7 @@ function checkFileIsExist(username: string, course: string, tasks: string, filen
  * @param {String} tasks 
  */
 function checkFileCount(username, course, tasks) {
-    return ajax.get("file/count", {
+    return ajax.get('file/count', {
         params: {
             username,
             course,
@@ -63,7 +63,7 @@ function getFileDownloadUrl(username: string, course: string, tasks: string, fil
 }
 
 function compressOssFile(username, course, tasks) {
-    return ajax.post("file/qiniu/compress", {
+    return ajax.post('file/qiniu/compress', {
         username,
         course,
         tasks

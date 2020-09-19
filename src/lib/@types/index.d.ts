@@ -73,11 +73,12 @@ declare namespace WebUploader {
 interface JQuery {
     ECalendar(opts?: ECalendar.Settings): DataTables.Api;
 }
-declare namespace ECalendar{
-    interface JQueryECalendar extends JQuery{
-
-    }
+declare namespace ECalendar {
     interface Settings {
-        
+        type: string,
+        stamp: boolean, //回调函数value值格式 单位为秒
+        skin: number,
+        format: string,
+        callback: (v: number) => void
     }
 }

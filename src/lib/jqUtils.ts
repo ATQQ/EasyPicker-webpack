@@ -1,9 +1,9 @@
 function freezeBtn(btn: JQuery<HTMLElement>) {
-    btn.attr("disabled", "disabled")
+    btn.attr('disabled', 'disabled')
 }
 
 function unFreezeBtn(btn: JQuery<HTMLElement>) {
-    btn.removeAttr("disabled")
+    btn.removeAttr('disabled')
 }
 
 export default {

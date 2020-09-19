@@ -7,13 +7,13 @@ import('../common/tongji').then(res => {
 })
 
 window.onload = function () {
-    let baseUrl = "/EasyPicker/";
-    let uname: string; //提交者姓名
-    let ucourse: string; //父类目名称
-    let utask: string; //子类目名称
-    let account: string; //管理员账号
-    let limited = false; //是否限了制提交人员
-    let loadParentComplete = false; //父类是否加载完成
+    const baseUrl = '/EasyPicker/'
+    let uname: string //提交者姓名
+    let ucourse: string //父类目名称
+    let utask: string //子类目名称
+    let account: string //管理员账号
+    let limited = false //是否限了制提交人员
+    let loadParentComplete = false //父类是否加载完成
 
     /**
      * 上传文件
@@ -35,11 +35,11 @@ window.onload = function () {
             if (status != 1 && status !== 2) {
                 // 原文件名称
                 let prefix = filename.slice(0, filename.indexOf('.'))
-                let ext = filename.slice(prefix.length)
+                const ext = filename.slice(prefix.length)
                 const getKey = () => {
                     return `${account}/${ucourse}/${utask}/${prefix}${ext}`
                 }
-                let t = prefix
+                const t = prefix
                 let i = 1
                 let exist = await checkFileIsExist(getKey())
                 while (exist) {
@@ -47,7 +47,7 @@ window.onload = function () {
                     prefix += `_${i++}`
                     exist = await checkFileIsExist(getKey())
                 }
-                f.filename = `${prefix}${ext}`;
+                f.filename = `${prefix}${ext}`
             }
         }
     }
@@ -56,12 +56,12 @@ window.onload = function () {
         for (const f of fileList) {
             const { file, status, id, filename } = f
             const fileItem = $(`#${id}`)
-            const process = fileItem.find(".progress")[0]
+            const process = fileItem.find('.progress')[0]
             const deleteDom = fileItem.find('.delete')[0]
             if (status !== 1 && status !== 2) {
-                let key = `${account}/${ucourse}/${utask}/${filename}`
+                const key = `${account}/${ucourse}/${utask}/${filename}`
                 const observable = qiniu.upload(file, key, token)
-                deleteDom?.remove();
+                deleteDom?.remove()
                 f.status = 2
                 const subscription = observable.subscribe({
                     next(res) {
@@ -72,17 +72,17 @@ window.onload = function () {
                     },
                     error(err) {
                         f.status = -1
-                        process.textContent = "上传失败"
+                        process.textContent = '上传失败'
                         process.classList.replace('am-progress-bar-secondary', 'am-progress-bar-danger')
-                        amModal.alert(JSON.stringify(err));
+                        amModal.alert(JSON.stringify(err))
                         fileItem.append(deleteDom)
                     },
                     complete(res) {
                         f.status = 1
                         const { hash, key } = res
-                        process.textContent = "上传成功"
+                        process.textContent = '上传成功'
                         process.classList.replace('am-progress-bar-secondary', 'am-progress-bar-success')
-                        addReport(uname, ucourse, utask, filename, account);
+                        addReport(uname, ucourse, utask, filename, account)
                     }
                 })
                 // subscription.close() // 取消上传
@@ -101,11 +101,11 @@ window.onload = function () {
             return f.file.name === file.name && file.size === f.file.size
         }).length !== 0
         if (isExist) {
-            amModal.alert("该文件已存在")
+            amModal.alert('该文件已存在')
             return
         }
-        if (file.name.indexOf(".") === -1 || file.name.indexOf(".") === file.name.length - 1) {
-            amModal.alert("文件必须有后缀", "文件名称不支持")
+        if (file.name.indexOf('.') === -1 || file.name.indexOf('.') === file.name.length - 1) {
+            amModal.alert('文件必须有后缀', '文件名称不支持')
             return
         }
         const tFile = {
@@ -114,7 +114,7 @@ window.onload = function () {
             id: getRandomStr(7)
         }
         fileList.push(tFile)
-        let dom = `<li class="file-item" id="${tFile.id}">
+        const dom = `<li class="file-item" id="${tFile.id}">
                     <h4 class="am-margin-bottom-sm">${file.name}</h4>
                         <div class="am-progress am-progress-striped am-active am-progress-lg">
                             <div status="${tFile.status}" class="progress am-progress-bar am-progress-bar-secondary" style="width: 100%">
@@ -122,14 +122,14 @@ window.onload = function () {
                             </div>
                         </div>
                         <span class="delete am-icon-close"></span>
-                    </li>`;
-        $('#thelist').append(dom);
+                    </li>`
+        $('#thelist').append(dom)
     })
     // 移除文件
     $('#thelist').on('click', '.delete', function (e) {
-        const fileItem = $(this).parents('.file-item');
+        const fileItem = $(this).parents('.file-item')
         const fileId = fileItem.attr('id')
-        if (!confirm("确认移除此文件？")) {
+        if (!confirm('确认移除此文件？')) {
             return
         }
         fileList.splice(fileList.findIndex(v => {
@@ -140,21 +140,21 @@ window.onload = function () {
     })
     // 开始上传
     $('#uploadBtn').on('click', function () {
-        ucourse = $('option[value="' + $("#course").val() + '"]').html();
-        utask = $('option[value="' + $("#task").val() + '"]').html();
-        uname = $('#name').val() as string;
+        ucourse = $('option[value="' + $('#course').val() + '"]').html()
+        utask = $('option[value="' + $('#task').val() + '"]').html()
+        uname = $('#name').val() as string
         uname = stringEncode(uname)
-        if (uname.trim() == null || uname.trim() == "") {
-            amModal.alert('姓名不能为空');
-            return;
+        if (uname.trim() == null || uname.trim() == '') {
+            amModal.alert('姓名不能为空')
+            return
         }
         if (fileList.filter(v => v.status !== 1 && v.status !== 2).length === 0) {
-            amModal.alert("没有可上传的文件")
+            amModal.alert('没有可上传的文件')
             return
         }
         const start = () => {
             getQiNiuUploadToken().then(res => {
-                $("#uploadBtn").button("loading");
+                $('#uploadBtn').button('loading')
                 $('#name').attr('disabled', 'disabled')
                 beforeUpload().then(() => {
                     startUpload(res.data.data)
@@ -165,38 +165,38 @@ window.onload = function () {
         if (limited) {
             //    检查是否在提交名单中
             peopleApi.checkIsLimited(account, ucourse, utask, uname).then(res => {
-                const { code } = res;
+                const { code } = res
                 if (code === 200) {
-                    const { isSubmit } = res.data;
-                    if (!isSubmit || confirm("你已经提交过,是否再次提交")) {
-                        $("#uploadBtn").button("loading");
+                    const { isSubmit } = res.data
+                    if (!isSubmit || confirm('你已经提交过,是否再次提交')) {
+                        $('#uploadBtn').button('loading')
                         start()
                     }
                 } else {
-                    amModal.alert("抱歉你不在提交名单之中,如有疑问请联系管理员.");
+                    amModal.alert('抱歉你不在提交名单之中,如有疑问请联系管理员.')
                 }
             })
         } else {
             start()
         }
-    });
+    })
     //页面初始化
-    init();
+    init()
 
     /**
      * 父类发生改变
      */
-    $("#course").on('change', function () {
-        setdata('children', $(this).val(), account);
-    });
+    $('#course').on('change', function () {
+        setdata('children', $(this).val(), account)
+    })
 
     // 丢弃中间请求
     let tempFlag = 1
     /**
      * 子类发生改变
      */
-    $("#task").on('change', function () {
-        if (!loadParentComplete && utask) return;
+    $('#task').on('change', function () {
+        if (!loadParentComplete && utask) return
         if (!$(this).val()) {
             return
         }
@@ -208,114 +208,114 @@ window.onload = function () {
                 }
                 jqUtils.unFreezeBtn($('#uploadBtn'))
                 //如果有数据
-                const { code, data } = res;
+                const { code, data } = res
                 if (code === 200) {
-                    $("#attributePanel").show();
+                    $('#attributePanel').show()
 
-                    limited = !!data.people;
+                    limited = !!data.people
                     if (data.ddl) {
                         //取得日期面板dom
-                        let $ddl = $("#attributePanel").children('div[target="ddl"]');
+                        const $ddl = $('#attributePanel').children('div[target="ddl"]')
                         //显示截止日期
-                        $ddl.children().eq(0).html("截止日期:" + new Date(data.ddl).Format("yyyy-MM-dd,hh:mm:ss"));
+                        $ddl.children().eq(0).html('截止日期:' + new Date(data.ddl).Format('yyyy-MM-dd,hh:mm:ss'))
                         const fn = () => {
-                            let str = "已经截止!!!"
+                            let str = '已经截止!!!'
                             //计算日期间隔
                             if (Date.now() > data.ddl) {
                                 jqUtils.freezeBtn($('#uploadBtn'))
-                                $ddl.children().eq(1).html(str);
+                                $ddl.children().eq(1).html(str)
                                 return
                             }
-                            str = "还剩:" + calculateDateDiffer(data.ddl, (new Date().getTime()))
-                            $ddl.children().eq(1).html(str);
+                            str = '还剩:' + calculateDateDiffer(data.ddl, (new Date().getTime()))
+                            $ddl.children().eq(1).html(str)
                             requestAnimationFrame(fn)
                         }
                         fn()
                         //显示时间面板
-                        $ddl.show();
+                        $ddl.show()
                     } else {
                         //隐藏截止时间面板
-                        $("#attributePanel").children('div[target="ddl"]').hide();
+                        $('#attributePanel').children('div[target="ddl"]').hide()
                     }
                     if (data.template) {
-                        $("#attributePanel").children('div[target="template"]').show();
-                        $("#downlloadTemplate").unbind('click');
-                        $("#downlloadTemplate").on('click', function () {
-                            let parent = $("#course").next().children().eq(0).find(".am-selected-status").html();
-                            let child = $("#task").next().children().eq(0).find(".am-selected-status").html() + "_Template";
-                            let jsonArray: any[] = []
-                            let { template } = data
-                            jsonArray.push({ "key": "course", "value": parent });
-                            jsonArray.push({ "key": "tasks", "value": child });
-                            jsonArray.push({ "key": "filename", "value": template });
-                            jsonArray.push({ "key": "username", "value": account });
-                            const $btn = $(this);
+                        $('#attributePanel').children('div[target="template"]').show()
+                        $('#downlloadTemplate').unbind('click')
+                        $('#downlloadTemplate').on('click', function () {
+                            const parent = $('#course').next().children().eq(0).find('.am-selected-status').html()
+                            const child = $('#task').next().children().eq(0).find('.am-selected-status').html() + '_Template'
+                            const jsonArray: any[] = []
+                            const { template } = data
+                            jsonArray.push({ 'key': 'course', 'value': parent })
+                            jsonArray.push({ 'key': 'tasks', 'value': child })
+                            jsonArray.push({ 'key': 'filename', 'value': template })
+                            jsonArray.push({ 'key': 'username', 'value': account })
+                            const $btn = $(this)
                             fileApi2.checkFileIsExist(account, parent, child, template).then(res => {
                                 const { where } = res.data
                                 if (where === 'server') {
-                                    downloadFile(baseUrl + "file/down", jsonArray);
-                                    $btn.button('loading');
+                                    downloadFile(baseUrl + 'file/down', jsonArray)
+                                    $btn.button('loading')
                                     setTimeout(function () {
-                                        $btn.button('reset');
-                                    }, 5000);
+                                        $btn.button('reset')
+                                    }, 5000)
                                 } else if (where === 'oss') {
                                     fileApi2.getFileDownloadUrl(account, parent, child, template).then(res => {
                                         const { url } = res.data
                                         downLoadByUrl(url, template)
-                                        $btn.button('loading');
+                                        $btn.button('loading')
                                         setTimeout(function () {
-                                            $btn.button('reset');
-                                        }, 5000);
+                                            $btn.button('reset')
+                                        }, 5000)
                                     })
                                 } else {
                                     amModal.alert('由于历史原因,老版平台上传的文件已经被清理', '源文件已经被删除')
                                 }
                             })
-                        });
+                        })
                     } else {
-                        $("#attributePanel").children('div[target="template"]').hide();
+                        $('#attributePanel').children('div[target="template"]').hide()
                     }
                 } else {
                     //    如果没有数据
-                    limited = false;
-                    $("#attributePanel").hide();
+                    limited = false
+                    $('#attributePanel').hide()
                 }
             })
         }
         request(++tempFlag)
-    });
+    })
 
     /**
      * 加载底部导航链接
      */
     function loadBottomLinks() {
         const links = [{
-            href: "/",
-            text: "首页"
+            href: '/',
+            text: '首页'
         }, {
-            href: "https://github.com/ATQQ/EasyPicker",
-            text: "GitHub"
+            href: 'https://github.com/ATQQ/EasyPicker',
+            text: 'GitHub'
         },
         {
-            href: "https://sugar-js.gitbook.io/easypicker-manual/",
-            text: "使用手册"
+            href: 'https://sugar-js.gitbook.io/easypicker-manual/',
+            text: '使用手册'
         },
         {
-            href: "https://github.com/ATQQ/EasyPicker/issues",
-            text: "问题反馈"
+            href: 'https://github.com/ATQQ/EasyPicker/issues',
+            text: '问题反馈'
         }
-        ];
-        const docFrag = document.createDocumentFragment();
+        ]
+        const docFrag = document.createDocumentFragment()
         links.forEach((link) => {
-            let li = document.createElement("li");
-            let a = document.createElement("a");
-            a.href = link.href;
-            a.target = "_blank";
-            a.textContent = link.text;
-            li.appendChild(a);
-            docFrag.appendChild(li);
-        });
-        document.getElementById('bottom-links')?.appendChild(docFrag);
+            const li = document.createElement('li')
+            const a = document.createElement('a')
+            a.href = link.href
+            a.target = '_blank'
+            a.textContent = link.text
+            li.appendChild(a)
+            docFrag.appendChild(li)
+        })
+        document.getElementById('bottom-links')?.appendChild(docFrag)
     }
 
 
@@ -325,22 +325,22 @@ window.onload = function () {
      * @param now 当前的时间
      */
     function calculateDateDiffer(old, now) {
-        let day = 0;
-        let hour = 0;
-        let minute = 0;
-        let seconds = 0;
-        let differ = Math.floor(Number((old - now) / 1000));
-        day = Math.floor(differ / (24 * 60 * 60)); //天
-        differ -= day * (24 * 60 * 60);
+        let day = 0
+        let hour = 0
+        let minute = 0
+        let seconds = 0
+        let differ = Math.floor(Number((old - now) / 1000))
+        day = Math.floor(differ / (24 * 60 * 60)) //天
+        differ -= day * (24 * 60 * 60)
 
-        hour = Math.floor(differ / (60 * 60)); //时
-        differ -= hour * (60 * 60);
+        hour = Math.floor(differ / (60 * 60)) //时
+        differ -= hour * (60 * 60)
 
-        minute = Math.floor(differ / 60); //分
+        minute = Math.floor(differ / 60) //分
 
-        seconds = Math.floor(differ % 60); //秒
+        seconds = Math.floor(differ % 60) //秒
 
-        return day + "天" + hour + "时" + minute + "分" + seconds + "秒";
+        return day + '天' + hour + '时' + minute + '分' + seconds + '秒'
     }
 
     /**
@@ -354,9 +354,9 @@ window.onload = function () {
             if (res.code === 200) {
                 amModal.alert(`${filename}提交成功`)
             } else {
-                amModal.alert(`${filename}提交失败`);
+                amModal.alert(`${filename}提交失败`)
             }
-            $("#uploadBtn").button("reset");
+            $('#uploadBtn').button('reset')
             $('#name').removeAttr('disabled')
         })
     }
@@ -365,8 +365,8 @@ window.onload = function () {
      * 初始化数据
      */
     function init() {
-        $('#course').empty();
-        $('#task').empty();
+        $('#course').empty()
+        $('#task').empty()
         //获取链接中 的管理员账号与附加参数
         let params = ''
         try {
@@ -382,57 +382,57 @@ window.onload = function () {
             pre[kv[0]] = kv[1]
             return pre
         }, {})
-        let type: number = 1; //三种情况
+        let type = 1 //三种情况
         //1 :获取全部父类
         //2 :获取指定父类
         //3: 获取指定子类
-        let { username, parent, child } = paramsData
+        const { username, parent, child } = paramsData
         if (location.search.includes('?')) {
             if (parent) {
-                type = 2;
+                type = 2
                 if (child) {
-                    type = 3;
+                    type = 3
                 }
             }
         } else {
             // 废弃
-            type = 1;
+            type = 1
         }
 
         if (!username || !type || type === 1) {
-            amModal.alert("链接失效!!!");
-            redirectHome();
+            amModal.alert('链接失效!!!')
+            redirectHome()
             return
         }
 
-        account = username;
+        account = username
         //查询账号是否有效
         userApi.checkAccount(username).then(res => {
             if (res) {
                 switch (type) {
-                    //获取父类全部子类
-                    case 2:
-                        setDataByParent(type, parent, username);
-                        break;
+                //获取父类全部子类
+                case 2:
+                    setDataByParent(type, parent, username)
+                    break
                     //获取指定子类
-                    case 3:
-                        setDataByChild(type, parent, child, username);
-                        break;
+                case 3:
+                    setDataByChild(type, parent, child, username)
+                    break
                 }
             } else {
-                amModal.alert("链接失效!!!");
-                redirectHome();
+                amModal.alert('链接失效!!!')
+                redirectHome()
             }
         })
         //加载导航数据
-        loadBottomLinks();
+        loadBottomLinks()
     }
 
     /**
      * 重定向到首页
      */
     function redirectHome() {
-        window.location.href = "/"
+        window.location.href = '/'
     }
 
 
@@ -447,37 +447,37 @@ window.onload = function () {
             return
         }
         courseApi.getCourseList(range, parentid, username).then(res => {
-            const { code } = res;
+            const { code } = res
             if (code !== 200) {
-                return;
+                return
             }
-            let courseList = res.data.courseList || []
+            const courseList = res.data.courseList || []
             if (courseList.length === 0) {
                 if (range === 'parents') {
-                    clearselect('#course');
-                    resetselect("#course");
+                    clearselect('#course')
+                    resetselect('#course')
                 } else {
-                    clearselect("#task");
-                    resetselect("#task");
-                    amModal.alert("链接失效!!!");
-                    redirectHome();
+                    clearselect('#task')
+                    resetselect('#task')
+                    amModal.alert('链接失效!!!')
+                    redirectHome()
                 }
-                return;
+                return
             }
             if (range === 'parents') {
-                clearselect('#course');
+                clearselect('#course')
                 courseList.forEach(v => {
-                    insertToSelect("#course", v.name, v.id);
-                });
-                resetselect("#course");
+                    insertToSelect('#course', v.name, v.id)
+                })
+                resetselect('#course')
             } else if (range === 'children') {
-                clearselect("#task");
+                clearselect('#task')
                 courseList.forEach(v => {
-                    insertToSelect("#task", v.name, v.id);
-                });
-                resetselect("#task");
+                    insertToSelect('#task', v.name, v.id)
+                })
+                resetselect('#task')
             }
-            loadParentComplete = true;
+            loadParentComplete = true
         })
     }
 
@@ -492,15 +492,15 @@ window.onload = function () {
             return
         }
         courseApi.getNodeList(type, username, parent).then(res => {
-            const { data: { status } } = res;
+            const { data: { status } } = res
             if (status) {
-                let node = res.data.data;
-                clearselect('#course');
-                insertToSelect("#course", node.name, node.id);
-                resetselect("#course");
+                const node = res.data.data
+                clearselect('#course')
+                insertToSelect('#course', node.name, node.id)
+                resetselect('#course')
             } else {
-                amModal.alert("链接失效");
-                redirectHome();
+                amModal.alert('链接失效')
+                redirectHome()
             }
         })
     }
@@ -513,33 +513,33 @@ window.onload = function () {
      * @param username
      */
     function setDataByChild(type, parent, child, username) {
-        //查询父节点信息
+    //查询父节点信息
         courseApi.getNodeList(2, username, parent).then(res => {
             if (res.data.status) {
-                let node = res.data.data;
-                clearselect('#course');
-                insertToSelect("#course", node.name, node.id);
-                resetselect("#course");
+                const node = res.data.data
+                clearselect('#course')
+                insertToSelect('#course', node.name, node.id)
+                resetselect('#course')
                 courseApi.getNodeList(type, username, parent, child).then(res => {
                     if (res.data.status) {
-                        let node = res.data.data;
+                        const node = res.data.data
                         const handler = setInterval(() => {
                             if (loadParentComplete) {
-                                clearselect("#task");
-                                insertToSelect("#task", node.name, node.id);
-                                resetselect("#task");
-                                clearInterval(handler);
+                                clearselect('#task')
+                                insertToSelect('#task', node.name, node.id)
+                                resetselect('#task')
+                                clearInterval(handler)
                             }
-                        }, 1);
+                        }, 1)
 
                     } else {
-                        amModal.alert("链接失效");
-                        redirectHome();
+                        amModal.alert('链接失效')
+                        redirectHome()
                     }
                 })
             } else {
-                amModal.alert("链接失效");
-                redirectHome();
+                amModal.alert('链接失效')
+                redirectHome()
             }
         })
     }
@@ -551,7 +551,7 @@ window.onload = function () {
      * @param id
      */
     function insertToSelect(selectid, value, id) {
-        $(selectid).append('<option value="' + id + '">' + value + '</option>');
+        $(selectid).append('<option value="' + id + '">' + value + '</option>')
     }
 
     /**
@@ -559,8 +559,8 @@ window.onload = function () {
      * @param selectid
      */
     function clearselect(selectid) {
-        $(selectid).empty();
-        $(selectid).selected('destroy');
+        $(selectid).empty()
+        $(selectid).selected('destroy')
     }
 
     /**
@@ -570,7 +570,7 @@ window.onload = function () {
     function resetselect(selectid) {
         $(selectid).selected({
             btnStyle: 'secondary'
-        });
+        })
     }
 
     /**
@@ -578,7 +578,7 @@ window.onload = function () {
      * @param {String} id 弹出层id
      */
     function closeModel(id) {
-        $(id).modal('close');
+        $(id).modal('close')
     }
 
     /**
@@ -587,27 +587,27 @@ window.onload = function () {
      * @param jsonArray 请求携带的参数
      */
     function downloadFile(path, jsonArray) {
-        let form = $("<form>");
-        form.attr("style", "display:none");
-        form.attr("target", "");
-        form.attr("method", "get");
-        form.attr("action", path);
+        const form = $('<form>')
+        form.attr('style', 'display:none')
+        form.attr('target', '')
+        form.attr('method', 'get')
+        form.attr('action', path)
 
 
         jsonArray.forEach(function (key) {
-            let temp = $("<input>");
-            temp.attr("type", "hidden");
-            temp.attr("name", key.key);
-            temp.val(key.value);
-            form.append(temp);
-        });
-        $("body").append(form);
-        form.submit();
-        form.remove();
-        // //新窗口打开
-        // let newTab = window.open('about:blank')
-        // newTab.location.href = path;
-        // //关闭新窗口
-        // newTab.close();
+            const temp = $('<input>')
+            temp.attr('type', 'hidden')
+            temp.attr('name', key.key)
+            temp.val(key.value)
+            form.append(temp)
+        })
+        $('body').append(form)
+        form.submit()
+        form.remove()
+    // //新窗口打开
+    // let newTab = window.open('about:blank')
+    // newTab.location.href = path;
+    // //关闭新窗口
+    // newTab.close();
     }
-};
+}

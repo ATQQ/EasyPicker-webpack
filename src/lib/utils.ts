@@ -1,4 +1,4 @@
-let baseUrl = "/EasyPicker/";
+const baseUrl = '/EasyPicker/'
 
 class AmazeUIModal {
     private alertEl
@@ -17,7 +17,7 @@ class AmazeUIModal {
     </div>`
         this.alertEl = $(alertHtml)
     }
-    alert(textContent, title = "提示") {
+    alert(textContent, title = '提示') {
         $(document.body).append(this.alertEl)
         this.alertEl.find('.am-modal-hd')[0].textContent = title
         this.alertEl.find('.am-modal-bd')[0].textContent = textContent
@@ -32,7 +32,7 @@ export const amModal = new AmazeUIModal()
  * @returns {boolean}
  */
 export function isStrEmpty(str: string) {
-    return (str === null || str.trim() === '' || str === undefined);
+    return (str === null || str.trim() === '' || str === undefined)
 }
 
 /**
@@ -40,24 +40,24 @@ export function isStrEmpty(str: string) {
  */
 export const placeholders = {
     mobile: {
-        errFormat: "手机号格式不正确",
-        notExist: "手机号不存在",
-        alreadyExist: "手机号已经存在"
+        errFormat: '手机号格式不正确',
+        notExist: '手机号不存在',
+        alreadyExist: '手机号已经存在'
     },
     code: {
-        errFormat: "验证码格式不正确",
+        errFormat: '验证码格式不正确',
         notMatch: '验证码不匹配',
         notRight: '验证码错误'
     },
     password: {
-        errFormat: "6-16位(数字/字母/@#$%)",
+        errFormat: '6-16位(数字/字母/@#$%)',
         notRight: '密码错误',
-        twoDiff: "两次密码不一致"
+        twoDiff: '两次密码不一致'
     },
     username: {
-        errFormat: "1-17位(数字/字母/中文/@._)",
-        notExist: "账号不存在",
-        alreadyExist: "账号已存在"
+        errFormat: '1-17位(数字/字母/中文/@._)',
+        notExist: '账号不存在',
+        alreadyExist: '账号已存在'
     }
 }
 
@@ -67,32 +67,32 @@ export const placeholders = {
 * @param {String} filename 文件名
 */
 export function downLoadByUrl(url: string, filename = Date.now() + '') {
-    let a = document.createElement('a');
-    a.href = url;
-    a.target = '_blank';
-    a.download = filename;
-    a.click();
+    const a = document.createElement('a')
+    a.href = url
+    a.target = '_blank'
+    a.download = filename
+    a.click()
 }
 
 export function getQiNiuUploadToken() {
-    return $.get(baseUrl + "file/qiniu/token")
+    return $.get(baseUrl + 'file/qiniu/token')
 }
 
 export function stringEncode(str) {
-    var div = document.createElement('div');
+    const div = document.createElement('div')
     if (div.innerText) {
-        div.innerText = str;
+        div.innerText = str
     } else {
-        div.textContent = str;//Support firefox
+        div.textContent = str//Support firefox
     }
-    return div.innerHTML;
+    return div.innerHTML
 }
 
 export const baseAddress = location.protocol + '//' + location.host
 
 
 export function getRandomStr(length) {
-    const str = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    const str = 'abcdefghijklmnopqrstuvwxyz0123456789'
     const res: string[] = []
     while (length) {
         const index = ~~(Math.random() * (length + 1) * 1000) % str.length
@@ -108,7 +108,7 @@ export function getRandomStr(length) {
  * @returns {boolean}
  */
 export function isEmpty(str) {
-    return (str == null || str.trim() == '');
+    return (str == null || str.trim() == '')
 }
 
 /**
@@ -119,8 +119,8 @@ export function isEmpty(str) {
 export function openModel(id, close) {
     $(id).modal({
         closeViaDimmer: close //设置点击遮罩层无法关闭
-    });
-    $(id).modal('open');
+    })
+    $(id).modal('open')
 }
 
 
@@ -130,11 +130,11 @@ export function openModel(id, close) {
  * @param paramName
  */
 export function getUrlParam(url, paramName) {
-    let isExist = false;
-    let res = null;
-    isExist = url.lastIndexOf(paramName + '=') !== -1;
+    let isExist = false
+    let res = null
+    isExist = url.lastIndexOf(paramName + '=') !== -1
     if (isExist) {
-        res = url.substring(url.indexOf(paramName + '=') + paramName.length + 1, (url.indexOf('&') > url.indexOf(paramName + '=') ? url.indexOf('&') : url.length));
+        res = url.substring(url.indexOf(paramName + '=') + paramName.length + 1, (url.indexOf('&') > url.indexOf(paramName + '=') ? url.indexOf('&') : url.length))
     }
-    return res;
+    return res
 }
