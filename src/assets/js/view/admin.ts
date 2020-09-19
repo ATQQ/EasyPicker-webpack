@@ -5,8 +5,7 @@ import '../../sass/modules/admin.scss'
 
 import '../common/app'
 
-import fileApi from '../apis/file.js'
-import { amModal, downLoadByUrl, getQiNiuUploadToken, stringEncode, baseAddress,getRandomStr } from '@/lib/utils'
+import { amModal, downLoadByUrl, getQiNiuUploadToken, stringEncode, baseAddress, getRandomStr } from '@/lib/utils'
 import jqUtils from '@/lib/jqUtils'
 import { childContentApi, fileApi2, reportApi, peopleApi, courseApi } from 'apis/index'
 
@@ -414,12 +413,13 @@ $(function () {
 
     function checkOssStatus(url) {
         $('#download').button('loading')
-        fileApi.getcompressFileStatus(url).then(res => {
+        fileApi2.getcompressFileStatus(url).then(res => {
             const { code } = res.data
             if (code === 0) {
                 const { key } = res.data
+                const [username, course, tasks, filename] = key.split('/')
                 // 获取下载链接
-                fileApi.getFileDownloadUrl(...key.split('/')).then(res => {
+                fileApi2.getFileDownloadUrl(username, course, tasks, filename).then(res => {
                     const { url } = res.data
                     // 开始下载
                     downLoadByUrl(url)
@@ -463,7 +463,7 @@ $(function () {
             //防止用户点击多次下载
             let $btn = $(this);
             $btn.button('loading');
-            fileApi.checkFileCount(username, parent, child).then(res => {
+            fileApi2.checkFileCount(username, parent, child).then(res => {
                 const { oss, server } = res.data
                 if (server !== 0) {
                     //生成指定任务的压缩包 并下载
@@ -488,7 +488,7 @@ $(function () {
                 }
 
                 if (oss !== 0) {
-                    fileApi.compressOssFile(username, parent, child).then(res => {
+                    fileApi2.compressOssFile(username, parent, child).then(res => {
                         const { url } = res.data
                         checkOssStatus(url)
                     })
@@ -575,12 +575,12 @@ $(function () {
         jsonArray.push({ "key": "tasks", "value": cells[3] });
         jsonArray.push({ "key": "filename", "value": cells[4] });
         jsonArray.push({ "key": "username", "value": username });
-        fileApi.checkFileIsExist(username, cells[2], cells[3], cells[4]).then(res => {
+        fileApi2.checkFileIsExist(username, cells[2], cells[3], cells[4]).then(res => {
             const { where } = res.data
             if (where === 'server') {
                 downloadFile(baseUrl + "file/down", jsonArray);
             } else if (where === 'oss') {
-                fileApi.getFileDownloadUrl(username, cells[2], cells[3], cells[4]).then(res => {
+                fileApi2.getFileDownloadUrl(username, cells[2], cells[3], cells[4]).then(res => {
                     const { url } = res.data
                     downLoadByUrl(url)
                 })
@@ -794,6 +794,7 @@ $(function () {
         }
         const id = e.currentTarget.getAttribute("people-key");
         const that = this;
+        // TODO: 待完善axios的delete传参
         $.ajax({
             url: baseUrl + "people/people",
             type: "DELETE",
@@ -1165,30 +1166,20 @@ $(function () {
      * @param parent -1表示添加课程
      */
     function addCourseOrTask(name, type, parent, username) {
-        $.ajax({
-            url: baseUrl + 'course/add',
-            contentType: "application/json",
-            type: 'PUT',
-            data: JSON.stringify({
-                "name": name,
-                "type": type,
-                "parent": parent,
-                "username": username
-            }),
-            success: function (res) {
-                if (res.code !== 200) {
-                    amModal.alert('添加失败');
-                    return;
-                }
-
-                if (!res.data.status) {
-                    amModal.alert('内容已存在');
-                } else if (!parent) {
-                    insertToPanel("#coursePanel", name, res.data.id, 'course');
-                } else {
-                    insertToPanel("#taskPanel", name, res.data.id, 'task');
-                }
+        courseApi.addCourse(name, type, parent, username).then(res => {
+            if (res.code !== 200) {
+                amModal.alert('添加失败');
+                return;
             }
+            if (!res.data.status) {
+                amModal.alert('内容已存在');
+                return
+            }
+            if (!parent) {
+                insertToPanel("#coursePanel", name, res.data.id, 'course');
+                return
+            }
+            insertToPanel("#taskPanel", name, res.data.id, 'task');
         })
     }
 
@@ -1199,6 +1190,7 @@ $(function () {
      */
     function delCourseOrTask(type, id) {
         return new Promise<BaseResponse>(resolve => {
+            // TODO:delete
             $.ajax({
                 url: baseUrl + 'course/del',
                 contentType: "application/json",
@@ -1336,13 +1328,7 @@ $(function () {
         filesTable.rows().remove().draw();
 
         setTimeout(() => {
-            $.ajax({
-                url: baseUrl + 'report/report' + `?time=${Date.now()}`,
-                type: "GET",
-                data: {
-                    "username": username
-                }
-            }).then(res => {
+            reportApi.getReports(username).then(res => {
                 const { code } = res
                 if (code === 200) {
                     ({ reportList: reports } = res.data);
@@ -1351,11 +1337,11 @@ $(function () {
                     });
                     filesTable.rows().draw();
                     refreshPageInfo();
-                } else {
-                    localStorage.removeItem('token')
-                    amModal.alert('登录过期')
-                    redirectHome()
+                    return
                 }
+                localStorage.removeItem('token')
+                amModal.alert('登录过期')
+                redirectHome()
             })
         }, 0);
 
@@ -1397,13 +1383,7 @@ $(function () {
      * 初始化文件面板下拉选框内容
      */
     function initSelectData() {
-        $.ajax({
-            url: baseUrl + 'course/node' + `?time=${Date.now()}`,
-            type: "GET",
-            data: {
-                "username": username
-            }
-        }).then(res => {
+        courseApi.getCourseNode(username).then(res => {
             const { code } = res;
             if (code === 200) {
                 ({ courseList: nodes } = res.data);
@@ -1444,7 +1424,6 @@ $(function () {
                 });
 
             }
-
         })
     }
 

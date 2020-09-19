@@ -16,6 +16,18 @@ function getList(parent: string, child: string, username: string) {
         }
     })
 }
+
+function checkIsLimited(username: string, parent: string, child: string, name: string) {
+    return ajax.get<any, BaseResponse>('people/people', {
+        params: {
+            username,
+            parent,
+            child,
+            name
+        }
+    })
+}
 export default {
-    getList
+    getList,
+    checkIsLimited
 }

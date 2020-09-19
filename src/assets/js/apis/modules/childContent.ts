@@ -29,6 +29,7 @@ function getInitData(taskid: string) {
         }
     })
 }
+
 export default {
     update,
     getInitData
