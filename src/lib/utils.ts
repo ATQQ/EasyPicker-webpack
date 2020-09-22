@@ -138,3 +138,18 @@ export function getUrlParam(url, paramName) {
     }
     return res
 }
+
+/**
+ * 生成二维码，以base64返回
+ * @param text 
+ * @param config 
+ */
+export function createEwm(text:string, config?:AraleQRCode.config) {
+    const canvasImg = new AraleQRCode({
+        text,
+        size: 145,
+        foreground: '#000',
+        ...config
+    })
+    return canvasImg.toDataURL('image/png')
+}

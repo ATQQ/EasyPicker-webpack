@@ -8,6 +8,7 @@
     <title><%= htmlWebpackPlugin.options.title %></title>
     <meta http-equiv="Cache-Control" content="no-siteapp" />
     <meta name="apple-mobile-web-app-title" content="<%= htmlWebpackPlugin.options.title %>" />
+    <script defer src="https://img.cdn.sugarat.top/arale-qrcode/3.0.5/index.js"></script>
     <script defer src="https://img.cdn.sugarat.top/jquery/2.1.4/jquery.min.js"></script>
     <!-- 日期插件 -->
     <script defer src="https://img.cdn.sugarat.top/js/Ecalendar.jquery.min.js"></script>
@@ -330,10 +331,13 @@
                         <!--短地址按钮-->
                         <span class="am-input-group-btn fw-w100 fw-flex fw-c-c">
                             <button id="createShortLink" class="am-btn-sm am-btn am-btn-secondary"
-                                type="button">生成短地址</button>
+                                type="button">短地址</button>&nbsp;
                         </span>
                         <a id="tempCopy" href="" style="word-break: break-all;" class="am-margin-sm"
                             target="_blank"></a>
+                        <div style="margin:10px auto;">
+                            <img height="200px" id="ewm" src="" alt="地址的二维码">
+                        </div>
                         <span class="am-input-group-btn fw-w100 fw-flex fw-c-c">
                             <button id="copyLink" class="am-btn am-btn-success" type="button">一键复制</button>
                         </span>

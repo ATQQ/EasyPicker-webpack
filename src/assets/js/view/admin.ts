@@ -5,7 +5,7 @@ import '../../sass/modules/admin.scss'
 
 import '../common/app'
 
-import { amModal, downLoadByUrl, getQiNiuUploadToken, stringEncode, baseAddress, getRandomStr } from '@/lib/utils'
+import { amModal, downLoadByUrl, getQiNiuUploadToken, stringEncode, baseAddress, getRandomStr, createEwm } from '@/lib/utils'
 import jqUtils from '@/lib/jqUtils'
 import { childContentApi, fileApi2, reportApi, peopleApi, courseApi } from 'apis/index'
 
@@ -357,6 +357,10 @@ $(function () {
         const originUrl = document.getElementById('tempCopy')?.getAttribute('href')
         getShortUrl(originUrl)
     })
+    // $('#createewm').on('click', function () {
+    //     const originUrl = document.getElementById('tempCopy')?.getAttribute('href')
+    //     createEwm(originUrl)
+    // })
 
     function checkOssStatus(url) {
         $('#download').button('loading')
@@ -407,7 +411,7 @@ $(function () {
         if (!findResult) {
             amModal.alert('没有可下载的文件')
         } else {
-        //防止用户点击多次下载
+            //防止用户点击多次下载
             const $btn = $(this)
             $btn.button('loading')
             fileApi2.checkFileCount(username, parent, child).then(res => {
@@ -727,7 +731,7 @@ $(function () {
         }
         const id = e.currentTarget.getAttribute('people-key')
         const $btn = $(this)
-        peopleApi.deletePeople(id).then(res=>{
+        peopleApi.deletePeople(id).then(res => {
             if (res.code === 200) {
                 peopleListTable.row($btn.parents('tr')).remove()
                 peopleListTable.draw()
@@ -885,6 +889,8 @@ $(function () {
         const key = btoa(encodeURI(`username=${username}&parent=${parent}&child=${child}`))
         const shareUrl = `${baseAddress}/upload?${key}`
         setCopyContent(shareUrl)
+        const $ewm = document.getElementById('ewm') as HTMLImageElement
+        $ewm.src = createEwm(shareUrl)
         openModel('#copy-panel')
     })
 
@@ -896,6 +902,8 @@ $(function () {
         const key = btoa(encodeURI(`username=${username}&parent=${parent}`))
         const shareUrl = `${baseAddress}/upload?${key}`
         setCopyContent(shareUrl)
+        const $ewm = document.getElementById('ewm') as HTMLImageElement
+        $ewm.src = createEwm(shareUrl)
         openModel('#copy-panel')
     })
 
@@ -1053,11 +1061,14 @@ $(function () {
      */
     function getShortUrl(url) {
         jsonp(`https://api.ft12.com/api.php?format=jsonp&url=${url}&apikey=15196520474@811a2f8e6e0f2424975993679ac041c5`, 'shortLink', function (res) {
+            const { url, status } = res
             const tempCopy = document.getElementById('tempCopy')
-            if (tempCopy) {
-                tempCopy.setAttribute('href', res.url)
-                tempCopy.textContent = res.url
+            if (tempCopy && url && status !== -1) {
+                tempCopy.setAttribute('href', url)
+                tempCopy.textContent = url
+                return
             }
+            amModal.alert('非法网址')
         })
     }
 
@@ -1112,9 +1123,9 @@ $(function () {
      */
     function delCourseOrTask(type, id) {
         return new Promise<BaseResponse>(resolve => {
-            courseApi.deleteCourse(id,type).then(res=>{
+            courseApi.deleteCourse(id, type).then(res => {
                 resolve(res)
-            })    
+            })
         })
 
     }
