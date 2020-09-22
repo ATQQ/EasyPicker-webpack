@@ -8,6 +8,7 @@
     <title><%= htmlWebpackPlugin.options.title %></title>
     <meta http-equiv="Cache-Control" content="no-siteapp" />
     <meta name="apple-mobile-web-app-title" content="<%= htmlWebpackPlugin.options.title %>" />
+    <script defer src="https://img.cdn.sugarat.top/arale-qrcode/3.0.5/index.js"></script>
     <script defer src="https://img.cdn.sugarat.top/jquery/2.1.4/jquery.min.js"></script>
     <!-- 日期插件 -->
     <script defer src="https://img.cdn.sugarat.top/js/Ecalendar.jquery.min.js"></script>
@@ -50,7 +51,7 @@
                         </li>
                         <!-- 欢迎语 -->
                         <li class="am-text-sm ">
-                            <a href="javascript:;">欢迎你, <span class="username am-secondary">Amaze UI</span> </a>
+                            <a href="javascript:;">欢迎你  <span class="username am-secondary">Amaze UI</span> </a>
                         </li>
 
                         <!-- 退出 -->
@@ -92,6 +93,11 @@
                 <li class="sidebar-nav-link" key='class'>
                     <a href="#" class="active">
                         <i class="am-icon-table sidebar-nav-link-logo"></i> 分类管理
+                    </a>
+                </li>
+                <li class="sidebar-nav-link" key='feedback'>
+                    <a href="#">
+                        <i class="am-icon-feed sidebar-nav-link-logo"></i> 使用反馈
                     </a>
                 </li>
             </ul>
@@ -315,6 +321,22 @@
                 </div>
             </div>
         </div>
+        <!-- 反馈面板 -->
+        <div id="panel-feedback" class="tpl-content-wrapper" hidden>
+            <div class="row-content am-cf">
+                <div class="row">
+                    <div class="am-u-sm-12 am-u-md-12 am-u-lg-12">
+                        <div class="widget am-cf">
+                            <div class="widget-head am-cf">
+                                <div class="widget-title  am-cf">问题/新功能反馈</div>
+                            </div>
+                            <iframe class="widget-body  am-fr" src="https://www.wenjuan.com/s/UZBZJvA040/"
+                                style="display: block; height: 80vh;" frameborder="0"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- 复制内容弹窗 -->
@@ -330,10 +352,13 @@
                         <!--短地址按钮-->
                         <span class="am-input-group-btn fw-w100 fw-flex fw-c-c">
                             <button id="createShortLink" class="am-btn-sm am-btn am-btn-secondary"
-                                type="button">生成短地址</button>
+                                type="button">短地址</button>&nbsp;
                         </span>
                         <a id="tempCopy" href="" style="word-break: break-all;" class="am-margin-sm"
                             target="_blank"></a>
+                        <div style="margin:10px auto;">
+                            <img height="200px" id="ewm" src="" alt="地址的二维码">
+                        </div>
                         <span class="am-input-group-btn fw-w100 fw-flex fw-c-c">
                             <button id="copyLink" class="am-btn am-btn-success" type="button">一键复制</button>
                         </span>
@@ -533,10 +558,12 @@
             </div>
         </div>
     </div>
-    <!-- <script
-        type="text/javascript">document.write(unescape("%3Cspan id='cnzz_stat_icon_1278930107'%3E%3C/span%3E%3Cscript src='https://s9.cnzz.com/z_stat.php%3Fid%3D1278930107%26online%3D1%26show%3Dline' type='text/javascript'%3E%3C/script%3E"));</script> -->
 
     <style>
+        #cnzz {
+            visibility: hidden;
+        }
+
         #cnzz_stat_icon_1278930107 {
             padding: 2rem 0;
             display: flex;

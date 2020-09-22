@@ -138,3 +138,57 @@ export function getUrlParam(url, paramName) {
     }
     return res
 }
+
+/**
+ * 生成二维码，以base64返回
+ * @param text 
+ * @param config 
+ */
+export function createEwm(text: string, config?: AraleQRCode.config) {
+    const canvasImg = new AraleQRCode({
+        text,
+        size: 145,
+        foreground: '#000',
+        ...config
+    })
+    return canvasImg.toDataURL('image/png')
+}
+/**
+* 加载底部导航链接
+*/
+export function loadBottomLinks() {
+    const $footer = document.createElement('footer')
+    $footer.className = 'footer-nav am-container'
+    const $ul = document.createElement('ul')
+    $ul.className = 'am-u-lg-5 am-u-md-6 am-u-sm-12 am-center'
+    $ul.id = 'bottom-links'
+    $footer.append($ul)
+    const links = [{
+        href: '/',
+        text: '首页'
+    }, {
+        href: 'https://github.com/ATQQ/EasyPicker',
+        text: 'GitHub'
+    },
+    {
+        href: 'https://sugar-js.gitbook.io/easypicker-manual/',
+        text: '使用手册'
+    },
+    {
+        href: 'https://www.wenjuan.com/s/UZBZJvA040/',
+        text: '问题反馈'
+    }
+    ]
+    const docFrag = document.createDocumentFragment()
+    links.forEach((link) => {
+        const li = document.createElement('li')
+        const a = document.createElement('a')
+        a.href = link.href
+        a.target = '_blank'
+        a.textContent = link.text
+        li.appendChild(a)
+        $ul.appendChild(li)
+    })
+    docFrag.append($footer)
+    document.body.append(docFrag)
+}
