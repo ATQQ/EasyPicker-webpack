@@ -1,7 +1,8 @@
+/* eslint-disable */
 const path = require('path');
 const webpack = require('webpack')
 const os = require('os')
-const { getEntry,getHtml } = require('./fileUtil')
+const { getEntry, getHtml } = require('./fileUtil')
 
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 //清理打包
@@ -37,7 +38,7 @@ module.exports = {
     entry: {
         base: './src/assets/js/common/base.ts',
         ...getEntry('./src/assets/js/view'),
-        ...getEntry('./src/assets/js/view','.ts')
+        ...getEntry('./src/assets/js/view', '.ts')
     },
     output: {
         filename: 'js/[name]-[hash].js',
@@ -58,9 +59,18 @@ module.exports = {
         // 配置loader
         rules: [
             {
+                test: /.ts$/,
+                loader: 'eslint-loader',
+                enforce: 'pre',
+                include: [path.resolve(__dirname, '../src')],
+                options: {
+                    formatter: require('eslint-friendly-formatter')
+                }
+            },
+            {
                 test: /\.(sa|sc|c)ss$/,
                 use: [
-                     MiniCssExtractPlugin.loader,
+                    MiniCssExtractPlugin.loader,
                     'css-loader',
                     // 'postcss-loader',
                     'sass-loader',
@@ -85,7 +95,7 @@ module.exports = {
             },
             {
                 test: /\.ts$/,
-                use:['ts-loader']
+                use: ['ts-loader']
             },
             { //字体文件
                 test: /\.(eot|svg|ttf|woff|woff2)$/,

@@ -6,7 +6,6 @@ $(function () {
 })
 
 // 侧边菜单开关
-
 function autoLeftNav() {
     if (window.screen.width < 1024) {
         $('.left-sidebar').addClass('active')

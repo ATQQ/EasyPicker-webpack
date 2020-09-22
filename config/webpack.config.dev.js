@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const path = require('path');
 const webpack = require('webpack')
 const os = require('os')
@@ -69,6 +71,15 @@ module.exports = {
     module: {
         // 配置loader
         rules: [
+            {
+                test: /.ts$/,
+                loader: 'eslint-loader',
+                enforce: 'pre',
+                include: [path.resolve(__dirname, '../src')],
+                options: {
+                    formatter: require('eslint-friendly-formatter')
+                }
+            },
             {
                 test: /\.(sa|sc|c)ss$/,
                 use: [

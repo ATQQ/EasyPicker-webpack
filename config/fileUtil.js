@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const path = require('path')
 const fs = require('fs')
 // 打包html
