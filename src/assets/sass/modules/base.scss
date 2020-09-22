@@ -1,0 +1,15 @@
+.footer-nav {
+    display: flex;
+    justify-content: center;
+    ul {
+        display: flex;
+        justify-content: space-around;
+        li {
+            list-style: none;
+            a {
+                font-size: 1.4rem;
+                color: rgba(14, 144, 210, 0.45);
+            }
+        }
+    }
+}

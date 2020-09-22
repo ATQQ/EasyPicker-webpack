@@ -1,6 +1,6 @@
 import '../../sass/modules/upload.scss'
 import jqUtils from '@/lib/jqUtils'
-import { amModal, downLoadByUrl, getQiNiuUploadToken, stringEncode, getRandomStr } from '@/lib/utils'
+import { amModal, downLoadByUrl, getQiNiuUploadToken, stringEncode, getRandomStr, loadBottomLinks } from '@/lib/utils'
 import { fileApi2, peopleApi, childContentApi, reportApi, userApi, courseApi } from 'apis/index'
 import('../common/tongji').then(res => {
     res.default.init()
@@ -285,39 +285,6 @@ window.onload = function () {
         request(++tempFlag)
     })
 
-    /**
-     * 加载底部导航链接
-     */
-    function loadBottomLinks() {
-        const links = [{
-            href: '/',
-            text: '首页'
-        }, {
-            href: 'https://github.com/ATQQ/EasyPicker',
-            text: 'GitHub'
-        },
-        {
-            href: 'https://sugar-js.gitbook.io/easypicker-manual/',
-            text: '使用手册'
-        },
-        {
-            href: 'https://github.com/ATQQ/EasyPicker/issues',
-            text: '问题反馈'
-        }
-        ]
-        const docFrag = document.createDocumentFragment()
-        links.forEach((link) => {
-            const li = document.createElement('li')
-            const a = document.createElement('a')
-            a.href = link.href
-            a.target = '_blank'
-            a.textContent = link.text
-            li.appendChild(a)
-            docFrag.appendChild(li)
-        })
-        document.getElementById('bottom-links')?.appendChild(docFrag)
-    }
-
 
     /**
      * 返回日期间隔时间
@@ -513,7 +480,7 @@ window.onload = function () {
      * @param username
      */
     function setDataByChild(type, parent, child, username) {
-    //查询父节点信息
+        //查询父节点信息
         courseApi.getNodeList(2, username, parent).then(res => {
             if (res.data.status) {
                 const node = res.data.data
@@ -604,10 +571,10 @@ window.onload = function () {
         $('body').append(form)
         form.submit()
         form.remove()
-    // //新窗口打开
-    // let newTab = window.open('about:blank')
-    // newTab.location.href = path;
-    // //关闭新窗口
-    // newTab.close();
+        // //新窗口打开
+        // let newTab = window.open('about:blank')
+        // newTab.location.href = path;
+        // //关闭新窗口
+        // newTab.close();
     }
 }

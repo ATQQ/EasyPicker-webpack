@@ -5,7 +5,7 @@ import '../../sass/modules/admin.scss'
 
 import '../common/app'
 
-import { amModal, downLoadByUrl, getQiNiuUploadToken, stringEncode, baseAddress, getRandomStr, createEwm } from '@/lib/utils'
+import { amModal, downLoadByUrl, getQiNiuUploadToken, stringEncode, baseAddress, getRandomStr, createEwm,loadBottomLinks } from '@/lib/utils'
 import jqUtils from '@/lib/jqUtils'
 import { childContentApi, fileApi2, reportApi, peopleApi, courseApi } from 'apis/index'
 
@@ -1236,7 +1236,8 @@ $(function () {
 
         //加载文件面板下拉选框数据
         initSelectData()
-
+        // 底部导航
+        loadBottomLinks()
     }
 
     /**
