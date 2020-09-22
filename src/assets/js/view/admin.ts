@@ -1052,7 +1052,6 @@ $(function () {
      * @param url
      */
     function getShortUrl(url) {
-        url = 'http://ep.sugarat.top/upload?dXNlcm5hbWU9YWRtaW4mcGFyZW50PUMjJUU2JUExJThDJUU5JTlEJUEyJUU1JUJBJTk0JUU3JTk0JUE4'
         jsonp(`https://api.ft12.com/api.php?format=jsonp&url=${url}&apikey=15196520474@811a2f8e6e0f2424975993679ac041c5`, 'shortLink', function (res) {
             const tempCopy = document.getElementById('tempCopy')
             if (tempCopy) {
