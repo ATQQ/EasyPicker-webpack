@@ -5,10 +5,10 @@ import { userApi } from 'apis/index'
 import { rMobile, rCode, rPassword, rUsername } from '@/lib/regExp'
 import jqUtils from '@/lib/jqUtils'
 import { themeColor } from '@/lib/enums'
-import { placeholders,amModal } from '@/lib/utils'
+import { placeholders, amModal, redirectAdmin } from '@/lib/utils'
 
 // CNZZ 统计
-import('./../common/tongji').then(res=>{
+import('./../common/tongji').then(res => {
     res.default.init()
 })
 
@@ -323,12 +323,12 @@ $(document).ready(function () {
      * @param $inputs 多个输入框
      */
     function getResetPlaceHolderArr($inputs: JQuery<HTMLInputElement>) {
-    /**
-         * 修改目标$input的placeholder且初始化值
-         * @param index 下标
-         * @param placeholder 提示内容
-         * @param themeColor 颜色 
-         */
+        /**
+             * 修改目标$input的placeholder且初始化值
+             * @param index 下标
+             * @param placeholder 提示内容
+             * @param themeColor 颜色 
+             */
         function resetByIndex(index: number, placeholder: string, color = themeColor.danger) {
             const $input = $inputs.eq(index)
             $input.val('')
@@ -348,7 +348,7 @@ $(document).ready(function () {
     function login(username: string, password: string) {
         const $inputs = $('#loginPanel').find('input')
         const reserInputByIndex = getResetPlaceHolderArr($inputs)
-        
+
         //如果勾选了记住密码
         if ($('#rememberAccount').is(':checked')) {
             storageAccount(username, password)
@@ -363,17 +363,17 @@ $(document).ready(function () {
                 if (power !== 1) {
                     localStorage.setItem('token', token)
                     localStorage.setItem('username', username)
-                    window.location.href = 'admin'
+                    redirectAdmin()
                 } else {
                     amModal.alert('登录失败,没有权限')
                 }
                 break
                 //登录失败
             case 20010:
-                reserInputByIndex(0,placeholders.username.notExist)
+                reserInputByIndex(0, placeholders.username.notExist)
                 break
             case 20011:
-                reserInputByIndex(1,placeholders.password.notRight)
+                reserInputByIndex(1, placeholders.password.notRight)
                 break
             default:
                 break
@@ -405,19 +405,22 @@ $(document).ready(function () {
      * 加载最后一次存储的账号信息
      */
     function loadLocatAccount() {
+        // 判断是否已经有登录用户
+        if (localStorage.getItem('token')) {
+            redirectAdmin()
+            return
+        }
         const nowUser = localStorage.getItem('user')
         if (!nowUser) {
             return
         }
+        // 加载上一次保存的账号密码
         try {
             const { username, password } = JSON.parse(nowUser)
             $('#login-username').val(username)
             $('#login-password').val(password)
         } catch (err) {
             localStorage.removeItem('user')
-        }
-        if (localStorage.getItem('token')) {
-            window.location.href = 'admin'
         }
     }
 

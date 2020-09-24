@@ -192,3 +192,11 @@ export function loadBottomLinks() {
     docFrag.append($footer)
     document.body.append(docFrag)
 }
+
+function redirect(path: string) {
+    return function () {
+        window.location.href = path
+    }
+}
+export const redirectAdmin = redirect('admin')
+export const redirectHome = redirect('/')
