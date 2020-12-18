@@ -5,7 +5,9 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title><%= htmlWebpackPlugin.options.title %></title>
+    <title>
+        <%= htmlWebpackPlugin.options.title %>
+    </title>
     <meta http-equiv="Cache-Control" content="no-siteapp" />
     <meta name="apple-mobile-web-app-title" content="<%= htmlWebpackPlugin.options.title %>" />
     <script defer src="https://img.cdn.sugarat.top/arale-qrcode/3.0.5/index.js"></script>
@@ -47,11 +49,17 @@
                 <div class="am-fr tpl-header-navbar">
                     <ul>
                         <li class="am-text-sm">
-                            <a href="javascript:" style="color: #00bcd48c">如果点击下载几秒后没有反应，请检查是否是浏览器阻止了弹窗下载</a>
+                            <a href="javascript:" style="color: yellow">如果点击下载几秒后没有反应
+                                <span>1.请检查是否是浏览器阻止了弹窗下载</span>
+                                <span>2.请换用非Chrome浏览器，后续进行优化</span>
+                            </a>
+                            <a style="color: skyblue;"
+                            href="https://help.salesforce.com/articleView?id=000355262&language=zh_CN&mode=1&type=1"
+                            target="_blank">点击查看：Google 避免用户在 Google Chrome 中下载不安全的内容</a>
                         </li>
                         <!-- 欢迎语 -->
                         <li class="am-text-sm ">
-                            <a href="javascript:;">欢迎你  <span class="username am-secondary">Amaze UI</span> </a>
+                            <a href="javascript:;">欢迎你 <span class="username am-secondary">Amaze UI</span> </a>
                         </li>
 
                         <!-- 退出 -->

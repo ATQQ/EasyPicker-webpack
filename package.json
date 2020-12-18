@@ -4,8 +4,8 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "deploy": "npm run build && ./build/deploy.sh",
-        "deploydev": "npm run build && ./build/deploydev.sh",
+        "deploy": "npm run build && bash ./build/deploy.sh",
+        "deploydev": "npm run build && bash ./build/deploydev.sh",
         "lint": "eslint --fix ./src",
         "dev": "cross-env NODE_ENV=development webpack-dev-server  --config=config/webpack.config.js",
         "build": "cross-env NODE_ENV=production webpack --config=config/webpack.config.js"
