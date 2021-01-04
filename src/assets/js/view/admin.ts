@@ -5,7 +5,7 @@ import '../../sass/modules/admin.scss'
 
 import '../common/app'
 
-import { amModal, downLoadByUrl, getQiNiuUploadToken, stringEncode, baseAddress, getRandomStr, createEwm,loadBottomLinks,redirectHome } from '@/lib/utils'
+import { amModal, downLoadByUrl, getQiNiuUploadToken, stringEncode, baseAddress, getRandomStr, createEwm, loadBottomLinks, redirectHome } from '@/lib/utils'
 import jqUtils from '@/lib/jqUtils'
 import { childContentApi, fileApi2, reportApi, peopleApi, courseApi } from 'apis/index'
 
@@ -351,16 +351,13 @@ $(function () {
     })
 
     /**
+     * todo: 短地址有问题，待自建
      * 调用第三方接口短地址生成  https://www.ft12.com/
      */
     $('#createShortLink').on('click', function () {
         const originUrl = document.getElementById('tempCopy')?.getAttribute('href')
         getShortUrl(originUrl)
     })
-    // $('#createewm').on('click', function () {
-    //     const originUrl = document.getElementById('tempCopy')?.getAttribute('href')
-    //     createEwm(originUrl)
-    // })
 
     function checkOssStatus(url) {
         $('#download').button('loading')
@@ -379,7 +376,7 @@ $(function () {
                 })
                 return
             }
-            // 为完成继续论询
+            // 未完成继续论询
             setTimeout(checkOssStatus, 1000, url)
         })
     }
@@ -468,6 +465,69 @@ $(function () {
         setTimeout(function () {
             $btn.button('reset')
         }, 5000)
+    })
+
+    function base64(s) {
+        return window.btoa(unescape(encodeURIComponent(s)))
+    }
+    /**
+     * 导出表格数据为xls
+     * @param headers 头部
+     * @param body 身体部分数据
+     */
+    function tableToEexcell(headers, body, filename = 'res.xls') {
+        //列标题
+        let str = `<tr>${headers.map(v => `<th>${v}</th>`).join('')}</tr>`
+        //循环遍历，每行加入tr标签，每个单元格加td标签
+        for (const row of body) {
+            str += '<tr>'
+            for (const cell of row) {
+                //增加\t为了不让表格显示科学计数法或者其他格式
+                str += `<td>${cell + '\t'}</td>`
+            }
+            str += '</tr>'
+        }
+
+        //Worksheet名
+        const worksheet = 'sheet1'
+        const uri = 'data:application/vnd.ms-excel;base64,'
+
+        //下载的表格模板数据
+        const template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" \n' +
+            '      xmlns:x="urn:schemas-microsoft-com:office:excel" \n' +
+            '      xmlns="http://www.w3.org/TR/REC-html40">\n' +
+            '      <head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>\n' +
+            `        <x:Name>${worksheet}</x:Name>\n` +
+            '        <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>\n' +
+            '        </x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->\n' +
+            `        </head><body><table>${str}</table></body></html>\n`
+        //下载模板
+        const tempA = document.createElement('a')
+        tempA.href = uri + base64(template)
+        tempA.download = filename
+        document.body.appendChild(tempA)
+        tempA.click()
+        document.body.removeChild(tempA)
+    }
+
+    /**
+     * 结果导出Excell
+     */
+    $('#export_excell').on('click', function () {
+        const courseName = $('#courseList').children(':selected').text()
+        const taskName = $('#taskList').children(':selected').text()
+
+        //查找是否有符合条件的文件
+        const rows = reports.filter(function (v) {
+            const _isCourseSame = courseName === '全部' || v.course === courseName
+            const _isTaskSame = taskName === '全部' || v.tasks === taskName
+            return _isCourseSame && _isTaskSame
+        }).map((v, idx) => {
+            const { course, date, filename, name, tasks } = v
+            return [idx, name, filename, new Date(date).Format('yyyy-MM-dd hh:mm:ss'), course, tasks]
+        })
+        const headers = ['序号', '提交者', '文件名', '提交时间', '所属父类', '所属子类']
+        tableToEexcell(headers, rows, `${courseName}-${taskName}.xls`)
     })
     /**
      * 搜索table中的内容
@@ -1060,10 +1120,10 @@ $(function () {
      * @param url
      */
     function getShortUrl(url) {
-        jsonp(`https://api.ft12.com/api.php?format=jsonp&url=${url}&apikey=15196520474@811a2f8e6e0f2424975993679ac041c5`, 'shortLink', function (res) {
-            const { url, status } = res
+        jsonp(`https://api.suowo.cn/api.htm?format=jsonp&url=${encodeURIComponent(url)}&key=5ec8a001be96bd79a37f19b8@bf33c7483d0c6900bb7bc90a0e6dfdf0&expireDate=2030-03-31&domain=0`, 'shortLink', function (res) {
+            const { url, err } = res
             const tempCopy = document.getElementById('tempCopy')
-            if (tempCopy && url && status !== -1) {
+            if (tempCopy && url && !err) {
                 tempCopy.setAttribute('href', url)
                 tempCopy.textContent = url
                 return
@@ -1215,8 +1275,8 @@ $(function () {
         //判断登录是否失效
         const token = localStorage.getItem('token')
         if (!token) {
-            amModal.alert('即将跳转登录页。。。','登录过期')
-            setTimeout(redirectHome,1500)
+            amModal.alert('即将跳转登录页。。。', '登录过期')
+            setTimeout(redirectHome, 1500)
             return
         }
         clearpanel('#coursePanel')
@@ -1254,8 +1314,8 @@ $(function () {
                     return
                 }
                 localStorage.removeItem('token')
-                amModal.alert('即将跳转登录页。。。','登录过期')
-                setTimeout(redirectHome,1500)
+                amModal.alert('即将跳转登录页。。。', '登录过期')
+                setTimeout(redirectHome, 1500)
             })
         }, 0)
 
