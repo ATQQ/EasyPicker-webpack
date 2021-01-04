@@ -351,8 +351,7 @@ $(function () {
     })
 
     /**
-     * todo: 短地址有问题，待自建
-     * 调用第三方接口短地址生成  https://www.ft12.com/
+     * 调用第三方接口短地址生成  https://home.suowo.cn/ucenter/api.htm/
      */
     $('#createShortLink').on('click', function () {
         const originUrl = document.getElementById('tempCopy')?.getAttribute('href')
