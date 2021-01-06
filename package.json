@@ -55,7 +55,7 @@
         "webpack-merge": "^5.1.4"
     },
     "dependencies": {
-        "axios": "^0.20.0",
+        "axios": "^0.21.1",
         "babel-loader": "^8.1.0",
         "css-loader": "^3.6.0",
         "postcss-loader": "^4.0.2",
