@@ -5,7 +5,7 @@ import '../../sass/modules/admin.scss'
 
 import '../common/app'
 
-import { amModal, downLoadByUrl, getQiNiuUploadToken, stringEncode, baseAddress, getRandomStr, createEwm, loadBottomLinks, redirectHome } from '@/lib/utils'
+import { amModal, downLoadByUrl, getQiNiuUploadToken, stringEncode, baseAddress, getRandomStr, createEwm, loadBottomLinks, redirectHome, setEwm } from '@/lib/utils'
 import jqUtils from '@/lib/jqUtils'
 import { childContentApi, fileApi2, reportApi, peopleApi, courseApi } from 'apis/index'
 
@@ -1123,8 +1123,8 @@ $(function () {
             const { url, err } = res
             const tempCopy = document.getElementById('tempCopy')
             if (tempCopy && url && !err) {
-                tempCopy.setAttribute('href', url)
-                tempCopy.textContent = url
+                setCopyContent(url)
+                setEwm('ewm', url)
                 return
             }
             amModal.alert('非法网址')

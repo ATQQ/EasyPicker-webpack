@@ -62,16 +62,42 @@ export const placeholders = {
 }
 
 /**
+ * 设置Copy的内容
+ */
+function setCopyContent(shareUrl) {
+    const tempCopy = document.getElementById('tempCopy')
+    if (tempCopy) {
+        tempCopy.setAttribute('href', shareUrl)
+        tempCopy.textContent = shareUrl
+    }
+}
+
+/**
 * 向指定路径发送下载请求
 * @param{String} url 请求路径
 * @param {String} filename 文件名
 */
 export function downLoadByUrl(url: string, filename = Date.now() + '') {
+    // todo: ddl 2021-1-20 待完善健壮性
+    // fixme: 耦合度过高，待修改
+    // 由于浏览器安全策略原因，弃用直接下载
     const a = document.createElement('a')
     a.href = url
     a.target = '_blank'
     a.download = filename
     a.click()
+    setCopyContent(url)
+    setEwm('ewm', url)
+    amModal.alert('如未自动开始下载，请复制url到浏览器打开，也可将url分享给其它人进行下载(12h有效)', '下载提示')
+    openModel('#copy-panel', false)
+}
+
+/**
+ * 设置二维码图片作为背景
+ */
+export function setEwm(id: string, url: string) {
+    const $ewm = document.getElementById(id) as HTMLImageElement
+    $ewm.src = createEwm(url)
 }
 
 export function getQiNiuUploadToken() {
@@ -116,7 +142,7 @@ export function isEmpty(str) {
  * @param {String} id 弹出层id
  * @param {boolean} close 设置点击遮罩层是否可以关闭
  */
-export function openModel(id, close) {
+export function openModel(id, close = true) {
     $(id).modal({
         closeViaDimmer: close //设置点击遮罩层无法关闭
     })

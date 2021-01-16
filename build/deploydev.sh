@@ -12,3 +12,4 @@ echo "开始-----部署"
 ssh -p22 ${user}@${origin} "tar -xf ${compressFile} && rm -rf ${targetDir}/dist/* && mv dist/* ${targetDir}/dist && rm -rf ${compressFile}"
 echo "清理-----临时的文件"
 rm -rf $compressDir
+rm -rf $compressFile
