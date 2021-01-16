@@ -7,7 +7,7 @@ class AmazeUIModal {
         const alertHtml = `<div id="${id}-alert" class="am-modal am-modal-alert" tabindex="-1" id="my-alert">
         <div class="am-modal-dialog">
             <div class="am-modal-hd">提示</div>
-            <div class="am-modal-bd">
+            <div class="am-modal-bd" style="word-break: break-all;">
                 Hello world！
             </div>
             <div class="am-modal-footer">
@@ -17,10 +17,13 @@ class AmazeUIModal {
     </div>`
         this.alertEl = $(alertHtml)
     }
-    alert(textContent, title = '提示') {
+    alert(textContent, title = '提示', close = true) {
         $(document.body).append(this.alertEl)
         this.alertEl.find('.am-modal-hd')[0].textContent = title
         this.alertEl.find('.am-modal-bd')[0].textContent = textContent
+        this.alertEl.modal({
+            closeViaDimmer: close //设置点击遮罩层能否关闭
+        })
         this.alertEl.modal('open')
     }
 }
@@ -73,14 +76,12 @@ function setCopyContent(shareUrl) {
 }
 
 /**
-* 向指定路径发送下载请求
+* fixme: 耦合度过高，待修改
+* 向指定路径发送下载请求 new,带弹窗二维码
 * @param{String} url 请求路径
 * @param {String} filename 文件名
 */
 export function downLoadByUrl(url: string, filename = Date.now() + '') {
-    // todo: ddl 2021-1-20 待完善健壮性
-    // fixme: 耦合度过高，待修改
-    // 由于浏览器安全策略原因，弃用直接下载
     const a = document.createElement('a')
     a.href = url
     a.target = '_blank'
@@ -90,6 +91,23 @@ export function downLoadByUrl(url: string, filename = Date.now() + '') {
     setEwm('ewm', url)
     amModal.alert('如未自动开始下载，请复制url到浏览器打开，也可将url分享给其它人进行下载(12h有效)', '下载提示')
     openModel('#copy-panel', false)
+}
+
+/**
+ * 下载文件旧
+ * @param url 
+ * @param filename 
+ */
+export function downloadFile_old(url, filename = Date.now() + '') {
+    const a = document.createElement('a')
+    a.href = url
+    a.target = '_blank'
+    a.download = filename
+    a.click()
+    amModal.alert(`如未自动开始下载，请复制url到浏览器打开，也可将url分享给其它人进行下载(12h有效)
+    
+    ${url}
+    `, '下载提示', false)
 }
 
 /**

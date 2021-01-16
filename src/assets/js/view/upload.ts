@@ -1,6 +1,6 @@
 import '../../sass/modules/upload.scss'
 import jqUtils from '@/lib/jqUtils'
-import { amModal, downLoadByUrl, getQiNiuUploadToken, stringEncode, getRandomStr, loadBottomLinks } from '@/lib/utils'
+import { amModal, downloadFile_old, getQiNiuUploadToken, stringEncode, getRandomStr, loadBottomLinks } from '@/lib/utils'
 import { fileApi2, peopleApi, childContentApi, reportApi, userApi, courseApi } from 'apis/index'
 import('../common/tongji').then(res => {
     res.default.init()
@@ -261,7 +261,7 @@ window.onload = function () {
                                 } else if (where === 'oss') {
                                     fileApi2.getFileDownloadUrl(account, parent, child, template).then(res => {
                                         const { url } = res.data
-                                        downLoadByUrl(url, template)
+                                        downloadFile_old(url, template)
                                         $btn.button('loading')
                                         setTimeout(function () {
                                             $btn.button('reset')
