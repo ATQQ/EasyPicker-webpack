@@ -9,13 +9,14 @@ module.exports = {
         open: true, //自动打开页面
         hot: true, //模块热替换
         hotOnly: false, //只有热更新不会刷新页面
-        proxy: { //跨域配置
+        proxy: { //反向代理
+            '/server2': {
+                target: 'https://ep.dev.sugarat.top/',
+                changeOrigin: true,
+            },
             '/EasyPicker': {
-                target: 'http://sugarat.top:8080/EasyPicker-Server-dev-1.0' || 'http://localhost:8080/EasyPicker',
-                changeOrigin: true, //是否跨域
-                pathRewrite: {
-                    '^/EasyPicker': '' //规定请求地址以什么作为开头
-                }
+                target: 'https://ep.dev.sugarat.top/' || 'http://localhost:8080/EasyPicker',
+                changeOrigin: true,
             }
         }
     }

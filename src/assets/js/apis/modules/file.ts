@@ -58,7 +58,8 @@ function getFileDownloadUrl(username: string, course: string, tasks: string, fil
             course,
             tasks,
             filename
-        }
+        },
+        baseURL:'/server2'
     })
 }
 

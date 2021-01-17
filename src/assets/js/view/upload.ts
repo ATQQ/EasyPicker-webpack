@@ -219,7 +219,7 @@ window.onload = function () {
                         //显示截止日期
                         $ddl.children().eq(0).html('截止日期:' + new Date(data.ddl).Format('yyyy-MM-dd,hh:mm:ss'))
                         const fn = () => {
-                            let str = '已经截止!!!'
+                            let str = '链接已失效'
                             //计算日期间隔
                             if (Date.now() > data.ddl) {
                                 jqUtils.freezeBtn($('#uploadBtn'))
