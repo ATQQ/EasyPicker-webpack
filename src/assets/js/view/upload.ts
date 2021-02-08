@@ -418,7 +418,7 @@ window.onload = function () {
             if (code !== 200) {
                 return
             }
-            const courseList = res.data.courseList || []
+            const courseList = res?.data?.courseList || []
             if (courseList.length === 0) {
                 if (range === 'parents') {
                     clearselect('#course')

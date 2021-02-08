@@ -1,8 +1,8 @@
 import ajax from '../ajax'
 
 interface LoginData {
-    power: number,
-    token: string
+    power: number;
+    token: string;
 }
 
 /**
@@ -10,11 +10,23 @@ interface LoginData {
  * @param username 用户名
  * @param password 密码
  */
-function login(username: string, password: string) {
-    return ajax.post<any, BaseResponse<LoginData>>('user/login', {
-        username,
-        password
-    })
+function login(
+    username: string,
+    password: string
+) {
+    return ajax.post<
+        any,
+        BaseResponse<LoginData>
+    >(
+        'user/login',
+        {
+            username,
+            password,
+        },
+        {
+            baseURL: '/server2',
+        }
+    )
 }
 
 /**
@@ -22,11 +34,14 @@ function login(username: string, password: string) {
  * @param mobile 手机号
  */
 function getCode(mobile: string) {
-    return ajax.get<any, BaseResponse>('user/getCode', {
-        params: {
-            mobile
+    return ajax.get<any, BaseResponse>(
+        'user/getCode',
+        {
+            params: {
+                mobile,
+            },
         }
-    })
+    )
 }
 
 /**
@@ -35,11 +50,18 @@ function getCode(mobile: string) {
  * @param password 新密码
  * @param code 验证码
  */
-function resetPassword(mobile: string, password: string, code: string) {
-    return ajax.put<any, BaseResponse>(`user/update/${code}`, {
-        mobile,
-        password
-    })
+function resetPassword(
+    mobile: string,
+    password: string,
+    code: string
+) {
+    return ajax.put<any, BaseResponse>(
+        `user/update/${code}`,
+        {
+            mobile,
+            password,
+        }
+    )
 }
 
 /**
@@ -49,24 +71,39 @@ function resetPassword(mobile: string, password: string, code: string) {
  * @param mobile 手机号
  * @param code 验证码
  */
-function register(username: string, password: string, mobile?: string, code?: string) {
+function register(
+    username: string,
+    password: string,
+    mobile?: string,
+    code?: string
+) {
     const urlPath = 'user/user'
     const data = {
         username,
-        password
+        password,
     }
     if (mobile) {
         Object.assign(data, {
             mobile,
-            code
+            code,
         })
     }
-    return ajax.post<any, BaseResponse>(urlPath, data)
+    return ajax.post<any, BaseResponse>(
+        urlPath,
+        data,
+        {
+            baseURL: '/server2',
+        }
+    )
 }
 
-function checkAccount(username:string){
-    return ajax.post('user/check',{
-        username
+function checkAccount(
+    username: string
+) {
+    return ajax.post('user/check', {
+        username,
+    },{
+        baseURL:'/server2'
     })
 }
 export default {
@@ -74,5 +111,5 @@ export default {
     getCode,
     resetPassword,
     register,
-    checkAccount
+    checkAccount,
 }
