@@ -13,7 +13,8 @@ function getList(parent: string, child: string, username: string) {
             parent,
             child,
             username
-        }
+        },
+        baseURL: '/server2'
     })
 }
 
@@ -24,15 +25,17 @@ function checkIsLimited(username: string, parent: string, child: string, name: s
             parent,
             child,
             name
-        }
+        },
+        baseURL: '/server2'
     })
 }
 
-function deletePeople(id:number){
-    return ajax.delete<any, BaseResponse>('people/people',{
-        params:{
+function deletePeople(id: number) {
+    return ajax.delete<any, BaseResponse>('people/people', {
+        params: {
             id
-        }
+        },
+        baseURL: '/server2'
     })
 }
 export default {

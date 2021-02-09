@@ -235,10 +235,15 @@ $(function () {
         auto: false,
         swf: 'https://img.cdn.sugarat.top/webuploader/0.1.1/Uploader.swf',
         threads: 1,
-        server: baseUrl + 'file/people',
+        server: '/server2/' + 'file/people',
         pick: '#filePicker',
         method: 'POST',
-        resize: false
+        resize: false,
+        accept: {
+            title: '文本文件',
+            extensions: 'txt',
+            mimeTypes: 'text/plain'
+        }
     })
     // 当有文件被添加进队列的时候
     peoplePicker.on('fileQueued', function (file) {
@@ -279,21 +284,23 @@ $(function () {
                 span.textContent = '上传成功'
                 const { code } = response
                 if (code === 200) {
-                    const { failCount } = response.data
+                    const { failCount, successCount, people } = response.data
                     if (failCount > 0) {
-                        amModal.alert(`有${failCount}条数据未导入成功`)
+                        amModal.alert(`有${failCount}条数据已存在，已自动下载已存在的人员名单`)
                         // 自动下载未导入成功数据文件
                         const tempData = peoplePicker.options.formData
                         let filename = file.name
                         filename = filename.substring(0, filename.lastIndexOf('.')) + '_fail.xls'
-                        const jsonArray: any[] = []
-                        jsonArray.push({ 'key': 'course', 'value': tempData.parent })
-                        jsonArray.push({ 'key': 'tasks', 'value': tempData.child + '_peopleFile' })
-                        jsonArray.push({ 'key': 'username', 'value': tempData.username })
-                        jsonArray.push({ 'key': 'filename', 'value': filename })
-                        downloadFile(baseUrl + 'file/down', jsonArray)
+                        tableToEexcell(['名称已存在'], people.map(v => [v]), filename)
+                        // 下：旧逻辑
+                        // const jsonArray: any[] = []
+                        // jsonArray.push({ 'key': 'course', 'value': tempData.parent })
+                        // jsonArray.push({ 'key': 'tasks', 'value': tempData.child + '_peopleFile' })
+                        // jsonArray.push({ 'key': 'username', 'value': tempData.username })
+                        // jsonArray.push({ 'key': 'filename', 'value': filename })
+                        // downloadFile(baseUrl + 'file/down', jsonArray)
                     } else {
-                        amModal.alert('全部导入成功')
+                        amModal.alert(`成功：${successCount}条 --- 失败：${failCount}条`, '导入结果')
                     }
                 } else {
                     span.classList.replace('am-badge-success', 'am-badge-warning')
