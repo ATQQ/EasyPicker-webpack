@@ -119,7 +119,7 @@ export function setEwm(id: string, url: string) {
 }
 
 export function getQiNiuUploadToken() {
-    return $.get(baseUrl + 'file/qiniu/token')
+    return $.get('/server2/' + 'file/qiniu/token')
 }
 
 export function stringEncode(str) {

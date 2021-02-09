@@ -209,6 +209,7 @@ window.onload = function () {
                 jqUtils.unFreezeBtn($('#uploadBtn'))
                 //如果有数据
                 const { code, data } = res
+
                 if (code === 200) {
                     $('#attributePanel').show()
 
@@ -226,7 +227,7 @@ window.onload = function () {
                                 $ddl.children().eq(1).html(str)
                                 return
                             }
-                            str = '还剩:' + calculateDateDiffer(data.ddl, (new Date().getTime()))
+                            str = '还剩:' + calculateDateDiffer(new Date(data.ddl).getTime(), (new Date().getTime()))
                             $ddl.children().eq(1).html(str)
                             requestAnimationFrame(fn)
                         }
@@ -377,14 +378,14 @@ window.onload = function () {
         userApi.checkAccount(username).then(res => {
             if (res) {
                 switch (type) {
-                //获取父类全部子类
-                case 2:
-                    setDataByParent(type, parent, username)
-                    break
+                    //获取父类全部子类
+                    case 2:
+                        setDataByParent(type, parent, username)
+                        break
                     //获取指定子类
-                case 3:
-                    setDataByChild(type, parent, child, username)
-                    break
+                    case 3:
+                        setDataByChild(type, parent, child, username)
+                        break
                 }
             } else {
                 amModal.alert('链接失效!!!')

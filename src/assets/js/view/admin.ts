@@ -1233,8 +1233,8 @@ $(function () {
     function insertToPanel(panelid, value, id, type) {
         let $li = ''
         switch (type) {
-        case 'task':
-            $li =
+            case 'task':
+                $li =
                     '<li class="am-margin-top-sm"text="' + value + '"value="' + id + '">' +
                     '<div class="am-btn-group am-btn-group-sm">' +
                     '<button  type="button"  class="checkChildren am-btn am-btn-secondary am-round">' + value + '</button>' +
@@ -1242,18 +1242,18 @@ $(function () {
                     '<button  type="button"  class="am-hide settings am-btn am-btn-secondary am-round am-icon-server"></button>' +
                     '<button type = "button" class="am-hide delete am-btn am-btn-secondary am-round am-icon-trash" ></button > ' +
                     '<button title="展开" type="button"  class="show-hide am-btn am-btn-secondary am-round am-icon-arrow-right"></button></div > </li >'
-            break
-        case 'course':
-            $li =
+                break
+            case 'course':
+                $li =
                     '<li class="am-margin-top-sm"text="' + value + '"value="' + id + '">' +
                     '<div class="am-btn-group am-btn-group-sm">' +
                     '<button title="查看子类任务" type="button"  class="checkChildren am-btn am-btn-success am-round">' + value + '</button>' +
                     '<button title="生成父类文件收取链接" type="button"  class="am-hide share am-btn am-btn-success am-round am-icon-share-alt"></button>' +
                     '<button title="删除" type = "button" class="am-hide delete am-btn am-btn-success am-round am-icon-trash" ></button > ' +
                     '<button title="展开" type="button"  class="show-hide am-btn am-btn-success am-round am-icon-arrow-right"></button></div > </li >'
-            break
-        default:
-            break
+                break
+            default:
+                break
         }
         $(panelid).append($li)
     }
