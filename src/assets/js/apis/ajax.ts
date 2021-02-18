@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { amModal } from '@/lib/utils'
+import { amModal, redirectHome } from '@/lib/utils'
 const instance = axios.create({
     baseURL: '/EasyPicker/',
 })
@@ -36,6 +36,12 @@ instance.interceptors.request.use((config) => {
  * 响应拦截
  */
 instance.interceptors.response.use(v => {
+    if (v.data?.code === 401) {
+        localStorage.removeItem('token')
+        amModal.alert('即将跳转登录页。。。', '登录过期')
+        setTimeout(redirectHome, 1500)
+        return v.data
+    }
     if (v.status === 200) {
         return v.data
     }

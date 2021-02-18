@@ -1319,9 +1319,6 @@ $(function () {
                     refreshPageInfo()
                     return
                 }
-                localStorage.removeItem('token')
-                amModal.alert('即将跳转登录页。。。', '登录过期')
-                setTimeout(redirectHome, 1500)
             })
         }, 0)
 
