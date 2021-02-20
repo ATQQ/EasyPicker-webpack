@@ -13,7 +13,7 @@ function update(taskid: string, type: number, config: Params): Promise<BaseRespo
         type,
         ...config
     }
-    return ajax.put<any, BaseResponse>('childContent/childContext', data, {
+    return ajax.put<any, BaseResponse>('childContent/childContent', data, {
         baseURL: '/server2'
     })
 }
