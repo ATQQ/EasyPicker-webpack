@@ -584,18 +584,18 @@ $(function () {
      * 下载指定实验报告
      */
     $('#filesTable').on('click', '.download', function () {
-        const cells = filesTable.row($(this).parents('tr')).data()
+        const report: Report = reports.find(v => v.id === (+this.dataset.id)) as Report
         const jsonArray: any = []
-        jsonArray.push({ 'key': 'course', 'value': cells[2] })
-        jsonArray.push({ 'key': 'tasks', 'value': cells[3] })
-        jsonArray.push({ 'key': 'filename', 'value': cells[4] })
+        jsonArray.push({ 'key': 'course', 'value': report?.course })
+        jsonArray.push({ 'key': 'tasks', 'value': report?.tasks })
+        jsonArray.push({ 'key': 'filename', 'value': report?.filename })
         jsonArray.push({ 'key': 'username', 'value': username })
-        fileApi2.checkFileIsExist(username, cells[2], cells[3], cells[4]).then(res => {
+        fileApi2.checkFileIsExist(username, report.course, report.tasks, report.filename).then(res => {
             const { where } = res.data
             if (where === 'server') {
                 downloadFile(baseUrl + 'file/down', jsonArray)
             } else if (where === 'oss') {
-                fileApi2.getFileDownloadUrl(username, cells[2], cells[3], cells[4]).then(res => {
+                fileApi2.getFileDownloadUrl(username, report.course, report.tasks, report.filename).then(res => {
                     const { url } = res.data
                     downLoadByUrl(url)
                 })
@@ -610,19 +610,11 @@ $(function () {
      */
     $('#filesTable').on('click', '.delete', function () {
         if (confirm('确认删除此文件,删除后将无法复原,请谨慎操作?')) {
-            const cells = filesTable.row($(this).parents('tr')).data()
-            const $btn = $(this)
-            reportApi.deleteByid(cells[0]).then(res => {
+            reportApi.deleteByid(+this.dataset.id).then(res => {
                 if (res.code === 200) {
-                    filesTable.row($btn.parents('tr')).remove()
-                    filesTable.draw()
                     amModal.alert('删除成功！')
                     //异步获取最新的repors数据
-                    reportApi.getReports(username).then(res => {
-                        if (res.code === 200) {
-                            reports = res.data.reportList
-                        }
-                    })
+                    $('#refreshData').trigger('click')
                 }
             })
         }
@@ -1334,9 +1326,9 @@ $(function () {
      * @param {String} date
      */
     function addDataToFilesTable(id, name, course, task, filename, date) {
-        const $btns = '<div class="tpl-table-black-operation"><a class="download btn-theme-green am-margin-sm" href = "javascript:;">' +
+        const $btns = `<div class="tpl-table-black-operation"><a data-id="${id}" class="download btn-theme-green am-margin-sm" href = "javascript:;">` +
             '<i class="am-icon-pencil"></i> 下载</a >' +
-            '<a href="javascript:;" class="delete tpl-table-black-operation-del am-margin-sm">' +
+            `<a href="javascript:;" data-id="${id}" class="delete tpl-table-black-operation-del am-margin-sm">` +
             '<i class="am-icon-trash" ></i> 删除</a></div> '
 
         date = new Date(date).Format('yyyy-MM-dd hh:mm:ss')
