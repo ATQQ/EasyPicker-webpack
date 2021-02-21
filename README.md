@@ -66,12 +66,14 @@ npm run dev
 由于历史原因项目经历了2个大的阶段：
 1. 前后端不分离-SSM/jQuery/amazeUI/sass
 2. 前后端分离 -- **`目前`**
-   * 后端不变
+   * 后端：node/TypeScript
    * 前端：webpack/jQuery/amazeUI/TS 
 
 ## 相关仓库
-1. 服务端(Java)：https://github.com/ATQQ/EasyPicker
+1. ~~服务端(Java-已弃用)：https://github.com/ATQQ/EasyPicker~~
+
 2. 客户端(web) ：https://github.com/ATQQ/EasyPicker-webpack
+3. 服务端（Node.js-目前）：https://github.com/ATQQ/easypicker-server
 
 ## 相关资源
 * [使用手册](https://sugar-js.gitbook.io/easypicker-manual/)
