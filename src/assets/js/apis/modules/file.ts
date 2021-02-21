@@ -13,7 +13,8 @@ function checkFileIsExistQiniu(key: string) {
     return ajax.get<any, BaseResponse<{ isExist: boolean }>>('file/qiniu/exist', {
         params: {
             key
-        }
+        },
+        baseURL: '/server2'
     })
 }
 
@@ -27,7 +28,8 @@ function checkFileIsExist(username: string, course: string, tasks: string, filen
             course,
             tasks,
             filename
-        }
+        },
+        baseURL: '/server2'
     })
 }
 
@@ -43,7 +45,8 @@ function checkFileCount(username, course, tasks) {
             username,
             course,
             tasks,
-        }
+        },
+        baseURL: '/server2'
     })
 }
 
@@ -59,7 +62,7 @@ function getFileDownloadUrl(username: string, course: string, tasks: string, fil
             tasks,
             filename
         },
-        baseURL:'/server2'
+        baseURL: '/server2'
     })
 }
 
@@ -68,13 +71,13 @@ function compressOssFile(username, course, tasks) {
         username,
         course,
         tasks
-    })
+    }, { baseURL: '/server2' })
 }
 
 function getcompressFileStatus(url) {
     return ajax.post('file/qiniu/compress/status', {
         url
-    })
+    }, { baseURL: '/server2' })
 }
 
 export default {

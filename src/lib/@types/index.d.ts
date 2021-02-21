@@ -63,7 +63,12 @@ declare namespace WebUploader {
         server: string,
         method: string,
         pick: string,
-        resize: boolean
+        resize: boolean,
+        accept?: {
+            title: string,
+            extensions: string,
+            mimeTypes: string
+        }
     }
 
     type create = (cf: Config) => any

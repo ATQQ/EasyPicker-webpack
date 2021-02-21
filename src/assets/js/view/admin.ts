@@ -235,10 +235,15 @@ $(function () {
         auto: false,
         swf: 'https://img.cdn.sugarat.top/webuploader/0.1.1/Uploader.swf',
         threads: 1,
-        server: baseUrl + 'file/people',
+        server: '/server2/' + 'file/people',
         pick: '#filePicker',
         method: 'POST',
-        resize: false
+        resize: false,
+        accept: {
+            title: '文本文件',
+            extensions: 'txt',
+            mimeTypes: 'text/plain'
+        }
     })
     // 当有文件被添加进队列的时候
     peoplePicker.on('fileQueued', function (file) {
@@ -279,21 +284,23 @@ $(function () {
                 span.textContent = '上传成功'
                 const { code } = response
                 if (code === 200) {
-                    const { failCount } = response.data
+                    const { failCount, successCount, people } = response.data
                     if (failCount > 0) {
-                        amModal.alert(`有${failCount}条数据未导入成功`)
+                        amModal.alert(`有${failCount}条数据已存在，已自动下载已存在的人员名单`)
                         // 自动下载未导入成功数据文件
                         const tempData = peoplePicker.options.formData
                         let filename = file.name
                         filename = filename.substring(0, filename.lastIndexOf('.')) + '_fail.xls'
-                        const jsonArray: any[] = []
-                        jsonArray.push({ 'key': 'course', 'value': tempData.parent })
-                        jsonArray.push({ 'key': 'tasks', 'value': tempData.child + '_peopleFile' })
-                        jsonArray.push({ 'key': 'username', 'value': tempData.username })
-                        jsonArray.push({ 'key': 'filename', 'value': filename })
-                        downloadFile(baseUrl + 'file/down', jsonArray)
+                        tableToEexcell(['名称已存在'], people.map(v => [v]), filename)
+                        // 下：旧逻辑
+                        // const jsonArray: any[] = []
+                        // jsonArray.push({ 'key': 'course', 'value': tempData.parent })
+                        // jsonArray.push({ 'key': 'tasks', 'value': tempData.child + '_peopleFile' })
+                        // jsonArray.push({ 'key': 'username', 'value': tempData.username })
+                        // jsonArray.push({ 'key': 'filename', 'value': filename })
+                        // downloadFile(baseUrl + 'file/down', jsonArray)
                     } else {
-                        amModal.alert('全部导入成功')
+                        amModal.alert(`成功：${successCount}条 --- 失败：${failCount}条`, '导入结果')
                     }
                 } else {
                     span.classList.replace('am-badge-success', 'am-badge-warning')
@@ -577,18 +584,18 @@ $(function () {
      * 下载指定实验报告
      */
     $('#filesTable').on('click', '.download', function () {
-        const cells = filesTable.row($(this).parents('tr')).data()
+        const report: Report = reports.find(v => v.id === (+this.dataset.id)) as Report
         const jsonArray: any = []
-        jsonArray.push({ 'key': 'course', 'value': cells[2] })
-        jsonArray.push({ 'key': 'tasks', 'value': cells[3] })
-        jsonArray.push({ 'key': 'filename', 'value': cells[4] })
+        jsonArray.push({ 'key': 'course', 'value': report?.course })
+        jsonArray.push({ 'key': 'tasks', 'value': report?.tasks })
+        jsonArray.push({ 'key': 'filename', 'value': report?.filename })
         jsonArray.push({ 'key': 'username', 'value': username })
-        fileApi2.checkFileIsExist(username, cells[2], cells[3], cells[4]).then(res => {
+        fileApi2.checkFileIsExist(username, report.course, report.tasks, report.filename).then(res => {
             const { where } = res.data
             if (where === 'server') {
                 downloadFile(baseUrl + 'file/down', jsonArray)
             } else if (where === 'oss') {
-                fileApi2.getFileDownloadUrl(username, cells[2], cells[3], cells[4]).then(res => {
+                fileApi2.getFileDownloadUrl(username, report.course, report.tasks, report.filename).then(res => {
                     const { url } = res.data
                     downLoadByUrl(url)
                 })
@@ -603,19 +610,11 @@ $(function () {
      */
     $('#filesTable').on('click', '.delete', function () {
         if (confirm('确认删除此文件,删除后将无法复原,请谨慎操作?')) {
-            const cells = filesTable.row($(this).parents('tr')).data()
-            const $btn = $(this)
-            reportApi.deleteByid(cells[0]).then(res => {
+            reportApi.deleteByid(+this.dataset.id).then(res => {
                 if (res.code === 200) {
-                    filesTable.row($btn.parents('tr')).remove()
-                    filesTable.draw()
                     amModal.alert('删除成功！')
                     //异步获取最新的repors数据
-                    reportApi.getReports(username).then(res => {
-                        if (res.code === 200) {
-                            reports = res.data.reportList
-                        }
-                    })
+                    $('#refreshData').trigger('click')
                 }
             })
         }
@@ -1233,8 +1232,8 @@ $(function () {
     function insertToPanel(panelid, value, id, type) {
         let $li = ''
         switch (type) {
-        case 'task':
-            $li =
+            case 'task':
+                $li =
                     '<li class="am-margin-top-sm"text="' + value + '"value="' + id + '">' +
                     '<div class="am-btn-group am-btn-group-sm">' +
                     '<button  type="button"  class="checkChildren am-btn am-btn-secondary am-round">' + value + '</button>' +
@@ -1242,18 +1241,18 @@ $(function () {
                     '<button  type="button"  class="am-hide settings am-btn am-btn-secondary am-round am-icon-server"></button>' +
                     '<button type = "button" class="am-hide delete am-btn am-btn-secondary am-round am-icon-trash" ></button > ' +
                     '<button title="展开" type="button"  class="show-hide am-btn am-btn-secondary am-round am-icon-arrow-right"></button></div > </li >'
-            break
-        case 'course':
-            $li =
+                break
+            case 'course':
+                $li =
                     '<li class="am-margin-top-sm"text="' + value + '"value="' + id + '">' +
                     '<div class="am-btn-group am-btn-group-sm">' +
                     '<button title="查看子类任务" type="button"  class="checkChildren am-btn am-btn-success am-round">' + value + '</button>' +
                     '<button title="生成父类文件收取链接" type="button"  class="am-hide share am-btn am-btn-success am-round am-icon-share-alt"></button>' +
                     '<button title="删除" type = "button" class="am-hide delete am-btn am-btn-success am-round am-icon-trash" ></button > ' +
                     '<button title="展开" type="button"  class="show-hide am-btn am-btn-success am-round am-icon-arrow-right"></button></div > </li >'
-            break
-        default:
-            break
+                break
+            default:
+                break
         }
         $(panelid).append($li)
     }
@@ -1312,9 +1311,6 @@ $(function () {
                     refreshPageInfo()
                     return
                 }
-                localStorage.removeItem('token')
-                amModal.alert('即将跳转登录页。。。', '登录过期')
-                setTimeout(redirectHome, 1500)
             })
         }, 0)
 
@@ -1330,9 +1326,9 @@ $(function () {
      * @param {String} date
      */
     function addDataToFilesTable(id, name, course, task, filename, date) {
-        const $btns = '<div class="tpl-table-black-operation"><a class="download btn-theme-green am-margin-sm" href = "javascript:;">' +
+        const $btns = `<div class="tpl-table-black-operation"><a data-id="${id}" class="download btn-theme-green am-margin-sm" href = "javascript:;">` +
             '<i class="am-icon-pencil"></i> 下载</a >' +
-            '<a href="javascript:;" class="delete tpl-table-black-operation-del am-margin-sm">' +
+            `<a href="javascript:;" data-id="${id}" class="delete tpl-table-black-operation-del am-margin-sm">` +
             '<i class="am-icon-trash" ></i> 删除</a></div> '
 
         date = new Date(date).Format('yyyy-MM-dd hh:mm:ss')

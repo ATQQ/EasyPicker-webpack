@@ -11,8 +11,11 @@ module.exports = {
         hotOnly: false, //只有热更新不会刷新页面
         proxy: { //反向代理
             '/server2': {
-                target: 'https://ep.dev.sugarat.top/',
+                target: 'https://ep.dev.sugarat.top/' && 'http://localhost:3000/',
                 changeOrigin: true,
+                pathRewrite: {
+                    '^/server2': '' //规定请求地址以什么作为开头
+                }
             },
             '/EasyPicker': {
                 target: 'https://ep.dev.sugarat.top/' || 'http://localhost:8080/EasyPicker',

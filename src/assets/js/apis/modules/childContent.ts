@@ -13,7 +13,9 @@ function update(taskid: string, type: number, config: Params): Promise<BaseRespo
         type,
         ...config
     }
-    return ajax.put<any, BaseResponse>('childContent/childContext', data)
+    return ajax.put<any, BaseResponse>('childContent/childContent', data, {
+        baseURL: '/server2'
+    })
 }
 
 interface TaskInfo {
@@ -22,11 +24,12 @@ interface TaskInfo {
     template: string
 }
 
-function getInitData(taskid: string) :Promise<BaseResponse<TaskInfo>>{
+function getInitData(taskid: string): Promise<BaseResponse<TaskInfo>> {
     return ajax.get<any, BaseResponse<TaskInfo>>('childContent/childContent', {
         params: {
             taskid
-        }
+        },
+        baseURL: '/server2'
     })
 }
 

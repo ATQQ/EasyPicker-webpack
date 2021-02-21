@@ -10,7 +10,8 @@ function getCourseList(range: string, contentid: number, username: string): Prom
             range,
             contentid,
             username
-        }
+        },
+        baseURL: '/server2'
     })
 }
 
@@ -23,6 +24,8 @@ function addCourse(name: string, type: number, parent: string, username: string)
         type,
         parent,
         username
+    }, {
+        baseURL: '/server2'
     })
 }
 
@@ -41,7 +44,8 @@ function getCourseNode(username: string): Promise<BaseResponse<CourseList>> {
     return ajax.get<any, BaseResponse<CourseList>>('course/node', {
         params: {
             username
-        }
+        },
+        baseURL:'/server2'
     })
 }
 
@@ -55,7 +59,8 @@ function getNodeList(type: number, username: string, parent: string, child?: str
         data['child'] = child
     }
     return ajax.get<any, BaseResponse>('course/course', {
-        params: data
+        params: data,
+        baseURL:'/server2'
     })
 }
 
@@ -64,7 +69,8 @@ function deleteCourse(id: number, type: number) {
         params: {
             id,
             type
-        }
+        },
+        baseURL: '/server2'
     })
 }
 export default {
