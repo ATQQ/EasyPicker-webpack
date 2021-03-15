@@ -550,7 +550,35 @@ $(function () {
         const val = $(this).parent().prev().val() as string
         peopleListTable.search(val || ' ').draw()
     })
-
+    $('#export-people').on('click', function (e) {
+        const { type } = e.target.dataset
+        let people: PeopleData[] = JSON.parse(sessionStorage.getItem('people') as unknown as string)
+        const headers = ['序号', '姓名', '状态', '最后提交时间']
+        const transferBodyData = (body: PeopleData[]) => {
+            return body.map((v, idx) => {
+                const { name, status, date } = v
+                return [idx + 1, name, status === 1 ? '已提交' : '未提交', date ? new Date(date).Format('yyyy-MM-dd hh:mm:ss') : '']
+            })
+        }
+        if (people.length === 0) {
+            amModal.alert('没有可导出数据')
+            return
+        }
+        const child = $('#taskActive').html() as string
+        switch (type) {
+            case 'all':
+                tableToEexcell(headers, transferBodyData(people), `全部-${child}.xls`)
+                break
+            case 'no':
+                people = people.filter(v => v.status === 0)
+                tableToEexcell(headers, transferBodyData(people), `未提交-${child}.xls`)
+                break
+            case 'yes':
+                people = people.filter(v => v.status === 1)
+                tableToEexcell(headers, transferBodyData(people), `已提交-${child}.xls`)
+                break
+        }
+    })
     /**
      * 状态过滤器发生改变
      */
@@ -740,6 +768,7 @@ $(function () {
         peopleApi.getList(parent, child, username).then(res => {
             if (res.code === 200) {
                 const { data } = res
+                sessionStorage.setItem('people', JSON.stringify(data))
                 //清空原有数据
                 peopleListTable.rows().remove().draw()
                 //记录未提交人数

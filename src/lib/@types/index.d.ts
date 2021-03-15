@@ -1,5 +1,12 @@
 type dateFormat = (fmt: string) => string
 
+interface PeopleData {
+    id: number,
+    name: string,
+    status: number,
+    date: number
+}
+
 interface Date {
     Format: dateFormat
 }

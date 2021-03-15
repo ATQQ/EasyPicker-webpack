@@ -1,11 +1,5 @@
 import ajax from '../ajax'
 
-interface PeopleData {
-    id: number,
-    name: string,
-    status: number,
-    date: number
-}
 
 function getList(parent: string, child: string, username: string) {
     return ajax.get<any, BaseResponse<PeopleData[]>>('people/peopleList', {
@@ -41,5 +35,5 @@ function deletePeople(id: number) {
 export default {
     getList,
     checkIsLimited,
-    deletePeople
+    deletePeople,
 }
