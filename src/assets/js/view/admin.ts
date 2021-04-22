@@ -113,16 +113,18 @@ $(function () {
             //绑定设置时间按钮事件
             $('#sure-Date').unbind('click')
             $('#sure-Date').on('click', function () {
-                if (nowClickId) {
-                    childContentApi.update(nowClickId, 1, {
-                        ddl: newDate
-                    }).then(({ code }) => {
-                        if (code === 200) {
-                            amModal.alert(`截止日期已设置为:${new Date(newDate).Format('yyyy-MM-dd hh:mm:ss')}`)
-                            jqUtils.unFreezeBtn($('#cancel-Date'))
-                        }
-                    })
-                }
+                amModal.alert('旧版不再提供新增/删除服务,请前往新版继续使用')
+                return
+                // if (nowClickId) {
+                //     childContentApi.update(nowClickId, 1, {
+                //         ddl: newDate
+                //     }).then(({ code }) => {
+                //         if (code === 200) {
+                //             amModal.alert(`截止日期已设置为:${new Date(newDate).Format('yyyy-MM-dd hh:mm:ss')}`)
+                //             jqUtils.unFreezeBtn($('#cancel-Date'))
+                //         }
+                //     })
+                // }
             })
         }
     })
@@ -169,6 +171,8 @@ $(function () {
 
     // 开始上传
     $('#sure-Template').on('click', function () {
+        amModal.alert('旧版不再提供新增/删除服务,请前往新版继续使用')
+        return
         const { file, status, id } = templateFile
         const fileItem = $(`#${id}`)
         const process = fileItem.find('.progress')[0]
@@ -323,6 +327,8 @@ $(function () {
 
     // 开始上传
     $('#uploadPeople').on('click', function () {
+        amModal.alert('旧版不再提供新增/删除服务,请前往新版继续使用')
+        return
         const { formData } = peoplePicker.options
         formData.parent = document.getElementById('courseActive')?.textContent
         formData.child = document.getElementById('taskActive')?.textContent
@@ -637,6 +643,8 @@ $(function () {
      * 删除指定实验报告
      */
     $('#filesTable').on('click', '.delete', function () {
+        amModal.alert('旧版不再提供新增/删除服务,请前往新版继续使用')
+        return
         if (confirm('确认删除此文件,删除后将无法复原,请谨慎操作?')) {
             reportApi.deleteByid(+this.dataset.id).then(res => {
                 if (res.code === 200) {
@@ -674,6 +682,8 @@ $(function () {
      * 移除当前设置的模板
      */
     $('#cancel-Template').on('click', function (e) {
+        amModal.alert('旧版不再提供新增/删除服务,请前往新版继续使用')
+        return
         if (confirm('确定移除当前设置的文件模板吗?')) {
             childContentApi.update(nowClickId as string, 3, {
                 template: null
@@ -693,6 +703,8 @@ $(function () {
      * 关闭截止日期设定
      */
     $('#cancel-Date').on('click', function (e) {
+        amModal.alert('旧版不再提供新增/删除服务,请前往新版继续使用')
+        return
         if (confirm('确定关闭截止日期吗?')) {
             childContentApi.update(nowClickId as string, 1, {
                 ddl: null
@@ -719,6 +731,8 @@ $(function () {
      *  关闭人员限制
      */
     $('#closePeople').on('click', function () {
+        amModal.alert('旧版不再提供新增/删除服务,请前往新版继续使用')
+        return
         const $btn = $(this)
         childContentApi.update(nowClickId as string, 2, {
             people: null
@@ -813,6 +827,8 @@ $(function () {
      * 移除指定人员
      */
     $('#peopleListTable').on('click', '.delete', function (e) {
+        amModal.alert('旧版不再提供新增/删除服务,请前往新版继续使用')
+        return
         if (!confirm('确认删除?')) {
             return
         }
@@ -914,6 +930,8 @@ $(function () {
      * 删除课程
      */
     $('#coursePanel').on('click', '.delete', function (event) {
+        amModal.alert('旧版不再提供新增/删除服务,请前往新版继续使用')
+        return
         const parentElement = this.parentElement.parentElement
         const id = parentElement.value
         if (confirm('确认删除此课程吗,删除课程将会移除课程相关的子任务?')) {
@@ -943,6 +961,8 @@ $(function () {
      * 删除任务
      */
     $('#taskPanel').on('click', '.delete', function (event) {
+        amModal.alert('旧版不再提供新增/删除服务,请前往新版继续使用')
+        return
         const parentElement = this.parentElement.parentElement
         const id = parentElement.value
         if (confirm('确认删除此任务吗?')) {
@@ -1010,6 +1030,8 @@ $(function () {
         //增加任务
         $('#addTask').unbind('click')
         $('#addTask').on('click', function (e) {
+            amModal.alert('旧版不再提供新增/删除/修改服务,请前往新版继续使用')
+            return
             const $input = e.currentTarget.parentElement?.previousElementSibling as HTMLInputElement
             let value = $input?.value.trim()
             value = stringEncode(value)
@@ -1038,6 +1060,8 @@ $(function () {
      * 添加课程
      */
     $('#addCourse').on('click', function () {
+        amModal.alert('旧版不再提供新增/删除服务,请前往新版继续使用')
+        return
         const $input = this.parentElement?.previousElementSibling as HTMLInputElement
         let value = $input?.value?.trim()
         if (!value) {

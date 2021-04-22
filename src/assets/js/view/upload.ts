@@ -140,6 +140,8 @@ window.onload = function () {
     })
     // 开始上传
     $('#uploadBtn').on('click', function () {
+        amModal.alert('旧版不再提供新增/删除服务,请前往新版继续使用')
+        return
         ucourse = $('option[value="' + $('#course').val() + '"]').html()
         utask = $('option[value="' + $('#task').val() + '"]').html()
         uname = $('#name').val() as string
@@ -242,6 +244,8 @@ window.onload = function () {
                         $('#attributePanel').children('div[target="template"]').show()
                         $('#downlloadTemplate').unbind('click')
                         $('#downlloadTemplate').on('click', function () {
+                            amModal.alert('旧版不再提供模板下载服务,请前往新版继续使用')
+                            return
                             const parent = $('#course').next().children().eq(0).find('.am-selected-status').html()
                             const child = $('#task').next().children().eq(0).find('.am-selected-status').html() + '_Template'
                             const jsonArray: any[] = []

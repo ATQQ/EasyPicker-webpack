@@ -5,7 +5,9 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title><%= htmlWebpackPlugin.options.title %></title>
+    <title>
+        <%= htmlWebpackPlugin.options.title %>
+    </title>
     <meta name="apple-mobile-web-app-title" content="<%= htmlWebpackPlugin.options.title %>" />
     <meta http-equiv="Cache-Control" content="no-siteapp" />
     <script defer src="https://img.cdn.sugarat.top/jquery/2.1.4/jquery.min.js"></script>
@@ -19,6 +21,40 @@
 
 <body class="bgc"
     style="background: linear-gradient(to bottom, rgba(128, 222, 234, 0.6313725490196078) 0% ,#ffffff 100%);">
+    <style>
+        .notice-bar {
+            text-align: center;
+            top: 20px;
+            z-index: 100;
+            margin: 0 auto;
+            position: fixed;
+            display: -webkit-box;
+            display: -webkit-flex;
+            display: flex;
+            flex-direction: column;
+            -webkit-box-align: center;
+            -webkit-align-items: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        .notice-bar .content {
+            padding: 16px;
+            color: #ed6a0c;
+            font-size: 14px;
+            background-color: #fffbe8;
+            margin: 0 auto;
+        }
+    </style>
+    <!-- 通告 -->
+    <div class="notice-bar">
+        <div class="content">
+            新版EasyPicker已经上线,欢迎登录新版使用-> <a href="https://ep2.sugarat.top">戳我访问</a>,旧版不再提供新增服务
+        </div>
+        <div class="content">
+            提醒管理员前往新版创建收集链接
+        </div>
+    </div>
     <div class="fw-w100 fw-flex fw-fdc theme">
 
         <h1 class="am-margin-sm fw-text-c">EasyPicker</h1>
@@ -99,7 +135,8 @@
             flex-wrap: wrap;
             justify-content: center;
         }
-        #cnzz{
+
+        #cnzz {
             visibility: hidden;
         }
     </style>

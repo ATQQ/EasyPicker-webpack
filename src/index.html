@@ -5,7 +5,9 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title><%= htmlWebpackPlugin.options.title %></title>
+    <title>
+        <%= htmlWebpackPlugin.options.title %>
+    </title>
     <meta name="apple-mobile-web-app-title" content="<%= htmlWebpackPlugin.options.title %>" />
     <meta http-equiv="Cache-Control" content="no-siteapp" />
     <!-- jquery -->
@@ -19,11 +21,42 @@
 <body class="bgc"
     style="background: linear-gradient(to bottom, rgba(128, 222, 234, 0.6313725490196078) 0% ,#ffffff 100%);">
     <div class="fw-w100 fw-flex fw-fdc theme">
+        <style>
+            .notice-bar {
+                text-align: center;
+                top: 20px;
+                z-index: 100;
+                margin: 0 auto;
+                position: fixed;
+                display: -webkit-box;
+                display: -webkit-flex;
+                display: flex;
+                -webkit-box-align: center;
+                -webkit-align-items: center;
+                align-items: center;
+                width: 100%;
+            }
+
+            .notice-bar .content {
+                padding: 16px;
+                color: #ed6a0c;
+                font-size: 14px;
+                background-color: #fffbe8;
+                margin: 0 auto;
+            }
+        </style>
+        <!-- 通告 -->
+        <div class="notice-bar">
+            <div class="content">
+                新版EasyPicker已经上线,欢迎登录新版使用-> <a href="https://ep2.sugarat.top">戳我访问</a>,老用户可直接前往使用新版,无需重新注册,旧版将在不久后下线
+            </div>
+        </div>
         <div class="am-g">
             <div class="fw-flex fw-c-c">
                 <div class="am-u-lg-3 am-u-md-5 am-center am-u-sm-12 ">
                     <!-- 登录面板 -->
-                    <div panel="login" id="loginPanel" class="animated  homePanel am-padding-lg am-margin-top-lg">
+                    <div panel="login" id="loginPanel" class="animated  homePanel am-padding-lg am-margin-top-lg"
+                        style="margin-top: 6rem;">
                         <h2 class="fw-text-c">用户登录</h2>
                         <section class="fw-flex fw-fdc">
                             <div class="am-input-group am-input-group-secondary am-margin-top-lg">
@@ -41,10 +74,12 @@
                                     </label>
                                 </div>
                                 <button class="am-btn am-btn-success w80" id="login">登录</button>
-                                <button targetPanel="register"
-                                    class="changePanel am-margin-top-sm am-btn w80 am-btn-primary">新用户注册</button>
-                                <p align="center" class="am-margin-sm"><a targetPanel="forget" class="changePanel"
-                                        href="javascript:void(0)">忘记密码?</a></p>
+                                <button targetPanel="register" class="am-margin-top-sm am-btn w80 am-btn-primary">
+                                    <a style="color: #ffffff;" href="https://ep2.sugarat.top/reset">新用户注册</a>
+                                </button>
+                                <p align="center" class="am-margin-sm">
+                                    <a targetPanel="forget" href="https://ep2.sugarat.top/reset">忘记密码?</a>
+                                </p>
 
                             </div>
                         </section>
