@@ -11,6 +11,11 @@
 	</a>
 </p>
 
+**本仓库为EasyPicker1.0的客户端源码仓库，不再维护！！！**
+
+**本仓库为EasyPicker1.0的客户端源码仓库，不再维护！！！**
+
+马上去体验最新版：[Easypicker2 介绍](https://docs.ep.sugarat.top/)
 
 ## 项目简介
 **[轻取](https://ep.sugarat.top)**,为方便在线文件收取而生。
